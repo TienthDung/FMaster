@@ -52,18 +52,50 @@ class QuizApp {
             this.navigateTo('practice-view');
         });
 
-        document.getElementById('btn-prev').addEventListener('click', () => {
+        const goPrev = () => {
             if (this.state.currentIndex > 0) {
                 this.state.currentIndex--;
                 this.ui.renderQuestion(this.state.currentIndex);
             }
-        });
-        document.getElementById('btn-next').addEventListener('click', () => {
+        };
+
+        const goNext = () => {
             if (this.state.currentIndex < this.state.questions.length - 1) {
                 this.state.currentIndex++;
                 this.ui.renderQuestion(this.state.currentIndex);
             }
-        });
+        };
+
+        let swipeStartX = null;
+        let swipeStartY = null;
+
+        const practiceView = document.getElementById('practice-view');
+        
+        practiceView.addEventListener('touchstart', (e) => {
+            swipeStartX = e.touches[0].clientX;
+            swipeStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        practiceView.addEventListener('touchend', (e) => {
+            if (!swipeStartX || !swipeStartY) return;
+
+            let swipeEndX = e.changedTouches[0].clientX;
+            let swipeEndY = e.changedTouches[0].clientY;
+
+            let diffX = swipeStartX - swipeEndX;
+            let diffY = swipeStartY - swipeEndY;
+
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                if (diffX > 0) {
+                    goNext();
+                } else {
+                    goPrev();
+                }
+            }
+
+            swipeStartX = null;
+            swipeStartY = null;
+        }, { passive: true });
         document.getElementById('btn-practice-back').addEventListener('click', () => {
             this.navigateTo('dashboard-view');
         });
