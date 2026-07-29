@@ -4,6 +4,19 @@ export class UI {
         this.app = app;
     }
 
+    checkIsCorrect(q, answer) {
+        if (!q || !answer) return false;
+        const correctArr = Array.isArray(q.correctanswer) ? q.correctanswer : [q.correctanswer];
+        const answerArr = Array.isArray(answer) ? answer : [answer];
+
+        if (q.type === 'multiple_choice') {
+            if (answerArr.length !== correctArr.length) return false;
+            return answerArr.every(a => correctArr.includes(a));
+        } else {
+            return correctArr.includes(answerArr[0]);
+        }
+    }
+
     renderSubjects(subjects) {
         const grid = document.getElementById('subject-grid');
         grid.innerHTML = '';
@@ -32,8 +45,7 @@ export class UI {
         for (const [id, answer] of Object.entries(answers)) {
             const q = this.state.questions.find(q => q.id === id);
             if (q) {
-                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(answer) : q.correctanswer === answer;
-                if (isCorrect) correct++;
+                if (this.checkIsCorrect(q, answer)) correct++;
                 else wrong++;
             }
         }
@@ -109,20 +121,44 @@ export class UI {
             btn.innerHTML = `<div class="option-letter">${letter}</div> <span class="flex-1">${opt}</span>`;
             
             if (userAnswer) {
-                const isOptionCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(opt) : opt === q.correctanswer;
+                const answerArr = Array.isArray(userAnswer) ? userAnswer : [userAnswer];
+                const correctArr = Array.isArray(q.correctanswer) ? q.correctanswer : [q.correctanswer];
+                
+                const isSelected = answerArr.includes(opt);
+                const isOptionCorrect = correctArr.includes(opt);
+                
                 if (isOptionCorrect) {
                     btn.classList.add('correct');
-                } else if (opt === userAnswer) {
+                } else if (isSelected) {
                     btn.classList.add('wrong');
                 }
                 btn.disabled = true;
             } else {
                 btn.addEventListener('click', () => {
-                    this.app.submitAnswer(q.id, opt);
+                    if (q.type === 'multiple_choice') {
+                        btn.classList.toggle('selected');
+                    } else {
+                        this.app.submitAnswer(q.id, opt);
+                    }
                 });
             }
             container.appendChild(btn);
         });
+
+        if (!userAnswer && q.type === 'multiple_choice') {
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'btn btn-primary mt-4';
+            submitBtn.style.width = '100%';
+            submitBtn.textContent = 'Submit Answer';
+            submitBtn.addEventListener('click', () => {
+                const selectedBtns = container.querySelectorAll('.option-btn.selected span.flex-1');
+                const selected = Array.from(selectedBtns).map(el => el.textContent);
+                if (selected.length > 0) {
+                    this.app.submitAnswer(q.id, selected);
+                }
+            });
+            container.appendChild(submitBtn);
+        }
 
         const prevBtn = document.getElementById('btn-prev');
         const nextBtn = document.getElementById('btn-next');
@@ -160,8 +196,7 @@ export class UI {
             
             const ans = answers[q.id];
             if (ans) {
-                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(ans) : q.correctanswer === ans;
-                if (isCorrect) {
+                if (this.checkIsCorrect(q, ans)) {
                     btn.classList.add('correct');
                     iconClass = 'fas fa-check';
                     correctCount++;
@@ -205,8 +240,7 @@ export class UI {
         for (const [id, answer] of Object.entries(answers)) {
             const q = this.state.questions.find(q => q.id === id);
             if (q) {
-                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(answer) : q.correctanswer === answer;
-                if (isCorrect) correct++;
+                if (this.checkIsCorrect(q, answer)) correct++;
                 else wrong++;
             }
         }
