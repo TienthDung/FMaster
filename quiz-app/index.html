@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Study/Quiz SPA</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Dashboard View (Home) -->
+        <section id="dashboard-view" class="view hidden">
+            <header class="app-header">
+                <h1>Dashboard</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <button class="icon-btn theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+            
+            <div class="content scrollable pb-bar">
+                <div class="card progress-card">
+                    <div class="progress-header">
+                        <span class="label">REVIEWED</span>
+                        <span class="numbers-cyan"><span id="reviewed-count">0</span>/299</span>
+                    </div>
+                    <div class="progress-bar-container mt-2 mb-4">
+                        <div class="progress-bar-fill" id="reviewed-progress" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="progress-header">
+                        <span class="label text-gray">Correct Rate</span>
+                        <span class="numbers-cyan text-xl" id="correct-rate">0%</span>
+                    </div>
+                    
+                    <div class="stats-grid mt-4">
+                        <div class="stat-item">
+                            <h3 class="stat-num text-cyan" id="stat-correct">0</h3>
+                            <span class="stat-label">Correct</span>
+                        </div>
+                        <div class="stat-item">
+                            <h3 class="stat-num text-red" id="stat-wrong">0</h3>
+                            <span class="stat-label">Wrong</span>
+                        </div>
+                        <div class="stat-item">
+                            <h3 class="stat-num text-gray" id="stat-skipped">0</h3>
+                            <span class="stat-label">Skipped</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header mt-6">STUDY MODE</div>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="btn-practice-mode">Practice Mode</button>
+                    <button class="mode-btn" id="btn-exam-mode">Exam Mode</button>
+                </div>
+
+                <div class="action-cards mt-4">
+                    <button class="action-card" id="btn-continue">
+                        <div class="action-icon bg-blue-subtle text-blue">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="action-text">
+                            <h3>Continue Last Question</h3>
+                            <p>Question #3 &mdash; Essay</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray"></i>
+                    </button>
+                    
+                    <button class="action-card mt-3" id="btn-new-session">
+                        <div class="action-icon bg-blue-subtle text-blue">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="action-text">
+                            <h3>Start New Session</h3>
+                            <p>Begin from question #1</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray"></i>
+                    </button>
+                </div>
+
+                <div class="section-header flex-between mt-6">
+                    <span>RECENT QUESTIONS</span>
+                    <a href="#" class="text-blue text-sm" style="text-decoration:none;">View All</a>
+                </div>
+                <div class="recent-list" id="recent-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice View -->
+        <section id="practice-view" class="view hidden">
+            <header class="app-header">
+                <div class="flex-align">
+                    <button class="icon-btn mr-2" id="btn-practice-back"><i class="fas fa-arrow-left"></i></button>
+                    <h1 id="question-counter" class="text-md">Q#1 · 1/30</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="far fa-star"></i></button>
+                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+            </header>
+            <div class="top-progress">
+                <div class="top-progress-fill" id="practice-progress" style="width: 5%"></div>
+            </div>
+
+            <div class="content scrollable pb-bar">
+                <div class="tag-pills mt-2 mb-4" id="practice-tags">
+                    <span class="tag-pill" id="q-type-badge">MCQ</span>
+                    <span class="tag-pill">Strategy</span>
+                </div>
+                
+                <div class="question-card" id="question-text">
+                    Question text goes here...
+                </div>
+                
+                <div class="options-container mt-4" id="options-container">
+                    <!-- Options populated by JS -->
+                </div>
+            </div>
+
+            <div class="bottom-action-bar">
+                <button class="btn btn-ghost text-gray" id="btn-prev"><i class="fas fa-arrow-left mr-2"></i> Previous</button>
+                <button class="btn btn-primary" id="btn-next">Next <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+        </section>
+
+        <!-- Bank View -->
+        <section id="bank-view" class="view hidden">
+            <header class="app-header">
+                <h1>Question Bank</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-plus"></i></button>
+                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+            </header>
+            
+            <div class="content scrollable pb-bar">
+                <div class="filter-pills mt-2" id="bank-filters">
+                    <button class="pill active" data-filter="all">All <span id="count-all">30</span></button>
+                    <button class="pill" data-filter="tf">T/F <span id="count-tf">10</span></button>
+                    <button class="pill" data-filter="mcq">Choice <span id="count-mcq">10</span></button>
+                    <button class="pill" data-filter="essay">Essay <span id="count-essay">10</span></button>
+                </div>
+
+                <div class="search-bar mt-4">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="bank-search" placeholder="Search questions...">
+                </div>
+
+                <div class="bank-legend mt-4">
+                    <span class="legend-badge"><i class="fas fa-check text-green mr-1"></i> Correct <span id="legend-correct" class="ml-1">12</span></span>
+                    <span class="legend-badge"><i class="fas fa-times text-red mr-1"></i> Incorrect <span id="legend-wrong" class="ml-1">6</span></span>
+                    <span class="legend-badge"><i class="fas fa-ban text-gray mr-1"></i> Unanswered <span id="legend-skipped" class="ml-1">7</span></span>
+                </div>
+
+                <div class="bank-grid mt-4" id="bank-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats View -->
+        <section id="stats-view" class="view hidden">
+            <header class="app-header">
+                <h1>Statistics</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+            </header>
+
+            <div class="content scrollable pb-bar">
+                <div class="card chart-card text-center mb-4 mt-2">
+                    <div class="donut-chart mx-auto" id="donut-chart">
+                        <div class="donut-inner">
+                            <h2 id="accuracy-display" class="text-white">67%</h2>
+                            <span class="text-gray text-xs">Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container mt-6 mb-2">
+                        <div class="progress-bar-fill bg-cyan" id="stats-overall-progress" style="width: 40%"></div>
+                    </div>
+                    <p class="text-gray text-sm" id="stats-answered-text">12/30 questions answered</p>
+                </div>
+
+                <div class="stats-summary-list mb-6">
+                    <div class="stat-row-card">
+                        <div class="stat-icon-circle bg-green-subtle text-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-white font-semibold">Correct</span>
+                                <span class="text-green font-bold"><span id="stats-correct-val">12</span> <span class="text-gray font-normal text-sm ml-2" id="stats-correct-perc">40%</span></span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-green" id="bar-correct" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-row-card mt-3">
+                        <div class="stat-icon-circle bg-red-subtle text-red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-white font-semibold">Incorrect</span>
+                                <span class="text-red font-bold"><span id="stats-incorrect-val">6</span> <span class="text-gray font-normal text-sm ml-2" id="stats-incorrect-perc">20%</span></span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-red" id="bar-incorrect" style="width: 20%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row-card mt-3">
+                        <div class="stat-icon-circle bg-gray-subtle text-gray">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-white font-semibold">Unanswered</span>
+                                <span class="text-white font-bold"><span id="stats-unanswered-val">7</span> <span class="text-gray font-normal text-sm ml-2" id="stats-unanswered-perc">23%</span></span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-cyan" id="bar-unanswered" style="width: 23%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header mb-4">CATEGORY BREAKDOWN</div>
+                <div class="category-list" id="breakdown-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="settings-view" class="view hidden">
+            <header class="app-header">
+                <h1>Settings</h1>
+            </header>
+            <div class="content scrollable pb-bar">
+                <div class="card p-4 text-center mt-4">Settings screen content here...</div>
+            </div>
+        </section>
+        
+        <!-- Subject Select View -->
+        <section id="subject-select-view" class="view active">
+            <header class="app-header">
+                <h1>Select Subject</h1>
+            </header>
+            <div class="content scrollable">
+                <div class="subject-grid mt-4" id="subject-grid"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav hidden" id="bottom-nav">
+            <div class="nav-indicator" id="nav-indicator"></div>
+            <button class="nav-item active" data-target="dashboard-view" data-index="0">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-target="practice-view" data-index="1">
+                <i class="fas fa-book-open"></i>
+                <span>Practice</span>
+            </button>
+            <button class="nav-item" data-target="bank-view" data-index="2">
+                <i class="fas fa-search"></i>
+                <span>Bank</span>
+            </button>
+            <button class="nav-item" data-target="stats-view" data-index="3">
+                <i class="fas fa-chart-bar"></i>
+                <span>Stats</span>
+            </button>
+            <button class="nav-item" data-target="settings-view" data-index="4">
+                <i class="fas fa-cog"></i>
+                <span>Menu</span>
+            </button>
+        </nav>
+    </div>
+    
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

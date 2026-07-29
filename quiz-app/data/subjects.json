@@ -1,0 +1,16 @@
+[
+    {
+        "id": "ai",
+        "name": "AI Basics",
+        "file": "ai.csv",
+        "icon": "fas fa-robot",
+        "description": "Learn the fundamentals of Artificial Intelligence."
+    },
+    {
+        "id": "js",
+        "name": "JavaScript Mastery",
+        "file": "ai.csv",
+        "icon": "fab fa-js",
+        "description": "Master JavaScript concepts."
+    }
+]
