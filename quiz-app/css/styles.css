@@ -274,8 +274,14 @@ body { background-color: #000; color: var(--text-main); display: flex; justify-c
     padding: 6px; z-index: 50;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
 }
 .bottom-nav.hidden { display: none; }
+.bottom-nav.nav-hidden {
+    transform: translate(-50%, 150px);
+    opacity: 0;
+    pointer-events: none;
+}
 
 .nav-indicator {
     position: absolute;
