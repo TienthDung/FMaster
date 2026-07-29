@@ -42,12 +42,21 @@ export class UI {
         const skipped = total - answeredCount;
 
         document.getElementById('reviewed-count').textContent = answeredCount;
+        document.getElementById('reviewed-total').textContent = total;
         document.getElementById('reviewed-progress').style.width = total > 0 ? `${(answeredCount/total)*100}%` : '0%';
         document.getElementById('correct-rate').textContent = `${accuracy}%`;
         
         document.getElementById('stat-correct').textContent = correct;
         document.getElementById('stat-wrong').textContent = wrong;
         document.getElementById('stat-skipped').textContent = skipped;
+        
+        const currentIndex = this.state.currentIndex;
+        if (total > 0 && currentIndex < total) {
+            const currentQ = this.state.questions[currentIndex];
+            document.getElementById('continue-desc').textContent = `Question #${currentIndex + 1} — ${currentQ.type.toUpperCase()}`;
+        } else {
+            document.getElementById('continue-desc').textContent = `Completed or empty`;
+        }
         
         this.updateRecentQuestions();
     }
