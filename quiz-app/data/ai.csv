@@ -1,6 +1,0 @@
-ưaid,type,question,options,correctAnswer
-q1,MCQ,What does AI stand for?,Artificial Intelligence | Automated Integration | Articulated Intelligence | None of the above,Artificial Intelligence
-q2,T/F,Machine Learning is a subset of AI.,True | False,True
-q3,MCQ,Which language is widely used for AI?,Python | HTML | CSS | Markdown,Python
-q4,MCQ,What is a Neural Network designed to mimic?,The human brain | A computer CPU | A database | An internet router,The human brain
-q5,T/F,AI can only perform tasks it is explicitly programmed for.,True | False,False

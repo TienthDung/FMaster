@@ -67,6 +67,11 @@ class QuizApp {
         document.getElementById('btn-practice-back').addEventListener('click', () => {
             this.navigateTo('dashboard-view');
         });
+
+        document.getElementById('btn-back-subjects').addEventListener('click', () => {
+            document.getElementById('bottom-nav').classList.add('hidden');
+            this.navigateTo('subject-select-view');
+        });
     }
 
     setupSmartNav() {
