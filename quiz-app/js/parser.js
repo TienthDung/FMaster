@@ -74,6 +74,18 @@ function parseCSV(text) {
             }
         });
         
+        if (qObj.correctanswer) {
+            const isIndexBased = /^(\d+\|)*\d+$/.test(qObj.correctanswer.trim());
+            if (isIndexBased && qObj.options && qObj.options.length > 0) {
+                const indices = qObj.correctanswer.split('|').map(x => parseInt(x.trim()));
+                if (indices.length === 1) {
+                    qObj.correctanswer = qObj.options[indices[0]] || qObj.correctanswer;
+                } else {
+                    qObj.correctanswer = indices.map(idx => qObj.options[idx]);
+                }
+            }
+        }
+        
         questions.push(qObj);
     }
     

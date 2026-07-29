@@ -31,8 +31,11 @@ export class UI {
         let correct = 0, wrong = 0;
         for (const [id, answer] of Object.entries(answers)) {
             const q = this.state.questions.find(q => q.id === id);
-            if (q && q.correctanswer === answer) correct++;
-            else wrong++;
+            if (q) {
+                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(answer) : q.correctanswer === answer;
+                if (isCorrect) correct++;
+                else wrong++;
+            }
         }
         
         const accuracy = answeredCount > 0 ? Math.round((correct / answeredCount) * 100) : 0;
@@ -97,7 +100,8 @@ export class UI {
             btn.innerHTML = `<div class="option-letter">${letter}</div> <span class="flex-1">${opt}</span>`;
             
             if (userAnswer) {
-                if (opt === q.correctanswer) {
+                const isOptionCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(opt) : opt === q.correctanswer;
+                if (isOptionCorrect) {
                     btn.classList.add('correct');
                 } else if (opt === userAnswer) {
                     btn.classList.add('wrong');
@@ -147,7 +151,8 @@ export class UI {
             
             const ans = answers[q.id];
             if (ans) {
-                if (ans === q.correctanswer) {
+                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(ans) : q.correctanswer === ans;
+                if (isCorrect) {
                     btn.classList.add('correct');
                     iconClass = 'fas fa-check';
                     correctCount++;
@@ -190,8 +195,11 @@ export class UI {
         let correct = 0, wrong = 0;
         for (const [id, answer] of Object.entries(answers)) {
             const q = this.state.questions.find(q => q.id === id);
-            if (q && q.correctanswer === answer) correct++;
-            else wrong++;
+            if (q) {
+                const isCorrect = Array.isArray(q.correctanswer) ? q.correctanswer.includes(answer) : q.correctanswer === answer;
+                if (isCorrect) correct++;
+                else wrong++;
+            }
         }
         
         const accuracy = answeredCount > 0 ? Math.round((correct / answeredCount) * 100) : 0;

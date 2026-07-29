@@ -12,5 +12,12 @@
         "file": "ai.csv",
         "icon": "fab fa-js",
         "description": "Master JavaScript concepts."
+    },
+    {
+        "id": "ite302c",
+        "name": "ITE302c - Ethics in AI",
+        "file": "ite302c.csv",
+        "icon": "fas fa-balance-scale",
+        "description": "Ethical considerations in data-driven systems."
     }
 ]
