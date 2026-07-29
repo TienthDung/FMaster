@@ -22,6 +22,20 @@ class QuizApp {
     }
 
     setupEventListeners() {
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        this.updateThemeIcons(currentTheme);
+
+        document.querySelectorAll('.theme-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let theme = document.documentElement.getAttribute('data-theme');
+                theme = theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                this.updateThemeIcons(theme);
+            });
+        });
+
         document.querySelectorAll('.nav-item').forEach(nav => {
             nav.addEventListener('click', (e) => {
                 const target = e.currentTarget.getAttribute('data-target');
@@ -148,6 +162,16 @@ class QuizApp {
     submitAnswer(qId, answer) {
         this.state.userAnswers[qId] = answer;
         this.ui.renderQuestion(this.state.currentIndex);
+    }
+
+    updateThemeIcons(theme) {
+        document.querySelectorAll('.theme-toggle i').forEach(icon => {
+            if (theme === 'light') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        });
     }
 }
 

@@ -27,7 +27,7 @@ export class UI {
             card.innerHTML = `
                 <div class="subject-icon"><i class="${subject.icon || 'fas fa-book'}"></i></div>
                 <div class="subject-info">
-                    <h3 class="text-white">${subject.name}</h3>
+                    <h3 class="text-color-main">${subject.name}</h3>
                     <p class="text-gray text-sm">${subject.description || 'Tap to start practicing'}</p>
                 </div>
             `;
@@ -90,7 +90,7 @@ export class UI {
                 list.innerHTML += `
                     <div class="recent-item">
                         <div class="recent-num">${qIndex}</div>
-                        <div class="recent-text text-white">${q.question}</div>
+                        <div class="recent-text text-color-main">${q.question}</div>
                         <div class="recent-badge">${q.type.toUpperCase()}</div>
                     </div>
                 `;
@@ -278,7 +278,7 @@ export class UI {
         list.innerHTML = `
             <div class="card p-4 mb-3" style="border:none; background-color:var(--surface-color);">
                 <div class="flex-between mb-2">
-                    <span class="text-white font-semibold text-sm">Strategy & IT</span>
+                    <span class="text-color-main font-semibold text-sm">Strategy & IT</span>
                     <div class="text-sm">
                         <span class="text-gray mr-2">15/18</span>
                         <span class="text-cyan font-bold">83%</span>
@@ -290,7 +290,7 @@ export class UI {
             </div>
             <div class="card p-4 mb-3" style="border:none; background-color:var(--surface-color);">
                 <div class="flex-between mb-2">
-                    <span class="text-white font-semibold text-sm">Economics & Markets</span>
+                    <span class="text-color-main font-semibold text-sm">Economics & Markets</span>
                     <div class="text-sm">
                         <span class="text-gray mr-2">13/20</span>
                         <span class="text-cyan font-bold">65%</span>
