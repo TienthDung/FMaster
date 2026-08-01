@@ -160,24 +160,7 @@ export class UI {
             container.appendChild(submitBtn);
         }
 
-        const prevBtn = document.getElementById('btn-prev');
-        const nextBtn = document.getElementById('btn-next');
-        
-        if (index === 0) {
-            prevBtn.style.opacity = '0.5';
-            prevBtn.disabled = true;
-        } else {
-            prevBtn.style.opacity = '1';
-            prevBtn.disabled = false;
-        }
-        
-        if (index === this.state.questions.length - 1) {
-            nextBtn.style.opacity = '0.5';
-            nextBtn.disabled = true;
-        } else {
-            nextBtn.style.opacity = '1';
-            nextBtn.disabled = false;
-        }
+
     }
 
     renderBank() {

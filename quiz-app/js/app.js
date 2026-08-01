@@ -26,15 +26,23 @@ class QuizApp {
         document.documentElement.setAttribute('data-theme', currentTheme);
         this.updateThemeIcons(currentTheme);
 
+        const toggleThemeLogic = () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            this.updateThemeIcons(theme);
+        };
+
         document.querySelectorAll('.theme-toggle').forEach(btn => {
-            btn.addEventListener('click', () => {
-                let theme = document.documentElement.getAttribute('data-theme');
-                theme = theme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-                this.updateThemeIcons(theme);
-            });
+            btn.addEventListener('click', toggleThemeLogic);
         });
+
+        // Thêm xử lý cho vertical switcher trong Settings
+        const verticalToggle = document.getElementById('vertical-theme-toggle');
+        if (verticalToggle) {
+            verticalToggle.addEventListener('click', toggleThemeLogic);
+        }
 
         document.querySelectorAll('.nav-item').forEach(nav => {
             nav.addEventListener('click', (e) => {
