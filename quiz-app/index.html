@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Study/Quiz SPA</title>
+    <script>
+        // Chỉ chuyển hướng sang PC nếu chiều rộng >= 1024px VÀ không phải là màn hình cảm ứng
+        // (iPad Pro M1 có độ phân giải >1024px nhưng maxTouchPoints > 0 nên sẽ không bị chuyển)
+        if (window.innerWidth >= 1024 && navigator.maxTouchPoints === 0) {
+            window.location.href = "pc.html";
+        }
+    </script>
     <link rel="stylesheet" href="css/styles.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
