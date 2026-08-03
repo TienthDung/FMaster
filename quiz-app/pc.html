@@ -126,9 +126,13 @@
 
         <!-- PRACTICE VIEW -->
         <section id="practice-view" class="view">
-            <div class="practice-header">
-                <span class="question-indicator">QUESTION 1 OF ...</span>
-                <div style="display:flex; gap: 12px;">
+            <div class="practice-header" style="justify-content: flex-end;">
+                <div style="display:flex; gap: 12px; align-items: center; width: 100%; justify-content: flex-end;">
+                    <div class="practice-quick-search">
+                        <input type="text" id="quick-search-input" placeholder="Search in quiz..." autocomplete="off">
+                        <button class="btn-ghost" id="btn-quick-search" title="Search"><i class="fas fa-search"></i></button>
+                        <div id="quick-search-dropdown" class="quick-search-dropdown"></div>
+                    </div>
                     <button class="btn-ghost" id="btn-favorite" title="Favorite"><i class="far fa-star"></i></button>
                     <button class="btn-ghost" id="btn-note" title="Note"><i class="far fa-sticky-note"></i></button>
                     <button class="timer glass-panel" id="btn-help" style="border-radius: 9999px; cursor: pointer; color: var(--cyan); border: 1px solid rgba(0, 240, 255, 0.2); background: rgba(0,240,255,0.05);">
@@ -138,6 +142,7 @@
             </div>
 
             <div class="question-container glass-panel">
+                <div class="question-indicator" style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;"></div>
                 <h2 class="question-text">
                     Which organelle is primarily responsible for the production of ATP (adenosine triphosphate) in a
                     eukaryotic cell?
@@ -168,7 +173,7 @@
                 <h1 style="font-size: 2rem; font-weight: 700;">Question Explorer</h1>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Search keywords...">
+                    <input type="text" id="search-input" placeholder="Search keywords or ID...">
                 </div>
             </div>
 

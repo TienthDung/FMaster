@@ -52,24 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function showToast(message, type = 'warning') {
         const container = document.getElementById('toast-container');
         if (!container) return;
-        
+
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        
-        let iconHtml = type === 'warning' ? '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>' 
-                                        : '<i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.2rem;"></i>';
-                                        
+
+        let iconHtml = type === 'warning' ? '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>'
+            : '<i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.2rem;"></i>';
+
         toast.innerHTML = `
             ${iconHtml}
             <div style="font-size: 0.95rem; font-weight: 500;">${message}</div>
         `;
-        
+
         container.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.classList.add('toast-hiding');
             setTimeout(() => {
-                if(toast.parentNode) toast.parentNode.removeChild(toast);
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
             }, 300);
         }, 3000);
     }
@@ -225,7 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (query) {
             filtered = filtered.filter(q => {
-                return q.question.toLowerCase().includes(query) || q.options.some(opt => opt.toLowerCase().includes(query));
+                return (q.id && q.id.toLowerCase().includes(query)) ||
+                    String(q.originalIndex + 1).includes(query) ||
+                    q.question.toLowerCase().includes(query) ||
+                    q.options.some(opt => opt.toLowerCase().includes(query));
             });
         }
 
@@ -254,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="display: flex; flex-shrink: 0; gap: 8px;">${badgeHtml}</div>
-                        <h4 style="margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">Q${q.originalIndex + 1}: ${q.question}</h4>
+                        <h4 style="margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">Question ${q.originalIndex + 1}: ${q.question}</h4>
                     </div>
                 `;
 
@@ -277,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentQuestions.length === 0) return;
         const q = currentQuestions[currentQuestionIndex];
 
-        document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} OF ${currentQuestions.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+        document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
         document.querySelector('.question-text').textContent = q.question;
 
         if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-main)';
@@ -292,11 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 noteContainer.style.display = 'none';
             }
-            
+
             // Remove old listener to avoid duplicates
             const newTextarea = noteTextarea.cloneNode(true);
             noteTextarea.parentNode.replaceChild(newTextarea, noteTextarea);
-            
+
             newTextarea.addEventListener('input', (e) => {
                 q.noteText = e.target.value;
             });
@@ -407,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (q) {
                 q.isNoted = !q.isNoted;
                 btnNote.style.color = q.isNoted ? 'var(--primary)' : 'var(--text-main)';
-                
+
                 const noteContainer = document.getElementById('note-area-container');
                 const noteTextarea = document.getElementById('question-note-textarea');
                 if (noteContainer && noteTextarea) {
@@ -437,245 +440,321 @@ document.addEventListener('DOMContentLoaded', () => {
                 switchView('home-view');
             }
         });
-    }
+        // ---- Quick Search in Practice ----
+        const quickSearchContainer = document.querySelector('.practice-quick-search');
+        const btnQuickSearch = document.getElementById('btn-quick-search');
+        const inputQuickSearch = document.getElementById('quick-search-input');
+        const dropdownQuickSearch = document.getElementById('quick-search-dropdown');
 
-    // ---- Keyboard Navigation ----
-    document.addEventListener('keydown', (e) => {
-        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-            return; // Ignore shortcuts when typing in input or textarea
+        if (btnQuickSearch && quickSearchContainer && inputQuickSearch) {
+            btnQuickSearch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                quickSearchContainer.classList.toggle('active');
+                if (quickSearchContainer.classList.contains('active')) {
+                    inputQuickSearch.focus();
+                    renderQuickSearch(inputQuickSearch.value);
+                } else {
+                    dropdownQuickSearch.classList.remove('active');
+                }
+            });
+
+            inputQuickSearch.addEventListener('input', (e) => {
+                renderQuickSearch(e.target.value);
+            });
+
+            inputQuickSearch.addEventListener('click', (e) => e.stopPropagation());
+            dropdownQuickSearch.addEventListener('click', (e) => e.stopPropagation());
+
+            document.addEventListener('click', () => {
+                quickSearchContainer.classList.remove('active');
+                dropdownQuickSearch.classList.remove('active');
+            });
         }
 
-        // Modal Navigation
-        if (modal.classList.contains('active')) {
+        function renderQuickSearch(query) {
+            if (!query.trim()) {
+                dropdownQuickSearch.classList.remove('active');
+                return;
+            }
+
+            const qLower = query.toLowerCase();
+            let results = [];
+
+            currentQuestions.forEach((q, idx) => {
+                if ((q.id && q.id.toLowerCase().includes(qLower)) ||
+                    String(idx + 1).includes(qLower) ||
+                    q.question.toLowerCase().includes(qLower) ||
+                    q.options.some(opt => opt.toLowerCase().includes(qLower))) {
+                    results.push({ q, idx });
+                }
+            });
+
+            dropdownQuickSearch.innerHTML = '';
+
+            if (results.length === 0) {
+                dropdownQuickSearch.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 0.9rem;">No questions found</div>';
+            } else {
+                results.slice(0, 10).forEach(result => {
+                    const item = document.createElement('div');
+                    item.className = 'quick-search-item';
+
+                    item.innerHTML = `
+                    <h5>Question ${result.idx + 1}</h5>
+                    <p>${result.q.question}</p>
+                `;
+
+                    item.addEventListener('click', () => {
+                        currentQuestionIndex = result.idx;
+                        focusedOptionIndex = 0;
+                        renderQuestion();
+                        quickSearchContainer.classList.remove('active');
+                        dropdownQuickSearch.classList.remove('active');
+                    });
+
+                    dropdownQuickSearch.appendChild(item);
+                });
+            }
+            dropdownQuickSearch.classList.add('active');
+        }
+
+        // ---- Keyboard Navigation ----
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+                return; // Ignore shortcuts when typing in input or textarea
+            }
+
+            // Modal Navigation
+            if (modal.classList.contains('active')) {
+                switch (e.key) {
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        if (currentModalIndex < currentModalList.length - 1) {
+                            currentModalIndex++;
+                            renderModalQuestion();
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        if (currentModalIndex > 0) {
+                            currentModalIndex--;
+                            renderModalQuestion();
+                        }
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        modal.classList.remove('active');
+                        break;
+                }
+                return; // Dừng xử lý các phím khác nếu Modal đang mở
+            }
+
+            if (currentView !== 'practice-view' || currentQuestions.length === 0) return;
+            const q = currentQuestions[currentQuestionIndex];
+
             switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (!q.isSubmitted) {
+                        focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
+                        renderQuestion();
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (!q.isSubmitted) {
+                        focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
+                        renderQuestion();
+                    }
+                    break;
+
+                case 'Enter':
+                    e.preventDefault();
+                    if (!q.isSubmitted) {
+                        toggleOption(focusedOptionIndex);
+                    }
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    submitAnswer();
+                    break;
+                case 'Shift':
+                    e.preventDefault();
+                    if (!q.isSubmitted) {
+                        q.isSubmitted = true;
+                        q.isCorrect = false; // Reveal doesn't give a point
+                        renderQuestion();
+                    }
+                    break;
                 case 'ArrowRight':
                     e.preventDefault();
-                    if (currentModalIndex < currentModalList.length - 1) {
-                        currentModalIndex++;
-                        renderModalQuestion();
+                    if (currentQuestionIndex < currentQuestions.length - 1) {
+                        currentQuestionIndex++;
+                        focusedOptionIndex = 0;
+                        renderQuestion();
+                    } else if (q.isSubmitted) {
+                        switchView('stats-view');
                     }
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
-                    if (currentModalIndex > 0) {
-                        currentModalIndex--;
-                        renderModalQuestion();
+                    if (currentQuestionIndex > 0) {
+                        currentQuestionIndex--;
+                        focusedOptionIndex = 0;
+                        renderQuestion();
                     }
                     break;
-                case 'Escape':
-                    e.preventDefault();
-                    modal.classList.remove('active');
-                    break;
             }
-            return; // Dừng xử lý các phím khác nếu Modal đang mở
-        }
-
-        if (currentView !== 'practice-view' || currentQuestions.length === 0) return;
-        const q = currentQuestions[currentQuestionIndex];
-
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                if (!q.isSubmitted) {
-                    focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
-                    renderQuestion();
-                }
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                if (!q.isSubmitted) {
-                    focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
-                    renderQuestion();
-                }
-                break;
-
-            case 'Enter':
-                e.preventDefault();
-                if (!q.isSubmitted) {
-                    toggleOption(focusedOptionIndex);
-                }
-                break;
-            case ' ':
-                e.preventDefault();
-                submitAnswer();
-                break;
-            case 'Shift':
-                e.preventDefault();
-                if (!q.isSubmitted) {
-                    q.isSubmitted = true;
-                    q.isCorrect = false; // Reveal doesn't give a point
-                    renderQuestion();
-                }
-                break;
-            case 'ArrowRight':
-                e.preventDefault();
-                if (currentQuestionIndex < currentQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    focusedOptionIndex = 0;
-                    renderQuestion();
-                } else if (q.isSubmitted) {
-                    switchView('stats-view');
-                }
-                break;
-            case 'ArrowLeft':
-                e.preventDefault();
-                if (currentQuestionIndex > 0) {
-                    currentQuestionIndex--;
-                    focusedOptionIndex = 0;
-                    renderQuestion();
-                }
-                break;
-        }
-    });
-
-    // ---- Data Loading ----
-    fetch('data/ite302c.csv')
-        .then(res => {
-            if (!res.ok) throw new Error("Could not fetch CSV");
-            return res.text();
-        })
-        .then(text => {
-            currentQuestions = parseCSV(text);
-            updateHome();
-        })
-        .catch(err => {
-            console.error("CSV loading error:", err);
         });
 
-    // ---- Dashboard Logic ----
-    function updateDashboard() {
-        if (currentQuestions.length === 0) return;
+        // ---- Data Loading ----
+        fetch('data/ite302c.csv')
+            .then(res => {
+                if (!res.ok) throw new Error("Could not fetch CSV");
+                return res.text();
+            })
+            .then(text => {
+                currentQuestions = parseCSV(text);
+                updateHome();
+            })
+            .catch(err => {
+                console.error("CSV loading error:", err);
+            });
 
-        const correct = currentQuestions.filter(q => q.isCorrect === true);
-        const incorrect = currentQuestions.filter(q => q.isCorrect === false);
-        const unanswered = currentQuestions.filter(q => !q.isSubmitted);
-        const favorites = currentQuestions.filter(q => q.isFavorite === true);
-        const notes = currentQuestions.filter(q => q.isNoted === true);
+        // ---- Dashboard Logic ----
+        function updateDashboard() {
+            if (currentQuestions.length === 0) return;
 
-        document.getElementById('stat-correct').textContent = correct.length;
-        document.getElementById('stat-incorrect').textContent = incorrect.length;
-        document.getElementById('stat-unanswered').textContent = unanswered.length;
-        document.getElementById('stat-favorites').textContent = favorites.length;
-        document.getElementById('stat-notes').textContent = notes.length;
+            const correct = currentQuestions.filter(q => q.isCorrect === true);
+            const incorrect = currentQuestions.filter(q => q.isCorrect === false);
+            const unanswered = currentQuestions.filter(q => !q.isSubmitted);
+            const favorites = currentQuestions.filter(q => q.isFavorite === true);
+            const notes = currentQuestions.filter(q => q.isNoted === true);
 
-        const chartContainer = document.getElementById('stats-chart');
-        if (chartContainer) {
-            chartContainer.innerHTML = '';
+            document.getElementById('stat-correct').textContent = correct.length;
+            document.getElementById('stat-incorrect').textContent = incorrect.length;
+            document.getElementById('stat-unanswered').textContent = unanswered.length;
+            document.getElementById('stat-favorites').textContent = favorites.length;
+            document.getElementById('stat-notes').textContent = notes.length;
 
-            const answeredCount = correct.length + incorrect.length;
-            let acc = 0;
-            if (answeredCount > 0) acc = Math.round((correct.length / answeredCount) * 100);
+            const chartContainer = document.getElementById('stats-chart');
+            if (chartContainer) {
+                chartContainer.innerHTML = '';
 
-            const barGroup = document.createElement('div');
-            barGroup.className = 'bar-group';
-            barGroup.innerHTML = `
+                const answeredCount = correct.length + incorrect.length;
+                let acc = 0;
+                if (answeredCount > 0) acc = Math.round((correct.length / answeredCount) * 100);
+
+                const barGroup = document.createElement('div');
+                barGroup.className = 'bar-group';
+                barGroup.innerHTML = `
                 <div class="bar bar-success" style="height: ${acc}%;"><span>${acc}%</span></div>
                 <span class="bar-label">ITE302C</span>
             `;
-            chartContainer.appendChild(barGroup);
-        }
-
-        setupModalTrigger('correct', "Correct Answers", correct);
-        setupModalTrigger('incorrect', "Incorrect Answers", incorrect);
-        setupModalTrigger('unanswered', "Unanswered Questions", unanswered);
-        setupModalTrigger('favorites', "Favorite Questions", favorites);
-        setupModalTrigger('notes', "Noted Questions", notes);
-    }
-
-    // ---- Modal Logic ----
-    const modal = document.getElementById('detail-modal');
-    const btnCloseModal = document.getElementById('btn-close-modal');
-
-    if (btnCloseModal) {
-        btnCloseModal.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-    }
-
-    function showModal(title, list, startIndex = 0) {
-        document.getElementById('modal-title').textContent = title;
-        currentModalList = list;
-        currentModalIndex = startIndex;
-
-        renderModalQuestion();
-        modal.classList.add('active');
-    }
-
-    function renderModalQuestion() {
-        const listContainer = document.getElementById('modal-list');
-        listContainer.innerHTML = '';
-
-        if (currentModalList.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found in this category.</p>';
-            return;
-        }
-
-        const q = currentModalList[currentModalIndex];
-
-        // Header (Index & Type)
-        const header = document.createElement('div');
-        header.style.marginBottom = '20px';
-        header.style.fontSize = '0.9rem';
-        header.style.color = 'var(--text-muted)';
-        header.style.fontWeight = '600';
-        header.style.textTransform = 'uppercase';
-        header.textContent = `QUESTION ${currentModalIndex + 1} OF ${currentModalList.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
-        listContainer.appendChild(header);
-
-        // Question Text
-        const qText = document.createElement('h3');
-        qText.style.fontSize = '1.3rem';
-        qText.style.fontWeight = '500';
-        qText.style.marginBottom = '24px';
-        qText.textContent = q.question;
-        listContainer.appendChild(qText);
-
-        // Options
-        const optionsList = document.createElement('div');
-        optionsList.className = 'options-list';
-
-        q.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = opt;
-            btn.disabled = true; // Read-only
-
-            const isSelected = q.userAnswers.includes(String(idx));
-            const isCorrectAns = q.correctAnswers.includes(String(idx));
-
-            if (isCorrectAns) {
-                btn.classList.add('correct');
-            } else if (isSelected && !isCorrectAns) {
-                btn.classList.add('incorrect');
+                chartContainer.appendChild(barGroup);
             }
 
-            optionsList.appendChild(btn);
-        });
+            setupModalTrigger('correct', "Correct Answers", correct);
+            setupModalTrigger('incorrect', "Incorrect Answers", incorrect);
+            setupModalTrigger('unanswered', "Unanswered Questions", unanswered);
+            setupModalTrigger('favorites', "Favorite Questions", favorites);
+            setupModalTrigger('notes', "Noted Questions", notes);
+        }
 
-        listContainer.appendChild(optionsList);
+        // ---- Modal Logic ----
+        const modal = document.getElementById('detail-modal');
+        const btnCloseModal = document.getElementById('btn-close-modal');
 
-        // Footer (Prev/Next hint)
-        const hint = document.createElement('div');
-        hint.style.marginTop = '24px';
-        hint.style.textAlign = 'center';
-        hint.style.color = 'var(--text-muted)';
-        hint.style.fontSize = '0.85rem';
-        hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Use Left/Right arrow keys to navigate';
-        listContainer.appendChild(hint);
+        if (btnCloseModal) {
+            btnCloseModal.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        }
+
+        function showModal(title, list, startIndex = 0) {
+            document.getElementById('modal-title').textContent = title;
+            currentModalList = list;
+            currentModalIndex = startIndex;
+
+            renderModalQuestion();
+            modal.classList.add('active');
+        }
+
+        function renderModalQuestion() {
+            const listContainer = document.getElementById('modal-list');
+            listContainer.innerHTML = '';
+
+            if (currentModalList.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found in this category.</p>';
+                return;
+            }
+
+            const q = currentModalList[currentModalIndex];
+
+            // Header (Index & Type)
+            const header = document.createElement('div');
+            header.style.marginBottom = '20px';
+            header.style.fontSize = '0.9rem';
+            header.style.color = 'var(--text-muted)';
+            header.style.fontWeight = '600';
+            header.style.textTransform = 'uppercase';
+            header.textContent = `QUESTION ${currentModalIndex + 1} OF ${currentModalList.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+            listContainer.appendChild(header);
+
+            // Question Text
+            const qText = document.createElement('h3');
+            qText.style.fontSize = '1.3rem';
+            qText.style.fontWeight = '500';
+            qText.style.marginBottom = '24px';
+            qText.textContent = q.question;
+            listContainer.appendChild(qText);
+
+            // Options
+            const optionsList = document.createElement('div');
+            optionsList.className = 'options-list';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.disabled = true; // Read-only
+
+                const isSelected = q.userAnswers.includes(String(idx));
+                const isCorrectAns = q.correctAnswers.includes(String(idx));
+
+                if (isCorrectAns) {
+                    btn.classList.add('correct');
+                } else if (isSelected && !isCorrectAns) {
+                    btn.classList.add('incorrect');
+                }
+
+                optionsList.appendChild(btn);
+            });
+
+            listContainer.appendChild(optionsList);
+
+            // Footer (Prev/Next hint)
+            const hint = document.createElement('div');
+            hint.style.marginTop = '24px';
+            hint.style.textAlign = 'center';
+            hint.style.color = 'var(--text-muted)';
+            hint.style.fontSize = '0.85rem';
+            hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Use Left/Right arrow keys to navigate';
+            listContainer.appendChild(hint);
+        }
+
+        function setupModalTrigger(type, title, list) {
+            const card = document.querySelector(`.stat-card[data-type="${type}"]`);
+            if (!card) return;
+
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+
+            newCard.addEventListener('click', () => {
+                showModal(title, list);
+            });
+        }
+
+        // Init View
+        switchView('home-view');
     }
-
-    function setupModalTrigger(type, title, list) {
-        const card = document.querySelector(`.stat-card[data-type="${type}"]`);
-        if (!card) return;
-
-        const newCard = card.cloneNode(true);
-        card.parentNode.replaceChild(newCard, card);
-
-        newCard.addEventListener('click', () => {
-            showModal(title, list);
-        });
-    }
-
-    // Init View
-    switchView('home-view');
 });
