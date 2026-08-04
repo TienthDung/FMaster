@@ -16,6 +16,92 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- SVG Definitions for Liquid Glass Effect -->
+    <svg style="display: none">
+      <!-- 
+        This SVG defines a custom filter for a liquid glass distortion effect.
+        It should be placed somewhere in your HTML (preferably near the top, such as in the <head> or before closing </body>).
+      -->
+      <filter id="de-glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+
+        <!-- 
+          1) Turbulence: Generates a noise texture for the distortion
+          - `type="fractalNoise"` creates a smoother, cloudy noise
+          - `baseFrequency` controls the size and density of the noise
+          - `animate` cycles through different seeds to make the distortion look fluid
+        -->
+        <feTurbulence 
+          type="fractalNoise" 
+          baseFrequency="0.01 0.01" 
+          numOctaves="1" 
+          seed="5" 
+          result="turbulence">
+            <animate attributeName="seed" from="1" to="200" dur="8s" repeatCount="indefinite"/>
+        </feTurbulence>
+
+        <!-- 
+          2) Color Mapping: Controls how the noise affects the RGB channels
+          - This stage adjusts the turbulence so it mainly affects the red channel (used for displacement)
+          - Green and blue channels are suppressed to reduce distortion in those axes
+        -->
+        <feComponentTransfer in="turbulence" result="mapped">
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5"/>
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0"/>
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5"/>
+        </feComponentTransfer>
+
+        <!-- 
+          3) Blur: Softens the turbulence map for smoother distortion
+        -->
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+
+        <!-- 
+          4) Lighting: Adds a specular light highlight based on the noise shape
+          - Simulates light reflecting off a bumpy glass surface
+        -->
+        <feSpecularLighting 
+          in="softMap" 
+          surfaceScale="5" 
+          specularConstant="1" 
+          specularExponent="100" 
+          lighting-color="white" 
+          result="specLight">
+            <fePointLight x="-200" y="-200" z="300"/>
+        </feSpecularLighting>
+
+        <!-- 
+          5) Composite: Merges the lighting effect with the noise
+        -->
+        <feComposite 
+          in="specLight" 
+          operator="arithmetic" 
+          k1="0" k2="1" k3="1" k4="0" 
+          result="litImage"/>
+
+        <!-- 
+          6) Displacement: Distorts the original graphic using the noise map
+          - `scale` controls intensity
+          - `xChannelSelector="R"` means distortion is driven by the red channel
+          - `yChannelSelector="G"` uses the (mostly suppressed) green channel
+        -->
+        <feDisplacementMap 
+          in="SourceGraphic" 
+          in2="softMap" 
+          scale="150" 
+          xChannelSelector="R" 
+          yChannelSelector="G"/>
+
+      </filter>
+    </svg>
+
+    <!-- Background 3D Geometric Shapes -->
+    <div class="bg-shapes">
+        <div class="shape cube cube-1"></div>
+        <div class="shape cube cube-2"></div>
+        <div class="shape sphere sphere-1"></div>
+        <div class="shape sphere sphere-2"></div>
+    </div>
+
     <div class="app-container">
         <!-- Dashboard View (Home) -->
         <section id="dashboard-view" class="view hidden">
@@ -108,7 +194,6 @@
                     <h1 id="question-counter" class="text-md">Q#1 · 1/30</h1>
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn"><i class="far fa-star"></i></button>
                     <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
                 </div>
             </header>
@@ -117,9 +202,11 @@
             </div>
 
             <div class="content scrollable pb-bar">
-                <div class="tag-pills mt-2 mb-4" id="practice-tags">
-                    <span class="tag-pill" id="q-type-badge">MCQ</span>
-                    <span class="tag-pill">Strategy</span>
+                <div class="tag-pills mt-2 mb-4" id="practice-tags" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; gap: 8px;">
+                        <span class="tag-pill" id="q-type-badge">MCQ</span>
+                    </div>
+                    <button class="icon-btn" id="btn-favorite" title="Favorite" style="font-size: 1.5rem;"><i class="far fa-star"></i></button>
                 </div>
                 
                 <div class="question-card" id="question-text">
@@ -145,21 +232,16 @@
             
             <div class="content scrollable pb-bar">
                 <div class="filter-pills mt-2" id="bank-filters">
-                    <button class="pill active" data-filter="all">All <span id="count-all">30</span></button>
-                    <button class="pill" data-filter="tf">T/F <span id="count-tf">10</span></button>
-                    <button class="pill" data-filter="mcq">Choice <span id="count-mcq">10</span></button>
-                    <button class="pill" data-filter="essay">Essay <span id="count-essay">10</span></button>
+                    <button class="pill active" data-filter="all">All <span id="count-all">0</span></button>
+                    <button class="pill" data-filter="favorites">Favorites <span id="count-favorites">0</span></button>
+                    <button class="pill" data-filter="single">Single <span id="count-single">0</span></button>
+                    <button class="pill" data-filter="multiple">Multiple <span id="count-multiple">0</span></button>
+                    <button class="pill" data-filter="tf">T/F <span id="count-tf">0</span></button>
                 </div>
 
                 <div class="search-bar mt-4">
                     <i class="fas fa-search"></i>
                     <input type="text" id="bank-search" placeholder="Search questions...">
-                </div>
-
-                <div class="bank-legend mt-4">
-                    <span class="legend-badge"><i class="fas fa-check text-green mr-1"></i> Correct <span id="legend-correct" class="ml-1">12</span></span>
-                    <span class="legend-badge"><i class="fas fa-times text-red mr-1"></i> Incorrect <span id="legend-wrong" class="ml-1">6</span></span>
-                    <span class="legend-badge"><i class="fas fa-ban text-gray mr-1"></i> Unanswered <span id="legend-skipped" class="ml-1">7</span></span>
                 </div>
 
                 <div class="bank-grid mt-4" id="bank-grid">
@@ -200,7 +282,7 @@
                         <div class="stat-row-content">
                             <div class="flex-between">
                                 <span class="text-color-main font-semibold">Correct</span>
-                                <span class="text-green font-bold"><span id="stats-correct-val">12</span> <span class="text-gray font-normal text-sm ml-2" id="stats-correct-perc">40%</span></span>
+                                <span class="text-green font-bold" id="stats-correct-val">12</span>
                             </div>
                             <div class="progress-bar-container mt-2">
                                 <div class="progress-bar-fill bg-green" id="bar-correct" style="width: 40%"></div>
@@ -215,7 +297,7 @@
                         <div class="stat-row-content">
                             <div class="flex-between">
                                 <span class="text-color-main font-semibold">Incorrect</span>
-                                <span class="text-red font-bold"><span id="stats-incorrect-val">6</span> <span class="text-gray font-normal text-sm ml-2" id="stats-incorrect-perc">20%</span></span>
+                                <span class="text-red font-bold" id="stats-incorrect-val">6</span>
                             </div>
                             <div class="progress-bar-container mt-2">
                                 <div class="progress-bar-fill bg-red" id="bar-incorrect" style="width: 20%"></div>
@@ -230,7 +312,7 @@
                         <div class="stat-row-content">
                             <div class="flex-between">
                                 <span class="text-color-main font-semibold">Unanswered</span>
-                                <span class="text-color-main font-bold"><span id="stats-unanswered-val">7</span> <span class="text-gray font-normal text-sm ml-2" id="stats-unanswered-perc">23%</span></span>
+                                <span class="text-color-main font-bold" id="stats-unanswered-val">7</span>
                             </div>
                             <div class="progress-bar-container mt-2">
                                 <div class="progress-bar-fill bg-cyan" id="bar-unanswered" style="width: 23%"></div>
@@ -279,23 +361,18 @@
             <div class="nav-indicator" id="nav-indicator"></div>
             <button class="nav-item active" data-target="dashboard-view" data-index="0">
                 <i class="fas fa-home"></i>
-                <span>Home</span>
             </button>
             <button class="nav-item" data-target="practice-view" data-index="1">
                 <i class="fas fa-book-open"></i>
-                <span>Practice</span>
             </button>
             <button class="nav-item" data-target="bank-view" data-index="2">
                 <i class="fas fa-search"></i>
-                <span>Bank</span>
             </button>
             <button class="nav-item" data-target="stats-view" data-index="3">
                 <i class="fas fa-chart-bar"></i>
-                <span>Stats</span>
             </button>
             <button class="nav-item" data-target="settings-view" data-index="4">
                 <i class="fas fa-cog"></i>
-                <span>Menu</span>
             </button>
         </nav>
     </div>

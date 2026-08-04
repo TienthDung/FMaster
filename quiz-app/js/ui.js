@@ -2,6 +2,7 @@ export class UI {
     constructor(state, app) {
         this.state = state;
         this.app = app;
+        this.activeFilter = 'all';
     }
 
     checkIsCorrect(q, answer) {
@@ -102,12 +103,18 @@ export class UI {
         const q = this.state.questions[index];
         if (!q) return;
 
-        document.getElementById('question-counter').textContent = `Q#${index + 1} · ${index + 1}/${this.state.questions.length}`;
+        document.getElementById('question-counter').textContent = `Question ${index + 1} - ${this.state.questions.length}`;
         document.getElementById('q-type-badge').textContent = q.type.toUpperCase();
         document.getElementById('question-text').textContent = q.question;
         
         const progress = ((index + 1) / this.state.questions.length) * 100;
         document.getElementById('practice-progress').style.width = `${progress}%`;
+
+        const btnFavorite = document.getElementById('btn-favorite');
+        if (btnFavorite) {
+            btnFavorite.innerHTML = q.isFavorite ? '<i class="fas fa-star" style="color: #F59E0B; text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);"></i>' : '<i class="far fa-star"></i>';
+            btnFavorite.onclick = () => this.app.toggleFavorite(index);
+        }
 
         const container = document.getElementById('options-container');
         container.innerHTML = '';
@@ -167,17 +174,37 @@ export class UI {
         const grid = document.getElementById('bank-grid');
         grid.innerHTML = '';
         
+        // Setup filter listeners if not already
+        const filterPills = document.querySelectorAll('#bank-filters .pill');
+        filterPills.forEach(pill => {
+            pill.onclick = (e) => {
+                filterPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                this.activeFilter = pill.getAttribute('data-filter');
+                this.renderBank();
+            };
+        });
+
         const answers = this.state.userAnswers;
         let correctCount = 0, wrongCount = 0;
+        let favCount = 0;
 
         this.state.questions.forEach((q, i) => {
+            if (q.isFavorite) favCount++;
+            const ans = answers[q.id];
+            
+            // Apply filter
+            if (this.activeFilter === 'favorites' && !q.isFavorite) return;
+            if (this.activeFilter === 'tf' && q.type !== 'true_false') return;
+            if (this.activeFilter === 'single' && q.type !== 'single_choice') return;
+            if (this.activeFilter === 'multiple' && q.type !== 'multiple_choice') return;
+
             const btn = document.createElement('button');
             btn.className = 'grid-item';
             
             let iconClass = 'fas fa-circle text-gray';
             let numHtml = `<span>${i + 1}</span>`;
             
-            const ans = answers[q.id];
             if (ans) {
                 if (this.checkIsCorrect(q, ans)) {
                     btn.classList.add('correct');
@@ -192,10 +219,14 @@ export class UI {
             
             if (i === this.state.currentIndex) {
                 btn.classList.add('current');
-                iconClass = 'fas fa-star';
+                iconClass = 'fas fa-star'; // current question always has a star or different marker
             }
             
-            btn.innerHTML = `${numHtml}<i class="${iconClass} grid-item-icon"></i>`;
+            // Add favorite mini star
+            let favHtml = q.isFavorite ? `<i class="fas fa-star" style="position:absolute; top:4px; right:4px; font-size:0.55rem; color:#F59E0B;"></i>` : '';
+
+            btn.innerHTML = `${favHtml}${numHtml}<i class="${iconClass} grid-item-icon"></i>`;
+            btn.style.position = 'relative'; // Ensure mini star positions correctly
             
             btn.addEventListener('click', () => {
                 this.state.currentIndex = i;
@@ -209,9 +240,15 @@ export class UI {
         const skippedCount = total - correctCount - wrongCount;
 
         document.getElementById('count-all').textContent = total;
-        document.getElementById('legend-correct').textContent = correctCount;
-        document.getElementById('legend-wrong').textContent = wrongCount;
-        document.getElementById('legend-skipped').textContent = skippedCount;
+        
+        // Update filter counts
+        document.getElementById('count-favorites').textContent = favCount;
+        const tfCount = this.state.questions.filter(q => q.type === 'true_false').length;
+        document.getElementById('count-tf').textContent = tfCount;
+        const singleCount = this.state.questions.filter(q => q.type === 'single_choice').length;
+        document.getElementById('count-single').textContent = singleCount;
+        const multipleCount = this.state.questions.filter(q => q.type === 'multiple_choice').length;
+        document.getElementById('count-multiple').textContent = multipleCount;
     }
 
     updateStats() {
@@ -246,43 +283,47 @@ export class UI {
         document.getElementById('stats-overall-progress').style.width = total > 0 ? `${(answeredCount/total)*100}%` : '0%';
 
         document.getElementById('stats-correct-val').textContent = correct;
-        document.getElementById('stats-correct-perc').textContent = `${percCorrect}%`;
         document.getElementById('bar-correct').style.width = `${percCorrect}%`;
 
         document.getElementById('stats-incorrect-val').textContent = wrong;
-        document.getElementById('stats-incorrect-perc').textContent = `${percWrong}%`;
         document.getElementById('bar-incorrect').style.width = `${percWrong}%`;
 
         document.getElementById('stats-unanswered-val').textContent = skipped;
-        document.getElementById('stats-unanswered-perc').textContent = `${percSkipped}%`;
         document.getElementById('bar-unanswered').style.width = `${percSkipped}%`;
         
         const list = document.getElementById('breakdown-list');
-        list.innerHTML = `
-            <div class="card p-4 mb-3" style="border:none; background-color:var(--surface-color);">
-                <div class="flex-between mb-2">
-                    <span class="text-color-main font-semibold text-sm">Strategy & IT</span>
-                    <div class="text-sm">
-                        <span class="text-gray mr-2">15/18</span>
-                        <span class="text-cyan font-bold">83%</span>
+        list.innerHTML = '';
+
+        const breakdown = {};
+        this.state.questions.forEach((q) => {
+            const cat = q.category || q.type || 'General';
+            const catName = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ');
+            if (!breakdown[catName]) breakdown[catName] = { total: 0, correct: 0 };
+            breakdown[catName].total++;
+            const ans = this.state.userAnswers[q.id];
+            if (ans && this.checkIsCorrect(q, ans)) {
+                breakdown[catName].correct++;
+            }
+        });
+
+        for (const [catName, data] of Object.entries(breakdown)) {
+            const perc = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+            const card = document.createElement('div');
+            card.className = 'stat-row-card mt-3'; 
+            card.innerHTML = `
+                <div class="stat-row-content">
+                    <div class="flex-between mb-2">
+                        <span class="text-color-main font-semibold text-sm">${catName}</span>
+                        <div class="text-sm">
+                            <span class="text-gray">${data.correct}/${data.total}</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill bg-cyan" style="width: ${perc}%"></div>
                     </div>
                 </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill bg-cyan" style="width: 83%"></div>
-                </div>
-            </div>
-            <div class="card p-4 mb-3" style="border:none; background-color:var(--surface-color);">
-                <div class="flex-between mb-2">
-                    <span class="text-color-main font-semibold text-sm">Economics & Markets</span>
-                    <div class="text-sm">
-                        <span class="text-gray mr-2">13/20</span>
-                        <span class="text-cyan font-bold">65%</span>
-                    </div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill bg-cyan" style="width: 65%"></div>
-                </div>
-            </div>
-        `;
+            `;
+            list.appendChild(card);
+        }
     }
 }

@@ -172,8 +172,38 @@ class QuizApp {
 
         this.state.questions = await fetchCSV(`data/${subject.file}`);
 
+        // Load favorites from local storage
+        const savedFavs = localStorage.getItem(`quiz_favorites_${subject.id}`);
+        if (savedFavs) {
+            try {
+                const favIndices = JSON.parse(savedFavs);
+                favIndices.forEach(idx => {
+                    if (this.state.questions[idx]) {
+                        this.state.questions[idx].isFavorite = true;
+                    }
+                });
+            } catch(e) { console.error("Could not parse favorites", e); }
+        }
+
         document.getElementById('bottom-nav').classList.remove('hidden');
         this.navigateTo('dashboard-view');
+    }
+
+    toggleFavorite(index) {
+        if (!this.state.questions[index]) return;
+        this.state.questions[index].isFavorite = !this.state.questions[index].isFavorite;
+        
+        // Save to local storage
+        const favIndices = [];
+        this.state.questions.forEach((q, i) => {
+            if (q.isFavorite) favIndices.push(i);
+        });
+        localStorage.setItem(`quiz_favorites_${this.state.currentSubject.id}`, JSON.stringify(favIndices));
+        
+        // Re-render UI pieces if necessary
+        if (document.getElementById('practice-view').classList.contains('active')) {
+            this.ui.renderQuestion(this.state.currentIndex);
+        }
     }
 
     navigateTo(viewId) {

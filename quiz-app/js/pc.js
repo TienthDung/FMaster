@@ -4,32 +4,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = document.querySelectorAll('.view');
 
     let currentView = 'home-view';
+    let isTransitioning = false;
 
     function switchView(viewId) {
-        currentView = viewId;
+        if (currentView === viewId || isTransitioning) return;
+        isTransitioning = true;
+        
+        const currentViewEl = document.getElementById(currentView);
+        const nextViewEl = document.getElementById(viewId);
+
         navItems.forEach(item => {
             item.classList.remove('active');
             if (item.dataset.target === viewId) item.classList.add('active');
         });
 
-        views.forEach(view => {
-            view.classList.remove('active');
-            if (view.id === viewId) view.classList.add('active');
-        });
+        if (currentViewEl) {
+            // Apply fade out animation inline
+            currentViewEl.style.opacity = '0';
+            currentViewEl.style.transform = 'scale(0.98) translateY(-10px)';
+            currentViewEl.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            setTimeout(() => {
+                currentViewEl.classList.remove('active');
+                currentViewEl.style = ''; // clear inline styles
+                
+                nextViewEl.classList.add('active');
+                currentView = viewId;
+                
+                executeViewLogic(viewId);
+                
+                setTimeout(() => { isTransitioning = false; }, 500);
+            }, 300);
+        } else {
+            nextViewEl.classList.add('active');
+            currentView = viewId;
+            executeViewLogic(viewId);
+            isTransitioning = false;
+        }
+    }
 
-        if (viewId === 'home-view') {
-            updateHome();
-        }
-        if (viewId === 'stats-view') {
-            updateDashboard();
-        }
-        if (viewId === 'search-view') {
-            updateSearch();
-        }
+    function executeViewLogic(viewId) {
+        if (viewId === 'home-view') updateHome();
+        if (viewId === 'stats-view') updateDashboard();
+        if (viewId === 'search-view') updateSearch();
         if (viewId === 'practice-view') {
             focusedOptionIndex = 0; // reset focus
             renderQuestion();
         }
+        
+        // Update all segmented controls to fix background positions after view is visible
+        setTimeout(() => {
+            if (typeof updateAllSegmentedControls === 'function') {
+                updateAllSegmentedControls();
+            }
+        }, 50);
     }
 
     navItems.forEach(item => {
@@ -198,16 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- Search View Logic ----
     const searchInput = document.getElementById('search-input');
-    const searchPills = document.querySelectorAll('#search-filter-pills .pill');
-
-    searchPills.forEach(pill => {
-        pill.addEventListener('click', () => {
-            searchPills.forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            currentSearchFilter = pill.dataset.filter;
-            updateSearch();
-        });
-    });
 
     if (searchInput) {
         searchInput.addEventListener('input', updateSearch);
@@ -254,11 +272,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (q.isFavorite) badgeHtml += '<span class="badge" style="color:#f59e0b; background: rgba(245, 158, 11, 0.15);"><i class="fas fa-star"></i></span>';
                 if (q.isNoted) badgeHtml += '<span class="badge" style="color:#60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fas fa-sticky-note"></i></span>';
 
+                const qType = q.type === 'multiple_choice' ? 'Multiple Choice' : 'Single Choice';
+                const snippet = q.options.join(' • ');
+
                 item.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="display: flex; flex-shrink: 0; gap: 8px;">${badgeHtml}</div>
-                        <h4 style="margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">Question ${q.originalIndex + 1}: ${q.question}</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Question ${q.originalIndex + 1} (ID: ${q.id}) &bull; ${qType}
+                        </span>
+                        <div style="display: flex; gap: 6px;">${badgeHtml}</div>
                     </div>
+                    <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
+                        ${q.question}
+                    </h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${snippet}
+                    </p>
                 `;
 
                 item.addEventListener('click', () => {
@@ -281,7 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = currentQuestions[currentQuestionIndex];
 
         document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
-        document.querySelector('.question-text').textContent = q.question;
+        
+        const qText = document.querySelector('.question-text');
+        qText.textContent = q.question;
 
         if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-main)';
         if (btnNote) btnNote.style.color = q.isNoted ? 'var(--primary)' : 'var(--text-main)';
@@ -753,6 +784,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 showModal(title, list);
             });
         }
+
+        // ---- Segmented Control Logic ----
+        window.updateAllSegmentedControls = function() {
+            const controls = document.querySelectorAll('.segmented-control');
+            controls.forEach(control => {
+                const active = control.querySelector('.pill.active');
+                const bg = control.querySelector('.pill-active-bg');
+                if (active && bg && active.offsetWidth > 0) {
+                    bg.style.width = active.offsetWidth + 'px';
+                    bg.style.transform = `translateX(${active.offsetLeft}px)`;
+                }
+            });
+        };
+
+        function initSegmentedControls() {
+            const controls = document.querySelectorAll('.segmented-control');
+            controls.forEach(control => {
+                const pills = control.querySelectorAll('.pill');
+
+                // Initial setup
+                if (control.querySelector('.pill.active')) {
+                    setTimeout(() => window.updateAllSegmentedControls(), 50);
+                }
+                
+                // Add click events
+                pills.forEach(pill => {
+                    pill.addEventListener('click', (e) => {
+                        const clickedPill = e.currentTarget;
+                        
+                        // Remove active from all
+                        pills.forEach(p => p.classList.remove('active'));
+                        // Add to current
+                        clickedPill.classList.add('active');
+                        // Animate BG
+                        window.updateAllSegmentedControls();
+                        
+                        // Handle filter logic if needed (for Search View)
+                        if (control.id === 'search-filter-pills') {
+                            const filterVal = clickedPill.getAttribute('data-filter');
+                            if (filterVal) {
+                                currentSearchFilter = filterVal;
+                                const searchInput = document.getElementById('search-input');
+                                if (searchInput) searchInput.value = '';
+                                updateSearch();
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        
+        // Window resize to fix pill bg size
+        window.addEventListener('resize', () => {
+            window.updateAllSegmentedControls();
+        });
+
+        // Initialize segmented controls
+        initSegmentedControls();
 
         // Init View
         switchView('home-view');
