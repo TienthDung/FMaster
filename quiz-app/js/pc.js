@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchView(viewId) {
         if (currentView === viewId || isTransitioning) return;
         isTransitioning = true;
-        
+
         const currentViewEl = document.getElementById(currentView);
         const nextViewEl = document.getElementById(viewId);
 
@@ -18,21 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.dataset.target === viewId) item.classList.add('active');
         });
 
+        updateNavActiveBg();
+
         if (currentViewEl) {
             // Apply fade out animation inline
             currentViewEl.style.opacity = '0';
             currentViewEl.style.transform = 'scale(0.98) translateY(-10px)';
             currentViewEl.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            
+
             setTimeout(() => {
                 currentViewEl.classList.remove('active');
                 currentViewEl.style = ''; // clear inline styles
-                
+
                 nextViewEl.classList.add('active');
                 currentView = viewId;
-                
+
                 executeViewLogic(viewId);
-                
+
                 setTimeout(() => { isTransitioning = false; }, 500);
             }, 300);
         } else {
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             focusedOptionIndex = 0; // reset focus
             renderQuestion();
         }
-        
+
         // Update all segmented controls to fix background positions after view is visible
         setTimeout(() => {
             if (typeof updateAllSegmentedControls === 'function') {
@@ -65,6 +67,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.dataset.target) switchView(item.dataset.target);
         });
     });
+
+    function updateNavActiveBg() {
+        const activeItem = document.querySelector('.nav-menu .nav-item.active[data-target]');
+        const navBg = document.querySelector('.nav-active-bg');
+        if (activeItem && navBg) {
+            navBg.style.transform = `translateY(${activeItem.offsetTop}px)`;
+            navBg.style.height = `${activeItem.offsetHeight}px`;
+        }
+    }
+
+    // Initialize nav background position
+    setTimeout(updateNavActiveBg, 50);
+    window.addEventListener('resize', updateNavActiveBg);
 
     // ---- Application State ----
     let currentQuestions = [];
@@ -84,8 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
 
-        let iconHtml = type === 'warning' ? '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>'
-            : '<i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.2rem;"></i>';
+        let iconHtml = '';
+        if (type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>';
+        else if (type === 'info') iconHtml = '<i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.2rem;"></i>';
+        else if (type === 'correct') iconHtml = '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.4rem;"></i>';
+        else if (type === 'incorrect') iconHtml = '<i class="fas fa-times-circle" style="color: var(--danger); font-size: 1.4rem;"></i>';
 
         toast.innerHTML = `
             ${iconHtml}
@@ -310,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = currentQuestions[currentQuestionIndex];
 
         document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
-        
+
         const qText = document.querySelector('.question-text');
         qText.textContent = q.question;
 
@@ -372,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (q.isSubmitted) {
                 btnSubmit.textContent = (currentQuestionIndex === currentQuestions.length - 1) ? "Finish Module" : "Next Question";
             } else {
-                btnSubmit.textContent = "Submit Answer";
+                btnSubmit.textContent = "Submit";
             }
         }
     }
@@ -424,6 +442,12 @@ document.addEventListener('DOMContentLoaded', () => {
             q.correctAnswers.every(val => q.userAnswers.includes(val));
         q.isCorrect = isMatch;
         renderQuestion();
+        
+        if (isMatch) {
+            showToast("Awesome! That's correct.", "correct");
+        } else {
+            showToast("Oops! That's incorrect.", "incorrect");
+        }
     }
 
     if (btnFav) {
@@ -499,6 +523,39 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('click', () => {
                 quickSearchContainer.classList.remove('active');
                 dropdownQuickSearch.classList.remove('active');
+            });
+        }
+
+        // ---- Main Search in Explorer ----
+        const mainSearchContainer = document.getElementById('main-search-container');
+        const btnMainSearch = document.getElementById('btn-main-search');
+        const inputMainSearch = document.getElementById('search-input');
+
+        if (btnMainSearch && mainSearchContainer && inputMainSearch) {
+            btnMainSearch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!mainSearchContainer.classList.contains('active')) {
+                    mainSearchContainer.classList.add('active');
+                    inputMainSearch.focus();
+                } else {
+                    if (inputMainSearch.value.trim() !== '') {
+                        // Clear the input on click when open
+                        inputMainSearch.value = '';
+                        // Trigger input event to update search results
+                        inputMainSearch.dispatchEvent(new Event('input'));
+                        inputMainSearch.focus();
+                    } else {
+                        mainSearchContainer.classList.remove('active');
+                    }
+                }
+            });
+
+            inputMainSearch.addEventListener('click', (e) => e.stopPropagation());
+
+            document.addEventListener('click', () => {
+                if (inputMainSearch.value.trim() === '') {
+                    mainSearchContainer.classList.remove('active');
+                }
             });
         }
 
@@ -786,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // ---- Segmented Control Logic ----
-        window.updateAllSegmentedControls = function() {
+        window.updateAllSegmentedControls = function () {
             const controls = document.querySelectorAll('.segmented-control');
             controls.forEach(control => {
                 const active = control.querySelector('.pill.active');
@@ -807,19 +864,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (control.querySelector('.pill.active')) {
                     setTimeout(() => window.updateAllSegmentedControls(), 50);
                 }
-                
+
                 // Add click events
                 pills.forEach(pill => {
                     pill.addEventListener('click', (e) => {
                         const clickedPill = e.currentTarget;
-                        
+
                         // Remove active from all
                         pills.forEach(p => p.classList.remove('active'));
                         // Add to current
                         clickedPill.classList.add('active');
                         // Animate BG
                         window.updateAllSegmentedControls();
-                        
+
                         // Handle filter logic if needed (for Search View)
                         if (control.id === 'search-filter-pills') {
                             const filterVal = clickedPill.getAttribute('data-filter');
@@ -834,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
-        
+
         // Window resize to fix pill bg size
         window.addEventListener('resize', () => {
             window.updateAllSegmentedControls();

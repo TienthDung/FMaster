@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Study/Quiz SPA</title>
+    <title>FMaster - Ultimate Study Platform</title>
     <script>
         // Chỉ chuyển hướng sang PC nếu chiều rộng >= 1024px VÀ không phải là màn hình cảm ứng
         // (iPad Pro M1 có độ phân giải >1024px nhưng maxTouchPoints > 0 nên sẽ không bị chuyển)
@@ -15,83 +16,65 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- SVG Definitions for Liquid Glass Effect -->
     <svg style="display: none">
-      <!-- 
+        <!-- 
         This SVG defines a custom filter for a liquid glass distortion effect.
         It should be placed somewhere in your HTML (preferably near the top, such as in the <head> or before closing </body>).
       -->
-      <filter id="de-glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+        <filter id="de-glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
 
-        <!-- 
+            <!-- 
           1) Turbulence: Generates a noise texture for the distortion
           - `type="fractalNoise"` creates a smoother, cloudy noise
           - `baseFrequency` controls the size and density of the noise
           - `animate` cycles through different seeds to make the distortion look fluid
         -->
-        <feTurbulence 
-          type="fractalNoise" 
-          baseFrequency="0.01 0.01" 
-          numOctaves="1" 
-          seed="5" 
-          result="turbulence">
-            <animate attributeName="seed" from="1" to="200" dur="8s" repeatCount="indefinite"/>
-        </feTurbulence>
+            <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence">
+                <animate attributeName="seed" from="1" to="200" dur="8s" repeatCount="indefinite" />
+            </feTurbulence>
 
-        <!-- 
+            <!-- 
           2) Color Mapping: Controls how the noise affects the RGB channels
           - This stage adjusts the turbulence so it mainly affects the red channel (used for displacement)
           - Green and blue channels are suppressed to reduce distortion in those axes
         -->
-        <feComponentTransfer in="turbulence" result="mapped">
-          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5"/>
-          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0"/>
-          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5"/>
-        </feComponentTransfer>
+            <feComponentTransfer in="turbulence" result="mapped">
+                <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+                <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+                <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+            </feComponentTransfer>
 
-        <!-- 
+            <!-- 
           3) Blur: Softens the turbulence map for smoother distortion
         -->
-        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
 
-        <!-- 
+            <!-- 
           4) Lighting: Adds a specular light highlight based on the noise shape
           - Simulates light reflecting off a bumpy glass surface
         -->
-        <feSpecularLighting 
-          in="softMap" 
-          surfaceScale="5" 
-          specularConstant="1" 
-          specularExponent="100" 
-          lighting-color="white" 
-          result="specLight">
-            <fePointLight x="-200" y="-200" z="300"/>
-        </feSpecularLighting>
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100"
+                lighting-color="white" result="specLight">
+                <fePointLight x="-200" y="-200" z="300" />
+            </feSpecularLighting>
 
-        <!-- 
+            <!-- 
           5) Composite: Merges the lighting effect with the noise
         -->
-        <feComposite 
-          in="specLight" 
-          operator="arithmetic" 
-          k1="0" k2="1" k3="1" k4="0" 
-          result="litImage"/>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
 
-        <!-- 
+            <!-- 
           6) Displacement: Distorts the original graphic using the noise map
           - `scale` controls intensity
           - `xChannelSelector="R"` means distortion is driven by the red channel
           - `yChannelSelector="G"` uses the (mostly suppressed) green channel
         -->
-        <feDisplacementMap 
-          in="SourceGraphic" 
-          in2="softMap" 
-          scale="150" 
-          xChannelSelector="R" 
-          yChannelSelector="G"/>
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
 
-      </filter>
+        </filter>
     </svg>
 
     <!-- Background 3D Geometric Shapes -->
@@ -114,22 +97,23 @@
                     <button class="icon-btn theme-toggle"><i class="fas fa-moon"></i></button>
                 </div>
             </header>
-            
+
             <div class="content scrollable pb-bar">
                 <div class="card progress-card">
                     <div class="progress-header">
                         <span class="label">REVIEWED</span>
-                        <span class="numbers-cyan"><span id="reviewed-count">0</span>/<span id="reviewed-total">299</span></span>
+                        <span class="numbers-cyan"><span id="reviewed-count">0</span>/<span
+                                id="reviewed-total">299</span></span>
                     </div>
                     <div class="progress-bar-container mt-2 mb-4">
                         <div class="progress-bar-fill" id="reviewed-progress" style="width: 0%"></div>
                     </div>
-                    
+
                     <div class="progress-header">
                         <span class="label text-gray">Correct Rate</span>
                         <span class="numbers-cyan text-xl" id="correct-rate">0%</span>
                     </div>
-                    
+
                     <div class="stats-grid mt-4">
                         <div class="stat-item">
                             <h3 class="stat-num text-cyan" id="stat-correct">0</h3>
@@ -163,7 +147,7 @@
                         </div>
                         <i class="fas fa-chevron-right text-gray"></i>
                     </button>
-                    
+
                     <button class="action-card mt-3" id="btn-new-session">
                         <div class="action-icon bg-blue-subtle text-blue">
                             <i class="fas fa-plus"></i>
@@ -202,17 +186,19 @@
             </div>
 
             <div class="content scrollable pb-bar">
-                <div class="tag-pills mt-2 mb-4" id="practice-tags" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="tag-pills mt-2 mb-4" id="practice-tags"
+                    style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <div style="display: flex; gap: 8px;">
                         <span class="tag-pill" id="q-type-badge">MCQ</span>
                     </div>
-                    <button class="icon-btn" id="btn-favorite" title="Favorite" style="font-size: 1.5rem;"><i class="far fa-star"></i></button>
+                    <button class="icon-btn" id="btn-favorite" title="Favorite" style="font-size: 1.5rem;"><i
+                            class="far fa-star"></i></button>
                 </div>
-                
+
                 <div class="question-card" id="question-text">
                     Question text goes here...
                 </div>
-                
+
                 <div class="options-container mt-4" id="options-container">
                     <!-- Options populated by JS -->
                 </div>
@@ -229,7 +215,7 @@
                     <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
                 </div>
             </header>
-            
+
             <div class="content scrollable pb-bar">
                 <div class="filter-pills mt-2" id="bank-filters">
                     <button class="pill active" data-filter="all">All <span id="count-all">0</span></button>
@@ -289,7 +275,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-row-card mt-3">
                         <div class="stat-icon-circle bg-red-subtle text-red">
                             <i class="fas fa-times-circle"></i>
@@ -343,11 +329,12 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Subject Select View -->
         <section id="subject-select-view" class="view active">
             <div class="welcome-header">
-                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                <img src="img/Logo.png" alt="FMaster Logo"
+                    style="height: 60px; width: auto; object-fit: contain; margin-bottom: 12px; display: inline-block;">
                 <h1>Welcome!</h1>
                 <p>What would you like to learn today?</p>
             </div>
@@ -376,7 +363,8 @@
             </button>
         </nav>
     </div>
-    
+
     <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

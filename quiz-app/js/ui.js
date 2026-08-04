@@ -154,9 +154,10 @@ export class UI {
 
         if (!userAnswer && q.type === 'multiple_choice') {
             const submitBtn = document.createElement('button');
-            submitBtn.className = 'btn btn-primary mt-4';
-            submitBtn.style.width = '100%';
-            submitBtn.textContent = 'Submit Answer';
+            submitBtn.className = 'btn btn-primary mt-4 btn-liquid-submit';
+            submitBtn.style.display = 'block';
+            submitBtn.style.marginLeft = 'auto'; // align right
+            submitBtn.textContent = 'Submit';
             submitBtn.addEventListener('click', () => {
                 const selectedBtns = container.querySelectorAll('.option-btn.selected span.flex-1');
                 const selected = Array.from(selectedBtns).map(el => el.textContent);
