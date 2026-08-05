@@ -236,6 +236,17 @@ class QuizApp {
 
     submitAnswer(qId, answer) {
         this.state.userAnswers[qId] = answer;
+
+        const q = this.state.questions.find(x => x.id === qId);
+        if (q) {
+            const isCorrect = this.ui.checkIsCorrect(q, answer);
+            if (isCorrect) {
+                this.ui.showToast("Awesome! That's correct.", "correct");
+            } else {
+                this.ui.showToast("Oops! That's incorrect.", "incorrect");
+            }
+        }
+
         this.ui.renderQuestion(this.state.currentIndex);
     }
 

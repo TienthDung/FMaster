@@ -18,6 +18,32 @@ export class UI {
         }
     }
 
+    showToast(message, type = 'warning') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        let icon = 'fa-exclamation-triangle';
+        if (type === 'correct') icon = 'fa-check-circle';
+        if (type === 'incorrect') icon = 'fa-times-circle';
+
+        toast.innerHTML = `
+            <div class="toast-icon"><i class="fas ${icon}"></i></div>
+            <div class="toast-content">${message}</div>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('toast-hiding');
+            setTimeout(() => {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
     renderSubjects(subjects) {
         const grid = document.getElementById('subject-grid');
         grid.innerHTML = '';
