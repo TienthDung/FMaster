@@ -296,16 +296,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                         <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Question ${q.originalIndex + 1} (ID: ${q.id}) &bull; ${qType}
+                            Question ${q.originalIndex + 1}  &bull; ${qType}
                         </span>
                         <div style="display: flex; gap: 6px;">${badgeHtml}</div>
                     </div>
                     <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
                         ${q.question}
                     </h4>
-                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${snippet}
-                    </p>
                 `;
 
                 item.addEventListener('click', () => {
@@ -442,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.correctAnswers.every(val => q.userAnswers.includes(val));
         q.isCorrect = isMatch;
         renderQuestion();
-        
+
         if (isMatch) {
             showToast("Awesome! That's correct.", "correct");
         } else {
