@@ -235,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 q.userAnswers = [];
                 q.isCorrect = null;
             });
+            saveProgress();
             updateHome();
             currentQuestionIndex = 0;
             confirmResetModal.classList.remove('active');
@@ -257,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (currentSearchFilter === 'incorrect') filtered = filtered.filter(q => q.isCorrect === false);
         else if (currentSearchFilter === 'unanswered') filtered = filtered.filter(q => !q.isSubmitted);
         else if (currentSearchFilter === 'favorites') filtered = filtered.filter(q => q.isFavorite);
-        else if (currentSearchFilter === 'notes') filtered = filtered.filter(q => q.isNoted);
+        else if (currentSearchFilter === 'notes') filtered = filtered.filter(q => q.isNoted && q.noteText && q.noteText.trim() !== '');
 
         if (query) {
             filtered = filtered.filter(q => {
@@ -288,21 +289,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (q.isFavorite) badgeHtml += '<span class="badge" style="color:#f59e0b; background: rgba(245, 158, 11, 0.15);"><i class="fas fa-star"></i></span>';
-                if (q.isNoted) badgeHtml += '<span class="badge" style="color:#60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fas fa-sticky-note"></i></span>';
+                if (q.isNoted && q.noteText && q.noteText.trim() !== '') badgeHtml += '<span class="badge" style="color:#60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fas fa-sticky-note"></i></span>';
 
-                const qType = q.type === 'multiple_choice' ? 'Multiple Choice' : 'Single Choice';
-                const snippet = q.options.join(' • ');
+                let noteHtml = '';
+                if (q.isNoted && q.noteText) {
+                    noteHtml = `
+                    <div style="margin-top: 12px; padding: 12px; background: rgba(96, 165, 250, 0.1); border-left: 3px solid #60a5fa; border-radius: 4px; font-size: 0.95rem; color: #bfdbfe; line-height: 1.5;">
+                        <i class="fas fa-sticky-note" style="margin-right: 6px;"></i> <strong>Note:</strong><br>
+                        ${q.noteText.replace(/\n/g, '<br>')}
+                    </div>`;
+                }
 
                 item.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                         <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Question ${q.originalIndex + 1}  &bull; ${qType}
+                            Question ${q.originalIndex + 1}  &bull; ${q.type}
                         </span>
                         <div style="display: flex; gap: 6px;">${badgeHtml}</div>
                     </div>
                     <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
                         ${q.question}
                     </h4>
+                    ${noteHtml}
                 `;
 
                 item.addEventListener('click', () => {
@@ -329,8 +337,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const qText = document.querySelector('.question-text');
         qText.textContent = q.question;
 
-        if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-main)';
-        if (btnNote) btnNote.style.color = q.isNoted ? 'var(--primary)' : 'var(--text-main)';
+        if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-muted)';
+        if (btnNote) btnNote.style.color = q.isNoted ? '#60a5fa' : 'var(--text-muted)';
 
         const noteContainer = document.getElementById('note-area-container');
         const noteTextarea = document.getElementById('question-note-textarea');
@@ -348,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             newTextarea.addEventListener('input', (e) => {
                 q.noteText = e.target.value;
+                saveProgress();
             });
         }
 
@@ -438,6 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMatch = q.correctAnswers.length === q.userAnswers.length &&
             q.correctAnswers.every(val => q.userAnswers.includes(val));
         q.isCorrect = isMatch;
+        saveProgress();
         renderQuestion();
 
         if (isMatch) {
@@ -449,30 +459,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnFav) {
         btnFav.addEventListener('click', () => {
+            if (currentView !== 'practice-view' || currentQuestions.length === 0) return;
             const q = currentQuestions[currentQuestionIndex];
-            if (q) {
-                q.isFavorite = !q.isFavorite;
-                btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-main)';
-            }
+            q.isFavorite = !q.isFavorite;
+            btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-muted)';
+            saveProgress();
         });
     }
     if (btnNote) {
         btnNote.addEventListener('click', () => {
             const q = currentQuestions[currentQuestionIndex];
-            if (q) {
-                q.isNoted = !q.isNoted;
-                btnNote.style.color = q.isNoted ? 'var(--primary)' : 'var(--text-main)';
+            q.isNoted = !q.isNoted;
+            btnNote.style.color = q.isNoted ? '#60a5fa' : 'var(--text-muted)';
+            saveProgress();
 
-                const noteContainer = document.getElementById('note-area-container');
-                const noteTextarea = document.getElementById('question-note-textarea');
-                if (noteContainer && noteTextarea) {
-                    if (q.isNoted) {
-                        noteContainer.style.display = 'block';
-                        noteTextarea.value = q.noteText || '';
-                        noteTextarea.focus();
-                    } else {
-                        noteContainer.style.display = 'none';
-                    }
+            const noteContainer = document.getElementById('note-area-container');
+            const noteTextarea = document.getElementById('question-note-textarea');
+            if (noteContainer && noteTextarea) {
+                if (q.isNoted) {
+                    noteContainer.style.display = 'block';
+                    noteTextarea.value = q.noteText || '';
+                    noteTextarea.focus();
+                } else {
+                    noteContainer.style.display = 'none';
                 }
             }
         });
@@ -667,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!q.isSubmitted) {
                         q.isSubmitted = true;
                         q.isCorrect = false; // Reveal doesn't give a point
+                        saveProgress();
                         renderQuestion();
                     }
                     break;
@@ -691,6 +701,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // ---- Progress Storage ----
+        function saveProgress() {
+            const progress = currentQuestions.map(q => ({
+                id: q.id,
+                isFavorite: q.isFavorite,
+                isNoted: q.isNoted,
+                noteText: q.noteText,
+                isSubmitted: q.isSubmitted,
+                userAnswers: q.userAnswers,
+                isCorrect: q.isCorrect
+            }));
+            localStorage.setItem('quiz_pc_progress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('quiz_pc_progress');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    parsed.forEach(p => {
+                        const q = currentQuestions.find(item => item.id === p.id);
+                        if (q) {
+                            q.isFavorite = p.isFavorite;
+                            q.isNoted = p.isNoted;
+                            q.noteText = p.noteText;
+                            q.isSubmitted = p.isSubmitted;
+                            q.userAnswers = p.userAnswers || [];
+                            q.isCorrect = p.isCorrect;
+                        }
+                    });
+                } catch(e) { console.error('Failed to load progress', e); }
+            }
+        }
+
         // ---- Data Loading ----
         fetch('data/ite302c.csv')
             .then(res => {
@@ -699,6 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(text => {
                 currentQuestions = parseCSV(text);
+                loadProgress();
                 updateHome();
             })
             .catch(err => {
@@ -713,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const incorrect = currentQuestions.filter(q => q.isCorrect === false);
             const unanswered = currentQuestions.filter(q => !q.isSubmitted);
             const favorites = currentQuestions.filter(q => q.isFavorite === true);
-            const notes = currentQuestions.filter(q => q.isNoted === true);
+            const notes = currentQuestions.filter(q => q.isNoted === true && q.noteText && q.noteText.trim() !== '');
 
             document.getElementById('stat-correct').textContent = correct.length;
             document.getElementById('stat-incorrect').textContent = incorrect.length;
@@ -816,6 +861,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             listContainer.appendChild(optionsList);
+
+            if (q.isNoted && q.noteText) {
+                const noteBox = document.createElement('div');
+                noteBox.style.marginTop = '24px';
+                noteBox.style.padding = '16px';
+                noteBox.style.background = 'rgba(96, 165, 250, 0.1)';
+                noteBox.style.borderLeft = '3px solid #60a5fa';
+                noteBox.style.borderRadius = '8px';
+                noteBox.style.fontSize = '1rem';
+                noteBox.style.color = '#bfdbfe';
+                noteBox.style.lineHeight = '1.5';
+                noteBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 6px;"><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Note:</div>${q.noteText.replace(/\n/g, '<br>')}`;
+                listContainer.appendChild(noteBox);
+            }
 
             // Footer (Prev/Next hint)
             const hint = document.createElement('div');
