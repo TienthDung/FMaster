@@ -167,42 +167,52 @@
                 </div>
             </div>
 
-            <div class="question-container glass-panel">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                    <div class="question-indicator"
-                        style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; padding-top: 8px;">
+            <div class="carousel-wrapper" id="carousel-container">
+                <button class="carousel-arrow left-arrow" id="btn-carousel-prev" title="Previous Question">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="question-container glass-panel" id="question-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div class="question-indicator"
+                            style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; padding-top: 8px;">
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-action" id="btn-favorite" title="Favorite">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <button class="btn-action" id="btn-note" title="Note">
+                                <i class="fas fa-sticky-note"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-action" id="btn-favorite" title="Favorite">
-                            <i class="fas fa-star"></i>
-                        </button>
-                        <button class="btn-action" id="btn-note" title="Note">
-                            <i class="fas fa-sticky-note"></i>
-                        </button>
+                    <h2 class="question-text">
+                        Which organelle is primarily responsible for the production of ATP (adenosine triphosphate) in a
+                        eukaryotic cell?
+                    </h2>
+
+                    <div class="options-list">
+                        <button class="option-btn">Mitochondria</button>
+                        <button class="option-btn">Nucleus</button>
+                        <button class="option-btn">Ribosome</button>
+                        <button class="option-btn">Endoplasmic Reticulum</button>
+                    </div>
+
+                    <!-- Note Area -->
+                    <div id="note-area-container"
+                        style="display: none; margin-top: 16px; margin-bottom: 24px; animation: fadeIn 0.3s ease;">
+                        <textarea id="question-note-textarea" placeholder="Type your notes here..." rows="3"></textarea>
+                    </div>
+
+                    <div class="practice-actions flex-center">
+                        <button class="btn-primary" id="btn-submit" style="width: 200px;">Submit</button>
                     </div>
                 </div>
-                <h2 class="question-text">
-                    Which organelle is primarily responsible for the production of ATP (adenosine triphosphate) in a
-                    eukaryotic cell?
-                </h2>
 
-                <div class="options-list">
-                    <button class="option-btn">Mitochondria</button>
-                    <button class="option-btn">Nucleus</button>
-                    <button class="option-btn">Ribosome</button>
-                    <button class="option-btn">Endoplasmic Reticulum</button>
-                </div>
-
-                <!-- Note Area -->
-                <div id="note-area-container"
-                    style="display: none; margin-top: 16px; margin-bottom: 24px; animation: fadeIn 0.3s ease;">
-                    <textarea id="question-note-textarea" placeholder="Type your notes here..." rows="3"></textarea>
-                </div>
-
-                <div class="practice-actions">
-                    <button class="btn-ghost" id="btn-prev">Previous</button>
-                    <button class="btn-primary" id="btn-submit">Submit</button>
-                </div>
+                <button class="carousel-arrow right-arrow" id="btn-carousel-next" title="Next Question">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </section>
 
@@ -284,7 +294,8 @@
     <!-- Support Help Icon (Bottom Right) -->
     <div id="btn-help"
         style="position: fixed; bottom: 24px; right: 24px; width: 36px; height: 36px; background-color: var(--surface-highlight); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 50;">
-        <i class="fas fa-question" style="color: var(--text-muted); font-size: 1.1rem; transition: color 0.2s;" onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'"></i>
+        <i class="fas fa-question" style="color: var(--text-muted); font-size: 1.1rem; transition: color 0.2s;"
+            onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'"></i>
     </div>
 
     <!-- Detail Modal -->
@@ -307,7 +318,8 @@
             <div class="modal-body" style="padding: 0;">
                 <div
                     style="font-size: 3.5rem; color: var(--danger); margin-bottom: 20px; filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.4));">
-                    <i class="fas fa-exclamation-circle"></i></div>
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
                 <h2 style="font-size: 1.5rem; margin-bottom: 12px; font-weight: 600;">Reset All Progress?</h2>
                 <p style="color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;">This action cannot be
                     undone. All your correct, incorrect, and unanswered statistics will be permanently wiped out.</p>

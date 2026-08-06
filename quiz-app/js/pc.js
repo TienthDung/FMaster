@@ -326,11 +326,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNote = document.getElementById('btn-note');
     const optionsContainer = document.querySelector('.options-list');
     const btnSubmit = document.getElementById('btn-submit');
-    const btnPrev = document.getElementById('btn-prev');
+    const btnCarouselPrev = document.getElementById('btn-carousel-prev');
+    const btnCarouselNext = document.getElementById('btn-carousel-next');
 
-    function renderQuestion() {
+    function renderQuestion(direction = '') {
         if (currentQuestions.length === 0) return;
         const q = currentQuestions[currentQuestionIndex];
+
+        const qCard = document.getElementById('question-card');
+        if (qCard) {
+            qCard.classList.remove('slide-in-left', 'slide-in-right');
+            void qCard.offsetWidth; // trigger reflow
+            if (direction === 'left') {
+                qCard.classList.add('slide-in-left');
+            } else if (direction === 'right') {
+                qCard.classList.add('slide-in-right');
+            }
+        }
 
         document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
 
@@ -394,9 +406,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnSubmit) {
             if (q.isSubmitted) {
-                btnSubmit.textContent = (currentQuestionIndex === currentQuestions.length - 1) ? "Finish Module" : "Next Question";
+                btnSubmit.textContent = "Checked";
+                btnSubmit.disabled = true;
+                btnSubmit.style.opacity = '0.5';
             } else {
                 btnSubmit.textContent = "Submit";
+                btnSubmit.disabled = false;
+                btnSubmit.style.opacity = '1';
+            }
+        }
+
+        if (btnCarouselPrev) {
+            if (currentQuestionIndex === 0) {
+                btnCarouselPrev.classList.add('disabled');
+            } else {
+                btnCarouselPrev.classList.remove('disabled');
+            }
+        }
+
+        if (btnCarouselNext) {
+            if (currentQuestionIndex === currentQuestions.length - 1) {
+                btnCarouselNext.classList.add('disabled');
+            } else {
+                btnCarouselNext.classList.remove('disabled');
             }
         }
     }
@@ -422,13 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function submitAnswer() {
         const q = currentQuestions[currentQuestionIndex];
         if (q.isSubmitted) {
-            if (currentQuestionIndex < currentQuestions.length - 1) {
-                currentQuestionIndex++;
-                focusedOptionIndex = 0;
-                renderQuestion();
-            } else {
-                switchView('stats-view');
-            }
             return;
         }
 
@@ -491,472 +516,486 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmit.addEventListener('click', submitAnswer);
     }
 
-    if (btnPrev) {
-        btnPrev.addEventListener('click', () => {
+    if (btnCarouselPrev) {
+        btnCarouselPrev.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
                 focusedOptionIndex = 0;
-                renderQuestion();
+                renderQuestion('left');
             } else {
                 switchView('home-view');
             }
         });
-        // ---- Quick Search in Practice ----
-        const quickSearchContainer = document.querySelector('.practice-quick-search');
-        const btnQuickSearch = document.getElementById('btn-quick-search');
-        const inputQuickSearch = document.getElementById('quick-search-input');
-        const dropdownQuickSearch = document.getElementById('quick-search-dropdown');
+    }
 
-        if (btnQuickSearch && quickSearchContainer && inputQuickSearch) {
-            btnQuickSearch.addEventListener('click', (e) => {
-                e.stopPropagation();
-                quickSearchContainer.classList.toggle('active');
-                if (quickSearchContainer.classList.contains('active')) {
-                    inputQuickSearch.focus();
-                    renderQuickSearch(inputQuickSearch.value);
-                } else {
-                    dropdownQuickSearch.classList.remove('active');
-                }
-            });
+    if (btnCarouselNext) {
+        btnCarouselNext.addEventListener('click', () => {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                focusedOptionIndex = 0;
+                renderQuestion('right');
+            } else {
+                showToast("You have reached the end of the module.", "info");
+                switchView('stats-view');
+            }
+        });
+    }
+    // ---- Quick Search in Practice ----
+    const quickSearchContainer = document.querySelector('.practice-quick-search');
+    const btnQuickSearch = document.getElementById('btn-quick-search');
+    const inputQuickSearch = document.getElementById('quick-search-input');
+    const dropdownQuickSearch = document.getElementById('quick-search-dropdown');
 
-            inputQuickSearch.addEventListener('input', (e) => {
-                renderQuickSearch(e.target.value);
-            });
-
-            inputQuickSearch.addEventListener('click', (e) => e.stopPropagation());
-            dropdownQuickSearch.addEventListener('click', (e) => e.stopPropagation());
-
-            document.addEventListener('click', () => {
-                quickSearchContainer.classList.remove('active');
+    if (btnQuickSearch && quickSearchContainer && inputQuickSearch) {
+        btnQuickSearch.addEventListener('click', (e) => {
+            e.stopPropagation();
+            quickSearchContainer.classList.toggle('active');
+            if (quickSearchContainer.classList.contains('active')) {
+                inputQuickSearch.focus();
+                renderQuickSearch(inputQuickSearch.value);
+            } else {
                 dropdownQuickSearch.classList.remove('active');
-            });
-        }
+            }
+        });
 
-        // ---- Main Search in Explorer ----
-        const mainSearchContainer = document.getElementById('main-search-container');
-        const btnMainSearch = document.getElementById('btn-main-search');
-        const inputMainSearch = document.getElementById('search-input');
+        inputQuickSearch.addEventListener('input', (e) => {
+            renderQuickSearch(e.target.value);
+        });
 
-        if (btnMainSearch && mainSearchContainer && inputMainSearch) {
-            btnMainSearch.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!mainSearchContainer.classList.contains('active')) {
-                    mainSearchContainer.classList.add('active');
+        inputQuickSearch.addEventListener('click', (e) => e.stopPropagation());
+        dropdownQuickSearch.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('click', () => {
+            quickSearchContainer.classList.remove('active');
+            dropdownQuickSearch.classList.remove('active');
+        });
+    }
+
+    // ---- Main Search in Explorer ----
+    const mainSearchContainer = document.getElementById('main-search-container');
+    const btnMainSearch = document.getElementById('btn-main-search');
+    const inputMainSearch = document.getElementById('search-input');
+
+    if (btnMainSearch && mainSearchContainer && inputMainSearch) {
+        btnMainSearch.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!mainSearchContainer.classList.contains('active')) {
+                mainSearchContainer.classList.add('active');
+                inputMainSearch.focus();
+            } else {
+                if (inputMainSearch.value.trim() !== '') {
+                    // Clear the input on click when open
+                    inputMainSearch.value = '';
+                    // Trigger input event to update search results
+                    inputMainSearch.dispatchEvent(new Event('input'));
                     inputMainSearch.focus();
                 } else {
-                    if (inputMainSearch.value.trim() !== '') {
-                        // Clear the input on click when open
-                        inputMainSearch.value = '';
-                        // Trigger input event to update search results
-                        inputMainSearch.dispatchEvent(new Event('input'));
-                        inputMainSearch.focus();
-                    } else {
-                        mainSearchContainer.classList.remove('active');
-                    }
-                }
-            });
-
-            inputMainSearch.addEventListener('click', (e) => e.stopPropagation());
-
-            document.addEventListener('click', () => {
-                if (inputMainSearch.value.trim() === '') {
                     mainSearchContainer.classList.remove('active');
                 }
-            });
+            }
+        });
+
+        inputMainSearch.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('click', () => {
+            if (inputMainSearch.value.trim() === '') {
+                mainSearchContainer.classList.remove('active');
+            }
+        });
+    }
+
+    function renderQuickSearch(query) {
+        if (!query.trim()) {
+            dropdownQuickSearch.classList.remove('active');
+            return;
         }
 
-        function renderQuickSearch(query) {
-            if (!query.trim()) {
-                dropdownQuickSearch.classList.remove('active');
-                return;
+        const qLower = query.toLowerCase();
+        let results = [];
+
+        currentQuestions.forEach((q, idx) => {
+            if ((q.id && q.id.toLowerCase().includes(qLower)) ||
+                String(idx + 1).includes(qLower) ||
+                q.question.toLowerCase().includes(qLower) ||
+                q.options.some(opt => opt.toLowerCase().includes(qLower))) {
+                results.push({ q, idx });
             }
+        });
 
-            const qLower = query.toLowerCase();
-            let results = [];
+        dropdownQuickSearch.innerHTML = '';
 
-            currentQuestions.forEach((q, idx) => {
-                if ((q.id && q.id.toLowerCase().includes(qLower)) ||
-                    String(idx + 1).includes(qLower) ||
-                    q.question.toLowerCase().includes(qLower) ||
-                    q.options.some(opt => opt.toLowerCase().includes(qLower))) {
-                    results.push({ q, idx });
-                }
-            });
+        if (results.length === 0) {
+            dropdownQuickSearch.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 0.9rem;">No questions found</div>';
+        } else {
+            results.slice(0, 10).forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'quick-search-item';
 
-            dropdownQuickSearch.innerHTML = '';
-
-            if (results.length === 0) {
-                dropdownQuickSearch.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 0.9rem;">No questions found</div>';
-            } else {
-                results.slice(0, 10).forEach(result => {
-                    const item = document.createElement('div');
-                    item.className = 'quick-search-item';
-
-                    item.innerHTML = `
+                item.innerHTML = `
                     <h5>Question ${result.idx + 1}</h5>
                     <p>${result.q.question}</p>
                 `;
 
-                    item.addEventListener('click', () => {
-                        currentQuestionIndex = result.idx;
-                        focusedOptionIndex = 0;
-                        renderQuestion();
-                        quickSearchContainer.classList.remove('active');
-                        dropdownQuickSearch.classList.remove('active');
-                    });
-
-                    dropdownQuickSearch.appendChild(item);
+                item.addEventListener('click', () => {
+                    currentQuestionIndex = result.idx;
+                    focusedOptionIndex = 0;
+                    renderQuestion();
+                    quickSearchContainer.classList.remove('active');
+                    dropdownQuickSearch.classList.remove('active');
                 });
-            }
-            dropdownQuickSearch.classList.add('active');
+
+                dropdownQuickSearch.appendChild(item);
+            });
+        }
+        dropdownQuickSearch.classList.add('active');
+    }
+
+    // ---- Keyboard Navigation ----
+    document.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+            return; // Ignore shortcuts when typing in input or textarea
         }
 
-        // ---- Keyboard Navigation ----
-        document.addEventListener('keydown', (e) => {
-            if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-                return; // Ignore shortcuts when typing in input or textarea
-            }
-
-            // Modal Navigation
-            if (modal.classList.contains('active')) {
-                switch (e.key) {
-                    case 'ArrowRight':
-                        e.preventDefault();
-                        if (currentModalIndex < currentModalList.length - 1) {
-                            currentModalIndex++;
-                            renderModalQuestion();
-                        }
-                        break;
-                    case 'ArrowLeft':
-                        e.preventDefault();
-                        if (currentModalIndex > 0) {
-                            currentModalIndex--;
-                            renderModalQuestion();
-                        }
-                        break;
-                    case 'Escape':
-                        e.preventDefault();
-                        modal.classList.remove('active');
-                        break;
-                }
-                return; // Dừng xử lý các phím khác nếu Modal đang mở
-            }
-
-            if (currentView !== 'practice-view' || currentQuestions.length === 0) return;
-            const q = currentQuestions[currentQuestionIndex];
-
+        // Modal Navigation
+        if (modal.classList.contains('active')) {
             switch (e.key) {
-                case 'ArrowDown':
-                    e.preventDefault();
-                    if (!q.isSubmitted) {
-                        focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
-                        renderQuestion();
-                    }
-                    break;
-                case 'ArrowUp':
-                    e.preventDefault();
-                    if (!q.isSubmitted) {
-                        focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
-                        renderQuestion();
-                    }
-                    break;
-
-                case 'Enter':
-                    e.preventDefault();
-                    if (!q.isSubmitted) {
-                        toggleOption(focusedOptionIndex);
-                    }
-                    break;
-                case ' ':
-                    e.preventDefault();
-                    submitAnswer();
-                    break;
-                case 'Shift':
-                    e.preventDefault();
-                    if (!q.isSubmitted) {
-                        q.isSubmitted = true;
-                        q.isCorrect = false; // Reveal doesn't give a point
-                        saveProgress();
-                        renderQuestion();
-                    }
-                    break;
                 case 'ArrowRight':
                     e.preventDefault();
-                    if (currentQuestionIndex < currentQuestions.length - 1) {
-                        currentQuestionIndex++;
-                        focusedOptionIndex = 0;
-                        renderQuestion();
-                    } else if (q.isSubmitted) {
-                        switchView('stats-view');
+                    if (currentModalIndex < currentModalList.length - 1) {
+                        currentModalIndex++;
+                        renderModalQuestion();
                     }
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
-                    if (currentQuestionIndex > 0) {
-                        currentQuestionIndex--;
-                        focusedOptionIndex = 0;
-                        renderQuestion();
+                    if (currentModalIndex > 0) {
+                        currentModalIndex--;
+                        renderModalQuestion();
                     }
                     break;
+                case 'Escape':
+                    e.preventDefault();
+                    modal.classList.remove('active');
+                    break;
             }
+            return; // Dừng xử lý các phím khác nếu Modal đang mở
+        }
+
+        if (currentView !== 'practice-view' || currentQuestions.length === 0) return;
+        const q = currentQuestions[currentQuestionIndex];
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (!q.isSubmitted) {
+                    focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
+                    renderQuestion();
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (!q.isSubmitted) {
+                    focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
+                    renderQuestion();
+                }
+                break;
+
+            case 'Enter':
+                e.preventDefault();
+                if (!q.isSubmitted) {
+                    toggleOption(focusedOptionIndex);
+                }
+                break;
+            case ' ':
+                e.preventDefault();
+                submitAnswer();
+                break;
+            case 'Shift':
+                e.preventDefault();
+                if (!q.isSubmitted) {
+                    q.isSubmitted = true;
+                    q.isCorrect = false; // Reveal doesn't give a point
+                    saveProgress();
+                    renderQuestion();
+                }
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    focusedOptionIndex = 0;
+                    renderQuestion();
+                } else if (q.isSubmitted) {
+                    switchView('stats-view');
+                }
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    focusedOptionIndex = 0;
+                    renderQuestion();
+                }
+                break;
+        }
+    });
+
+    // ---- Progress Storage ----
+    function saveProgress() {
+        const progress = currentQuestions.map(q => ({
+            id: q.id,
+            isFavorite: q.isFavorite,
+            isNoted: q.isNoted,
+            noteText: q.noteText,
+            isSubmitted: q.isSubmitted,
+            userAnswers: q.userAnswers,
+            isCorrect: q.isCorrect
+        }));
+        localStorage.setItem('quiz_pc_progress', JSON.stringify(progress));
+    }
+
+    function loadProgress() {
+        const saved = localStorage.getItem('quiz_pc_progress');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                parsed.forEach(p => {
+                    const q = currentQuestions.find(item => item.id === p.id);
+                    if (q) {
+                        q.isFavorite = p.isFavorite;
+                        q.isNoted = p.isNoted;
+                        q.noteText = p.noteText;
+                        q.isSubmitted = p.isSubmitted;
+                        q.userAnswers = p.userAnswers || [];
+                        q.isCorrect = p.isCorrect;
+                    }
+                });
+            } catch (e) { console.error('Failed to load progress', e); }
+        }
+    }
+
+    // ---- Data Loading ----
+    fetch('data/ite302c.csv')
+        .then(res => {
+            if (!res.ok) throw new Error("Could not fetch CSV");
+            return res.text();
+        })
+        .then(text => {
+            currentQuestions = parseCSV(text);
+            loadProgress();
+            updateHome();
+        })
+        .catch(err => {
+            console.error("CSV loading error:", err);
         });
 
-        // ---- Progress Storage ----
-        function saveProgress() {
-            const progress = currentQuestions.map(q => ({
-                id: q.id,
-                isFavorite: q.isFavorite,
-                isNoted: q.isNoted,
-                noteText: q.noteText,
-                isSubmitted: q.isSubmitted,
-                userAnswers: q.userAnswers,
-                isCorrect: q.isCorrect
-            }));
-            localStorage.setItem('quiz_pc_progress', JSON.stringify(progress));
-        }
+    // ---- Dashboard Logic ----
+    function updateDashboard() {
+        if (currentQuestions.length === 0) return;
 
-        function loadProgress() {
-            const saved = localStorage.getItem('quiz_pc_progress');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    parsed.forEach(p => {
-                        const q = currentQuestions.find(item => item.id === p.id);
-                        if (q) {
-                            q.isFavorite = p.isFavorite;
-                            q.isNoted = p.isNoted;
-                            q.noteText = p.noteText;
-                            q.isSubmitted = p.isSubmitted;
-                            q.userAnswers = p.userAnswers || [];
-                            q.isCorrect = p.isCorrect;
-                        }
-                    });
-                } catch (e) { console.error('Failed to load progress', e); }
-            }
-        }
+        const correct = currentQuestions.filter(q => q.isCorrect === true);
+        const incorrect = currentQuestions.filter(q => q.isCorrect === false);
+        const unanswered = currentQuestions.filter(q => !q.isSubmitted);
+        const favorites = currentQuestions.filter(q => q.isFavorite === true);
+        const notes = currentQuestions.filter(q => q.isNoted === true && q.noteText && q.noteText.trim() !== '');
 
-        // ---- Data Loading ----
-        fetch('data/ite302c.csv')
-            .then(res => {
-                if (!res.ok) throw new Error("Could not fetch CSV");
-                return res.text();
-            })
-            .then(text => {
-                currentQuestions = parseCSV(text);
-                loadProgress();
-                updateHome();
-            })
-            .catch(err => {
-                console.error("CSV loading error:", err);
-            });
+        document.getElementById('stat-correct').textContent = correct.length;
+        document.getElementById('stat-incorrect').textContent = incorrect.length;
+        document.getElementById('stat-unanswered').textContent = unanswered.length;
+        document.getElementById('stat-favorites').textContent = favorites.length;
+        document.getElementById('stat-notes').textContent = notes.length;
 
-        // ---- Dashboard Logic ----
-        function updateDashboard() {
-            if (currentQuestions.length === 0) return;
+        const chartContainer = document.getElementById('stats-chart');
+        if (chartContainer) {
+            chartContainer.innerHTML = '';
 
-            const correct = currentQuestions.filter(q => q.isCorrect === true);
-            const incorrect = currentQuestions.filter(q => q.isCorrect === false);
-            const unanswered = currentQuestions.filter(q => !q.isSubmitted);
-            const favorites = currentQuestions.filter(q => q.isFavorite === true);
-            const notes = currentQuestions.filter(q => q.isNoted === true && q.noteText && q.noteText.trim() !== '');
+            const answeredCount = correct.length + incorrect.length;
+            let acc = 0;
+            if (answeredCount > 0) acc = Math.round((correct.length / answeredCount) * 100);
 
-            document.getElementById('stat-correct').textContent = correct.length;
-            document.getElementById('stat-incorrect').textContent = incorrect.length;
-            document.getElementById('stat-unanswered').textContent = unanswered.length;
-            document.getElementById('stat-favorites').textContent = favorites.length;
-            document.getElementById('stat-notes').textContent = notes.length;
-
-            const chartContainer = document.getElementById('stats-chart');
-            if (chartContainer) {
-                chartContainer.innerHTML = '';
-
-                const answeredCount = correct.length + incorrect.length;
-                let acc = 0;
-                if (answeredCount > 0) acc = Math.round((correct.length / answeredCount) * 100);
-
-                const barGroup = document.createElement('div');
-                barGroup.className = 'bar-group';
-                barGroup.innerHTML = `
+            const barGroup = document.createElement('div');
+            barGroup.className = 'bar-group';
+            barGroup.innerHTML = `
                 <div class="bar bar-success" style="height: ${acc}%;"><span>${acc}%</span></div>
                 <span class="bar-label">ITE302C</span>
             `;
-                chartContainer.appendChild(barGroup);
+            chartContainer.appendChild(barGroup);
+        }
+
+        setupModalTrigger('correct', "Correct Answers", correct);
+        setupModalTrigger('incorrect', "Incorrect Answers", incorrect);
+        setupModalTrigger('unanswered', "Unanswered Questions", unanswered);
+        setupModalTrigger('favorites', "Favorite Questions", favorites);
+        setupModalTrigger('notes', "Noted Questions", notes);
+    }
+
+    // ---- Modal Logic ----
+    const modal = document.getElementById('detail-modal');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+
+    if (btnCloseModal) {
+        btnCloseModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+
+    function showModal(title, list, startIndex = 0) {
+        document.getElementById('modal-title').textContent = title;
+        currentModalList = list;
+        currentModalIndex = startIndex;
+
+        renderModalQuestion();
+        modal.classList.add('active');
+    }
+
+    function renderModalQuestion() {
+        const listContainer = document.getElementById('modal-list');
+        listContainer.innerHTML = '';
+
+        if (currentModalList.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found in this category.</p>';
+            return;
+        }
+
+        const q = currentModalList[currentModalIndex];
+
+        // Header (Index & Type)
+        const header = document.createElement('div');
+        header.style.marginBottom = '20px';
+        header.style.fontSize = '0.9rem';
+        header.style.color = 'var(--text-muted)';
+        header.style.fontWeight = '600';
+        header.style.textTransform = 'uppercase';
+        header.textContent = `QUESTION ${currentModalIndex + 1} OF ${currentModalList.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+        listContainer.appendChild(header);
+
+        // Question Text
+        const qText = document.createElement('h3');
+        qText.style.fontSize = '1.3rem';
+        qText.style.fontWeight = '500';
+        qText.style.marginBottom = '24px';
+        qText.textContent = q.question;
+        listContainer.appendChild(qText);
+
+        // Options
+        const optionsList = document.createElement('div');
+        optionsList.className = 'options-list';
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.disabled = true; // Read-only
+
+            const isSelected = q.userAnswers.includes(String(idx));
+            const isCorrectAns = q.correctAnswers.includes(String(idx));
+
+            if (isCorrectAns) {
+                btn.classList.add('correct');
+            } else if (isSelected && !isCorrectAns) {
+                btn.classList.add('incorrect');
             }
 
-            setupModalTrigger('correct', "Correct Answers", correct);
-            setupModalTrigger('incorrect', "Incorrect Answers", incorrect);
-            setupModalTrigger('unanswered', "Unanswered Questions", unanswered);
-            setupModalTrigger('favorites', "Favorite Questions", favorites);
-            setupModalTrigger('notes', "Noted Questions", notes);
-        }
-
-        // ---- Modal Logic ----
-        const modal = document.getElementById('detail-modal');
-        const btnCloseModal = document.getElementById('btn-close-modal');
-
-        if (btnCloseModal) {
-            btnCloseModal.addEventListener('click', () => {
-                modal.classList.remove('active');
-            });
-        }
-
-        function showModal(title, list, startIndex = 0) {
-            document.getElementById('modal-title').textContent = title;
-            currentModalList = list;
-            currentModalIndex = startIndex;
-
-            renderModalQuestion();
-            modal.classList.add('active');
-        }
-
-        function renderModalQuestion() {
-            const listContainer = document.getElementById('modal-list');
-            listContainer.innerHTML = '';
-
-            if (currentModalList.length === 0) {
-                listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found in this category.</p>';
-                return;
-            }
-
-            const q = currentModalList[currentModalIndex];
-
-            // Header (Index & Type)
-            const header = document.createElement('div');
-            header.style.marginBottom = '20px';
-            header.style.fontSize = '0.9rem';
-            header.style.color = 'var(--text-muted)';
-            header.style.fontWeight = '600';
-            header.style.textTransform = 'uppercase';
-            header.textContent = `QUESTION ${currentModalIndex + 1} OF ${currentModalList.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
-            listContainer.appendChild(header);
-
-            // Question Text
-            const qText = document.createElement('h3');
-            qText.style.fontSize = '1.3rem';
-            qText.style.fontWeight = '500';
-            qText.style.marginBottom = '24px';
-            qText.textContent = q.question;
-            listContainer.appendChild(qText);
-
-            // Options
-            const optionsList = document.createElement('div');
-            optionsList.className = 'options-list';
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.disabled = true; // Read-only
-
-                const isSelected = q.userAnswers.includes(String(idx));
-                const isCorrectAns = q.correctAnswers.includes(String(idx));
-
-                if (isCorrectAns) {
-                    btn.classList.add('correct');
-                } else if (isSelected && !isCorrectAns) {
-                    btn.classList.add('incorrect');
-                }
-
-                optionsList.appendChild(btn);
-            });
-
-            listContainer.appendChild(optionsList);
-
-            if (q.isNoted && q.noteText) {
-                const noteBox = document.createElement('div');
-                noteBox.style.marginTop = '24px';
-                noteBox.style.padding = '16px';
-                noteBox.style.background = 'rgba(96, 165, 250, 0.1)';
-                noteBox.style.borderLeft = '3px solid #60a5fa';
-                noteBox.style.borderRadius = '8px';
-                noteBox.style.fontSize = '1rem';
-                noteBox.style.color = '#bfdbfe';
-                noteBox.style.lineHeight = '1.5';
-                noteBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 6px;"><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Note:</div>${q.noteText.replace(/\n/g, '<br>')}`;
-                listContainer.appendChild(noteBox);
-            }
-
-            // Footer (Prev/Next hint)
-            const hint = document.createElement('div');
-            hint.style.marginTop = '24px';
-            hint.style.textAlign = 'center';
-            hint.style.color = 'var(--text-muted)';
-            hint.style.fontSize = '0.85rem';
-            hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Use Left/Right arrow keys to navigate';
-            listContainer.appendChild(hint);
-        }
-
-        function setupModalTrigger(type, title, list) {
-            const card = document.querySelector(`.stat-card[data-type="${type}"]`);
-            if (!card) return;
-
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-
-            newCard.addEventListener('click', () => {
-                showModal(title, list);
-            });
-        }
-
-        // ---- Segmented Control Logic ----
-        window.updateAllSegmentedControls = function () {
-            const controls = document.querySelectorAll('.segmented-control');
-            controls.forEach(control => {
-                const active = control.querySelector('.pill.active');
-                const bg = control.querySelector('.pill-active-bg');
-                if (active && bg && active.offsetWidth > 0) {
-                    bg.style.width = active.offsetWidth + 'px';
-                    bg.style.transform = `translateX(${active.offsetLeft}px)`;
-                }
-            });
-        };
-
-        function initSegmentedControls() {
-            const controls = document.querySelectorAll('.segmented-control');
-            controls.forEach(control => {
-                const pills = control.querySelectorAll('.pill');
-
-                // Initial setup
-                if (control.querySelector('.pill.active')) {
-                    setTimeout(() => window.updateAllSegmentedControls(), 50);
-                }
-
-                // Add click events
-                pills.forEach(pill => {
-                    pill.addEventListener('click', (e) => {
-                        const clickedPill = e.currentTarget;
-
-                        // Remove active from all
-                        pills.forEach(p => p.classList.remove('active'));
-                        // Add to current
-                        clickedPill.classList.add('active');
-                        // Animate BG
-                        window.updateAllSegmentedControls();
-
-                        // Handle filter logic if needed (for Search View)
-                        if (control.id === 'search-filter-pills') {
-                            const filterVal = clickedPill.getAttribute('data-filter');
-                            if (filterVal) {
-                                currentSearchFilter = filterVal;
-                                const searchInput = document.getElementById('search-input');
-                                if (searchInput) searchInput.value = '';
-                                updateSearch();
-                            }
-                        }
-                    });
-                });
-            });
-        }
-
-        // Window resize to fix pill bg size
-        window.addEventListener('resize', () => {
-            window.updateAllSegmentedControls();
+            optionsList.appendChild(btn);
         });
 
-        // Initialize segmented controls
-        initSegmentedControls();
+        listContainer.appendChild(optionsList);
 
-        // Init View
-        switchView('home-view');
+        if (q.isNoted && q.noteText) {
+            const noteBox = document.createElement('div');
+            noteBox.style.marginTop = '24px';
+            noteBox.style.padding = '16px';
+            noteBox.style.background = 'rgba(96, 165, 250, 0.1)';
+            noteBox.style.borderLeft = '3px solid #60a5fa';
+            noteBox.style.borderRadius = '8px';
+            noteBox.style.fontSize = '1rem';
+            noteBox.style.color = '#bfdbfe';
+            noteBox.style.lineHeight = '1.5';
+            noteBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 6px;"><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Note:</div>${q.noteText.replace(/\n/g, '<br>')}`;
+            listContainer.appendChild(noteBox);
+        }
+
+        // Footer (Prev/Next hint)
+        const hint = document.createElement('div');
+        hint.style.marginTop = '24px';
+        hint.style.textAlign = 'center';
+        hint.style.color = 'var(--text-muted)';
+        hint.style.fontSize = '0.85rem';
+        hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Use Left/Right arrow keys to navigate';
+        listContainer.appendChild(hint);
     }
-});
+
+    function setupModalTrigger(type, title, list) {
+        const card = document.querySelector(`.stat-card[data-type="${type}"]`);
+        if (!card) return;
+
+        const newCard = card.cloneNode(true);
+        card.parentNode.replaceChild(newCard, card);
+
+        newCard.addEventListener('click', () => {
+            showModal(title, list);
+        });
+    }
+
+    // ---- Segmented Control Logic ----
+    window.updateAllSegmentedControls = function () {
+        const controls = document.querySelectorAll('.segmented-control');
+        controls.forEach(control => {
+            const active = control.querySelector('.pill.active');
+            const bg = control.querySelector('.pill-active-bg');
+            if (active && bg && active.offsetWidth > 0) {
+                bg.style.width = active.offsetWidth + 'px';
+                bg.style.transform = `translateX(${active.offsetLeft}px)`;
+            }
+        });
+    };
+
+    function initSegmentedControls() {
+        const controls = document.querySelectorAll('.segmented-control');
+        controls.forEach(control => {
+            const pills = control.querySelectorAll('.pill');
+
+            // Initial setup
+            if (control.querySelector('.pill.active')) {
+                setTimeout(() => window.updateAllSegmentedControls(), 50);
+            }
+
+            // Add click events
+            pills.forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    const clickedPill = e.currentTarget;
+
+                    // Remove active from all
+                    pills.forEach(p => p.classList.remove('active'));
+                    // Add to current
+                    clickedPill.classList.add('active');
+                    // Animate BG
+                    window.updateAllSegmentedControls();
+
+                    // Handle filter logic if needed (for Search View)
+                    if (control.id === 'search-filter-pills') {
+                        const filterVal = clickedPill.getAttribute('data-filter');
+                        if (filterVal) {
+                            currentSearchFilter = filterVal;
+                            const searchInput = document.getElementById('search-input');
+                            if (searchInput) searchInput.value = '';
+                            updateSearch();
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    // Window resize to fix pill bg size
+    window.addEventListener('resize', () => {
+        window.updateAllSegmentedControls();
+    });
+
+    // Initialize segmented controls
+    initSegmentedControls();
+
+    // Init View
+    switchView('home-view');
+}
+);

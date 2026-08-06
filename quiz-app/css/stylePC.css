@@ -67,7 +67,7 @@ body {
     position: absolute;
     background: rgba(100, 255, 218, 0.08);
     /* Very subtle blue cyan glow */
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px) url(#de-glass-distortion);
     border: 1px solid rgba(100, 255, 218, 0.15);
     box-shadow: 0 0 30px rgba(100, 255, 218, 0.1);
 }
@@ -115,8 +115,8 @@ body {
 /* Glass Panel Utility (Sidebar / Default) */
 .glass-panel {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(15px) saturate(120%);
-    -webkit-backdrop-filter: blur(15px) saturate(120%);
+    backdrop-filter: blur(15px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
@@ -185,8 +185,8 @@ body {
 .sidebar {
     width: var(--sidebar-width);
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
@@ -310,6 +310,7 @@ body {
         opacity: 0;
         transform: scale(0.98) translateY(15px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -344,7 +345,12 @@ body {
 }
 
 /* Micro-interaction for buttons */
-.btn-primary:active, .btn-ghost:active, .option-btn:active, .pill:active, .stat-card:active, .jump-card:active {
+.btn-primary:active,
+.btn-ghost:active,
+.option-btn:active,
+.pill:active,
+.stat-card:active,
+.jump-card:active {
     transform: scale(0.96);
     transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -515,8 +521,8 @@ body {
     max-height: 300px;
     overflow-y: auto;
     background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-md);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -615,8 +621,8 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     background: rgba(255, 255, 255, 0.02) !important;
-    backdrop-filter: blur(20px) saturate(120%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
+    backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -641,8 +647,8 @@ body {
     text-align: left;
     padding: 20px 24px;
     background-color: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(5px) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     color: var(--text-main);
@@ -702,8 +708,8 @@ body {
 
 .btn-action {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(12px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -749,8 +755,8 @@ body {
 
 #btn-submit {
     background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -794,15 +800,15 @@ body {
 .filter-pills {
     display: inline-flex;
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-full);
     padding: 6px;
     position: relative;
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.1);
     margin-bottom: 24px;
 }
 
@@ -812,9 +818,9 @@ body {
     bottom: 6px;
     left: 0;
     width: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+    backdrop-filter: blur(10px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-full);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
@@ -846,7 +852,7 @@ body {
 
 .pill.active {
     color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .data-table {
@@ -1017,8 +1023,8 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) url(#de-glass-distortion);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1098,8 +1104,8 @@ body {
 .search-result-item {
     padding: 16px 20px;
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
@@ -1122,8 +1128,8 @@ body {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(20px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
@@ -1207,8 +1213,8 @@ body {
 
 .toast {
     background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-left: 4px solid var(--danger);
@@ -1260,4 +1266,116 @@ body {
         transform: translateY(10px);
         opacity: 0;
     }
+}
+
+/* Carousel Flashcard UI */
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+    gap: 24px;
+}
+
+.carousel-wrapper .question-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+    padding: 32px;
+}
+
+/* Animations */
+.slide-in-right {
+    animation: slideInRight 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(60px) scale(0.98);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    0% {
+        transform: translateX(-60px) scale(0.98);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.carousel-arrow {
+    position: relative;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(24px) saturate(120%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10;
+}
+
+.carousel-arrow:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.carousel-arrow:active {
+    transform: scale(0.95);
+}
+
+.carousel-arrow.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+@media (max-width: 1000px) {
+    .carousel-wrapper {
+        gap: 12px;
+    }
+
+    .carousel-arrow {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+
+    .carousel-wrapper .question-container {
+        padding: 24px;
+    }
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
