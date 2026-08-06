@@ -329,8 +329,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCarouselPrev = document.getElementById('btn-carousel-prev');
     const btnCarouselNext = document.getElementById('btn-carousel-next');
 
+    function updatePracticeProgress() {
+        if (currentQuestions.length === 0) return;
+        
+        let answered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        
+        currentQuestions.forEach(q => {
+            if (q.isSubmitted) {
+                answered++;
+                if (q.isCorrect) correctCount++;
+                else incorrectCount++;
+            }
+        });
+        
+        const total = currentQuestions.length;
+        const unansweredCount = total - answered;
+        const progressPercent = total > 0 ? (answered / total) * 100 : 0;
+        
+        const fillEl = document.getElementById('practice-progress-fill');
+        const textEl = document.getElementById('practice-progress-text');
+        const unansEl = document.getElementById('practice-stat-unanswered');
+        const corrEl = document.getElementById('practice-stat-correct');
+        const incorrEl = document.getElementById('practice-stat-incorrect');
+        
+        if (fillEl) fillEl.style.width = `${progressPercent}%`;
+        if (textEl) textEl.textContent = `${Math.round(progressPercent)}%`;
+        if (unansEl) unansEl.textContent = unansweredCount;
+        if (corrEl) corrEl.textContent = correctCount;
+        if (incorrEl) incorrEl.textContent = incorrectCount;
+    }
+
     function renderQuestion(direction = '') {
         if (currentQuestions.length === 0) return;
+        
+        updatePracticeProgress();
         const q = currentQuestions[currentQuestionIndex];
 
         const qCard = document.getElementById('question-card');
