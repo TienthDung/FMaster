@@ -645,9 +645,12 @@ body {
 }
 
 .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
     width: 100%;
     text-align: left;
-    padding: 20px 24px;
+    padding: 16px 24px;
     background-color: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(5px) url(#de-glass-distortion);
     -webkit-backdrop-filter: blur(5px) url(#de-glass-distortion);
@@ -658,6 +661,60 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
+}
+
+.option-indicator {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px) saturate(120%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(12px) saturate(120%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.option-text {
+    flex: 1;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.option-btn:hover .option-indicator,
+.option-btn.focused .option-indicator {
+    color: #fff;
+    border-color: rgba(100, 255, 218, 0.5);
+    background: rgba(100, 255, 218, 0.15);
+    box-shadow: inset 0 1px 1px rgba(100, 255, 218, 0.2), 0 0 15px rgba(100, 255, 218, 0.3);
+}
+
+.option-btn.selected .option-indicator {
+    color: #fff;
+    border-color: #00F2FE;
+    background: rgba(0, 242, 254, 0.2);
+    box-shadow: inset 0 1px 1px rgba(0, 242, 254, 0.2), 0 0 15px rgba(0, 242, 254, 0.5);
+}
+
+.option-btn.correct .option-indicator {
+    color: #fff;
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.2);
+    box-shadow: inset 0 1px 1px rgba(16, 185, 129, 0.2), 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.option-btn.incorrect .option-indicator {
+    color: #fff;
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.2);
+    box-shadow: inset 0 1px 1px rgba(239, 68, 68, 0.2), 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
 .option-btn:hover,

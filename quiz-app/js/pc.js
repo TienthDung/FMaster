@@ -378,7 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
         q.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.textContent = opt;
+            
+            const letter = String.fromCharCode(65 + idx); // 0 -> A, 1 -> B
+            btn.innerHTML = `
+                <div class="option-indicator">${letter}</div>
+                <div class="option-text">${opt}</div>
+            `;
 
             if (idx === focusedOptionIndex && !q.isSubmitted) {
                 btn.classList.add('focused');
