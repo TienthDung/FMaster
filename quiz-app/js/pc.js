@@ -915,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         header.style.color = 'var(--text-muted)';
         header.style.fontWeight = '600';
         header.style.textTransform = 'uppercase';
-        header.textContent = `QUESTION ${currentModalIndex + 1} OF ${currentModalList.length} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+        header.textContent = `QUESTION ${q.originalIndex + 1} (${currentModalIndex + 1} OF ${currentModalList.length}) - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
         listContainer.appendChild(header);
 
         // Question Text
