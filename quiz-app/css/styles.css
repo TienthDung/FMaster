@@ -1514,23 +1514,6 @@ body {
     font-weight: 600;
 }
 
-.nav-indicator {
-    height: 74px;
-    top: 8px;
-    width: calc((100% - 16px) / 5);
-    left: 8px;
-    border-radius: 37px;
-}
-
-.nav-item {
-    font-size: 0.95rem;
-    padding-top: 4px;
-}
-
-.nav-item i {
-    font-size: 1.6rem;
-    margin-bottom: 4px;
-}
 
 
 /* 2. iPad Pro / Tablet Màn hình ngang (Landscape) - Từ 1024px trở lên */

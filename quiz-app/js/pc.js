@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             q.isCorrect = p.isCorrect;
                         }
                     });
-                } catch(e) { console.error('Failed to load progress', e); }
+                } catch (e) { console.error('Failed to load progress', e); }
             }
         }
 
