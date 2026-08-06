@@ -707,7 +707,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case ' ':
                 e.preventDefault();
-                submitAnswer();
+                if (q.isSubmitted) {
+                    if (currentQuestionIndex < currentQuestions.length - 1) {
+                        currentQuestionIndex++;
+                        focusedOptionIndex = 0;
+                        renderQuestion('right');
+                    } else {
+                        showToast("You have reached the end of the module.", "info");
+                        switchView('stats-view');
+                    }
+                } else {
+                    submitAnswer();
+                }
                 break;
             case 'Shift':
                 e.preventDefault();
