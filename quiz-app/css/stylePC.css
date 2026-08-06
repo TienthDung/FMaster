@@ -1101,6 +1101,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    /* Tùy chọn: Thêm khoảng trống nhỏ cho scrollbar */
 }
 
 .search-result-item {
