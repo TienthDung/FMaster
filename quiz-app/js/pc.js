@@ -406,10 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnSubmit) {
             if (q.isSubmitted) {
-                btnSubmit.textContent = "Checked";
-                btnSubmit.disabled = true;
-                btnSubmit.style.opacity = '0.5';
+                btnSubmit.style.display = 'none';
             } else {
+                btnSubmit.style.display = 'inline-block';
                 btnSubmit.textContent = "Submit";
                 btnSubmit.disabled = false;
                 btnSubmit.style.opacity = '1';
