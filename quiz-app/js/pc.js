@@ -1083,5 +1083,260 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Init View
     switchView('home-view');
+
+    // ==========================================
+    // FLASHCARDS LOGIC
+    // ==========================================
+    let fcData = []; // Filtered list for flashcards
+    let fcIndex = 0;
+    
+    const fcSearchInput = document.getElementById('fc-search-input');
+    const fcCard = document.getElementById('fc-card');
+    const fcFrontContent = document.getElementById('fc-front-content');
+    const fcBackContent = document.getElementById('fc-back-content');
+    const btnFcPrev = document.getElementById('btn-fc-prev');
+    const btnFcNext = document.getElementById('btn-fc-next');
+    const fcProgress = document.getElementById('fc-progress');
+
+    const fcFrontOptions = document.getElementById('fc-front-options');
+    const btnFcNoIdea = document.getElementById('btn-fc-no-idea');
+    const btnFcMaster = document.getElementById('btn-fc-master');
+    const fcStatMastered = document.getElementById('fc-stat-mastered');
+    const fcStatLearning = document.getElementById('fc-stat-learning');
+    const fcStatNew = document.getElementById('fc-stat-new');
+    const fcProgressFill = document.getElementById('fc-progress-fill');
+
+    function updateFcStats() {
+        if (!currentQuestions || currentQuestions.length === 0) return;
+        
+        let mastered = 0;
+        let learning = 0;
+        let notStarted = 0;
+
+        currentQuestions.forEach(q => {
+            if (q.fcStatus === 'mastered') mastered++;
+            else if (q.fcStatus === 'learning') learning++;
+            else notStarted++;
+        });
+
+        if (fcStatMastered) fcStatMastered.textContent = `Mastered: ${mastered}`;
+        if (fcStatLearning) fcStatLearning.textContent = `In Progress: ${learning}`;
+        if (fcStatNew) fcStatNew.textContent = `Not Started: ${notStarted}`;
+
+        const total = currentQuestions.length;
+        const percent = Math.round(((mastered + (learning * 0.5)) / total) * 100);
+        if (fcProgressFill) fcProgressFill.style.width = `${percent}%`;
+    }
+
+    function initFlashcards() {
+        if (typeof currentQuestions !== 'undefined' && currentQuestions.length > 0) {
+            fcData = [...currentQuestions];
+            fcIndex = 0;
+            updateFcStats();
+            renderFlashcard(fcIndex, null);
+        }
+    }
+
+    function renderFlashcard(index, direction = null) {
+        if (fcData.length === 0) {
+            if(fcFrontContent) fcFrontContent.textContent = "No flashcards found.";
+            if(fcFrontOptions) fcFrontOptions.innerHTML = "";
+            if(fcBackContent) fcBackContent.textContent = "";
+            if(fcProgress) fcProgress.textContent = "0 / 0";
+            return;
+        }
+
+        const q = fcData[index];
+        
+        // Render Question
+        if(fcFrontContent) fcFrontContent.textContent = `Question ${q.id}: ${q.question}`;
+        
+        // Render Options
+        if(fcFrontOptions) {
+            fcFrontOptions.innerHTML = "";
+            if (q.options && q.options.length > 0) {
+                const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                q.options.forEach((opt, i) => {
+                    if (opt.trim() === '') return;
+                    const div = document.createElement('div');
+                    div.className = 'fc-option-item';
+                    div.innerHTML = `<strong>${labels[i] || '-'}.</strong> ${opt}`;
+                    fcFrontOptions.appendChild(div);
+                });
+            }
+        }
+
+        // Render Answer
+        if(fcBackContent) {
+            const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const correctTexts = q.correctAnswers.map(idx => {
+                const optIdx = parseInt(idx);
+                return `<div style="margin-bottom: 8px;"><strong>${labels[optIdx] || '-'}.</strong> ${q.options[optIdx]}</div>`;
+            }).join('');
+            
+            fcBackContent.innerHTML = `
+                <div style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">Correct Answer:</div>
+                <div style="font-size: 1.3rem; font-weight: 400; color: var(--success); text-align: left;">
+                    ${correctTexts}
+                </div>
+            `;
+        }
+        
+        if(fcProgress) fcProgress.textContent = `${index + 1} / ${fcData.length}`;
+
+        if(fcCard) {
+            // Temporarily disable transition to snap back instantly without glitch
+            fcCard.style.transition = 'none';
+            fcCard.classList.remove('is-flipped');
+            void fcCard.offsetWidth; // Force reflow
+            fcCard.style.transition = ''; // Restore transition
+        }
+
+        // Apply slide animation if direction is provided
+        if (direction && fcCard) {
+            fcCard.classList.remove('slide-out-left', 'slide-out-right', 'slide-in-left', 'slide-in-right');
+            
+            // Force reflow to restart animation
+            void fcCard.offsetWidth;
+
+            if (direction === 'next') {
+                fcCard.classList.add('slide-in-right');
+            } else if (direction === 'prev') {
+                fcCard.classList.add('slide-in-left');
+            }
+            
+            setTimeout(() => {
+                fcCard.classList.remove('slide-in-right', 'slide-in-left');
+            }, 300);
+        }
+    }
+
+    // Toggle Flip
+    if (fcCard) {
+        fcCard.addEventListener('click', (e) => {
+            // Prevent flip if clicking on actions
+            if (e.target.closest('.fc-actions')) return;
+            if (fcData.length === 0) return;
+            fcCard.classList.toggle('is-flipped');
+        });
+    }
+
+    // Action Buttons
+    if (btnFcNoIdea) {
+        btnFcNoIdea.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (fcData.length === 0) return;
+            const q = fcData[fcIndex];
+            q.fcStatus = 'learning';
+            updateFcStats();
+            
+            // Advance to next card
+            btnFcNext.click();
+        });
+    }
+
+    if (btnFcMaster) {
+        btnFcMaster.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (fcData.length === 0) return;
+            const q = fcData[fcIndex];
+            q.fcStatus = 'mastered';
+            updateFcStats();
+            
+            // Advance to next card
+            btnFcNext.click();
+        });
+    }
+
+    // Prev Button
+    if (btnFcPrev) {
+        btnFcPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (fcData.length === 0) return;
+            fcIndex = (fcIndex - 1 + fcData.length) % fcData.length;
+            renderFlashcard(fcIndex, 'prev');
+        });
+    }
+
+    // Next Button
+    if (btnFcNext) {
+        btnFcNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (fcData.length === 0) return;
+            fcIndex = (fcIndex + 1) % fcData.length;
+            renderFlashcard(fcIndex, 'next');
+        });
+    }
+
+    // Search Logic
+    if (fcSearchInput) {
+        fcSearchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            if (!term) {
+                fcData = [...currentQuestions];
+            } else {
+                fcData = currentQuestions.filter(q => 
+                    q.question.toLowerCase().includes(term) || 
+                    q.correctAnswers.join(', ').toLowerCase().includes(term)
+                );
+            }
+            fcIndex = 0;
+            renderFlashcard(fcIndex, null);
+        });
+    }
+
+    // Keyboard controls for Flashcard (only when view is active)
+    document.addEventListener('keydown', (e) => {
+        const flashcardView = document.getElementById('flashcard-view');
+        if(!flashcardView) return;
+        const isFlashcardView = flashcardView.classList.contains('active');
+        if (!isFlashcardView) return;
+        
+        // Don't trigger if user is typing in search box
+        if (document.activeElement === fcSearchInput) return;
+
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            if(btnFcNext) btnFcNext.click();
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            if(btnFcPrev) btnFcPrev.click();
+        } else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (fcData.length > 0 && fcCard) {
+                fcCard.classList.toggle('is-flipped');
+            }
+        }
+    });
+
+    // Initial load hook - if we navigate to flashcards, make sure they're initialized
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (item.getAttribute('data-target') === 'flashcard-view') {
+                // If it's the first time and we have data
+                if (fcData.length === 0 && typeof currentQuestions !== 'undefined' && currentQuestions.length > 0) {
+                    initFlashcards();
+                }
+            }
+        });
+    });
+
+    // We also need to hook into the CSV load success to init flashcards if we are on the view
+    if (typeof updateHome === 'function') {
+        const originalUpdateHome = updateHome;
+        updateHome = function() {
+            originalUpdateHome();
+            const flashcardView = document.getElementById('flashcard-view');
+            if (flashcardView && flashcardView.classList.contains('active')) {
+                initFlashcards();
+            } else if (fcData.length === 0) {
+                initFlashcards(); // preemptive init
+            }
+        };
+    }
 }
 );
+
+
+
+
