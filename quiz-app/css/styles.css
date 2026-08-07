@@ -46,25 +46,25 @@
 }
 
 :root[data-theme="light"] {
-    --bg-color: #f2f2f7;
-    --surface-color: #FFFFFF;
-    --surface-highlight: rgba(0, 0, 0, 0.03);
+    --bg-color: #f8fafc;
+    --surface-color: rgba(255, 255, 255, 0.65);
+    --surface-highlight: #f1f5f9;
 
-    --primary: #5e5ce6;
-    --primary-hover: #4a48c4;
-    --primary-subtle: rgba(94, 92, 230, 0.12);
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-subtle: rgba(59, 130, 246, 0.15);
 
-    --cyan: #32ade6;
-    --cyan-subtle: rgba(50, 173, 230, 0.15);
+    --cyan: #0ea5e9;
+    --cyan-subtle: rgba(14, 165, 233, 0.15);
 
-    --success: #34c759;
-    --success-subtle: rgba(52, 199, 89, 0.15);
+    --success: #10b981;
+    --success-subtle: rgba(16, 185, 129, 0.15);
 
-    --danger: #ff3b30;
-    --danger-subtle: rgba(255, 59, 48, 0.15);
+    --danger: #ef4444;
+    --danger-subtle: rgba(239, 68, 68, 0.15);
 
-    --text-main: #1c1c1e;
-    --text-muted: #8e8e93;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
 
     --border-color: rgba(0, 0, 0, 0.06);
 
@@ -83,8 +83,8 @@
 }
 
 body {
-    background: radial-gradient(circle at center, #103060 0%, #050A1A 100%);
-    background-attachment: fixed;
+    background: linear-gradient(rgba(10, 15, 30, 0.6), rgba(10, 15, 30, 0.8)), url('../img/dark_theme.jpeg') no-repeat center center fixed;
+    background-size: cover;
     color: var(--text-main);
     display: flex;
     justify-content: center;
@@ -402,8 +402,8 @@ body {
     border-radius: var(--radius-lg);
     border: 1px solid rgba(100, 255, 218, 0.1);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 20px rgba(100, 255, 218, 0.05);
-    backdrop-filter: blur(20px) url(#de-glass-distortion);
-    -webkit-backdrop-filter: blur(20px) url(#de-glass-distortion);
+    backdrop-filter: blur(40px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(40px) url(#de-glass-distortion);
 }
 
 .progress-card {
@@ -525,7 +525,7 @@ body {
 
 .action-card:hover {
     border-color: rgba(100, 255, 218, 0.3);
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(196, 196, 196, 0.14);
 }
 
 .action-icon {
@@ -647,8 +647,8 @@ body {
     line-height: 1.6;
     color: var(--text-main);
     font-weight: 500;
-    backdrop-filter: blur(20px) url(#de-glass-distortion);
-    -webkit-backdrop-filter: blur(20px) url(#de-glass-distortion);
+    backdrop-filter: blur(10px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 25px rgba(100, 255, 218, 0.08);
 }
 
@@ -663,7 +663,7 @@ body {
     text-align: left;
     padding: 16px;
     border-radius: var(--radius-lg);
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(196, 196, 196, 0.14);
     color: var(--text-main);
     border: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 1.05rem;
@@ -688,9 +688,9 @@ body {
     font-weight: 700;
     font-size: 1rem;
     color: var(--text-muted);
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    background: rgba(196, 196, 196, 0.14);
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
@@ -698,7 +698,7 @@ body {
 
 .option-btn:hover {
     border-color: rgba(100, 255, 218, 0.3);
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(196, 196, 196, 0.14);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transform: translateY(-2px);
 }
@@ -795,7 +795,7 @@ body {
 .pill {
     padding: 10px 16px;
     border-radius: var(--radius-full);
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(196, 196, 196, 0.14);
     color: var(--text-main);
     border: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
@@ -858,7 +858,7 @@ body {
     padding: 6px 12px;
     border-radius: var(--radius-full);
     border: 1px solid var(--border-color);
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(196, 196, 196, 0.14);
     font-size: 0.8rem;
     color: var(--text-muted);
     display: flex;
@@ -888,7 +888,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(196, 196, 196, 0.14);
     color: var(--text-main);
     transition: 0.2s;
     position: relative;
@@ -1005,8 +1005,8 @@ body {
     max-width: 400px;
     height: 72px;
     background: rgba(72, 72, 72, 0);
-    backdrop-filter: blur(24px) url(#de-glass-distortion);
-    -webkit-backdrop-filter: blur(24px) url(#de-glass-distortion);
+    backdrop-filter: blur(40px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(40px) url(#de-glass-distortion);
     border-radius: 36px;
     border: 1px solid rgba(100, 255, 218, 0.15);
     display: flex;
@@ -1514,9 +1514,9 @@ body {
 
 /* Mobile Liquid Submit Button */
 .btn-liquid-submit {
-    background: rgba(15, 23, 42, 0.45) !important;
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    background: rgba(196, 196, 196, 0.14) !important;
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
@@ -1718,9 +1718,9 @@ body {
 
 /* Mobile Liquid Submit Button */
 .btn-liquid-submit {
-    background: rgba(15, 23, 42, 0.45) !important;
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    background: rgba(196, 196, 196, 0.14) !important;
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
@@ -1757,9 +1757,9 @@ body {
 }
 
 .toast {
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    background: rgba(196, 196, 196, 0.14);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
     border-radius: var(--radius-lg);
     padding: 14px 20px;
     color: var(--text-main);
@@ -1835,3 +1835,101 @@ body {
         opacity: 0;
     }
 }
+
+/* =========================================
+   LIGHT THEME OVERRIDES (MOBILE)
+   ========================================= */
+[data-theme="light"] body {
+    color: var(--text-main);
+    background: url('../img/light_theme.jpeg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* App Header & Bottom Nav (Glass) */
+[data-theme="light"] .app-header,
+[data-theme="light"] .bottom-nav {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .bottom-nav {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: none;
+}
+
+[data-theme="light"] .app-header h1 {
+    color: var(--text-main);
+}
+[data-theme="light"] .nav-item {
+    color: var(--text-muted);
+}
+[data-theme="light"] .nav-item.active {
+    color: var(--primary);
+}
+[data-theme="light"] .icon-btn {
+    color: var(--text-main);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* Option Buttons */
+[data-theme="light"] .option-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--text-main);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+[data-theme="light"] .option-btn.selected {
+    background: #eff6ff;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px var(--primary-subtle);
+}
+
+/* Bottom Sheet / Modal */
+[data-theme="light"] .bottom-sheet {
+    background: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .search-bar {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="light"] .search-bar input {
+    color: var(--text-main);
+}
+
+/* Tags and Pills */
+[data-theme="light"] .tag-pill {
+    background: #f1f5f9;
+    color: var(--text-muted);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Action Icons */
+[data-theme="light"] .action-icon.bg-blue-subtle {
+    background: var(--primary-subtle);
+}
+[data-theme="light"] .action-icon.text-blue {
+    color: var(--primary);
+}
+
+/* Progress Text */
+[data-theme="light"] .progress-text {
+    color: var(--text-main);
+}
+
+/* Stats Row Cards */
+[data-theme="light"] .stat-row-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+[data-theme="light"] .stat-row-card h3 {
+    color: var(--text-main);
+}
+[data-theme="light"] .stat-row-card p {
+    color: var(--text-muted);
+}
+

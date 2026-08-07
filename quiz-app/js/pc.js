@@ -1044,6 +1044,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize segmented controls
     initSegmentedControls();
 
+    // =========================================
+    // SETTINGS MODAL & THEME TOGGLE
+    // =========================================
+    const btnSettings = document.getElementById('btn-settings');
+    const settingsModal = document.getElementById('settings-modal');
+    const btnCloseSettings = document.getElementById('btn-close-settings');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    if (btnSettings && settingsModal && btnCloseSettings) {
+        btnSettings.addEventListener('click', () => {
+            settingsModal.classList.add('active');
+        });
+
+        btnCloseSettings.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+    }
+
+    // Load theme from localStorage
+    const currentTheme = localStorage.getItem('fmaster_theme');
+    if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (themeToggle) themeToggle.checked = true;
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('fmaster_theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('fmaster_theme', 'dark');
+            }
+        });
+    }
+
     // Init View
     switchView('home-view');
 }
