@@ -60,17 +60,35 @@ class QuizApp {
             this.navigateTo('practice-view');
         });
 
+        const btnPracticeMode = document.getElementById('btn-practice-mode');
+        
+        btnPracticeMode.addEventListener('click', () => {
+            this.navigateTo('practice-view');
+        });
+
         const goPrev = () => {
             if (this.state.currentIndex > 0) {
                 this.state.currentIndex--;
-                this.ui.renderQuestion(this.state.currentIndex);
+                const isFc = document.getElementById('flashcard-view').classList.contains('active');
+                if (isFc) {
+                    this.resetFlashcardState();
+                    this.ui.renderFlashcard(this.state.currentIndex);
+                } else {
+                    this.ui.renderQuestion(this.state.currentIndex);
+                }
             }
         };
 
         const goNext = () => {
             if (this.state.currentIndex < this.state.questions.length - 1) {
                 this.state.currentIndex++;
-                this.ui.renderQuestion(this.state.currentIndex);
+                const isFc = document.getElementById('flashcard-view').classList.contains('active');
+                if (isFc) {
+                    this.resetFlashcardState();
+                    this.ui.renderFlashcard(this.state.currentIndex);
+                } else {
+                    this.ui.renderQuestion(this.state.currentIndex);
+                }
             }
         };
 
@@ -104,7 +122,45 @@ class QuizApp {
             swipeStartX = null;
             swipeStartY = null;
         }, { passive: true });
+        
+        // Flashcard specific logic
+        const flipCard = () => {
+            const card = document.getElementById('fc-card');
+            if(card) {
+                card.classList.toggle('is-flipped');
+            }
+        };
+        
+        const fcView = document.getElementById('flashcard-view');
+        fcView.addEventListener('touchstart', (e) => {
+            swipeStartX = e.touches[0].clientX;
+            swipeStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        fcView.addEventListener('touchend', (e) => {
+            if (!swipeStartX || !swipeStartY) return;
+            let swipeEndX = e.changedTouches[0].clientX;
+            let swipeEndY = e.changedTouches[0].clientY;
+            let diffX = swipeStartX - swipeEndX;
+            let diffY = swipeStartY - swipeEndY;
+
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                if (diffX > 0) goNext();
+                else goPrev();
+            } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+                // simple tap to flip if target is the card
+                if(e.target.closest('.fc-container')) {
+                   flipCard();
+                }
+            }
+            swipeStartX = null;
+            swipeStartY = null;
+        }, { passive: true });
+
         document.getElementById('btn-practice-back').addEventListener('click', () => {
+            this.navigateTo('dashboard-view');
+        });
+        document.getElementById('btn-flashcard-back').addEventListener('click', () => {
             this.navigateTo('dashboard-view');
         });
 
@@ -230,8 +286,19 @@ class QuizApp {
 
         if (viewId === 'dashboard-view') this.ui.updateDashboard();
         if (viewId === 'practice-view') this.ui.renderQuestion(this.state.currentIndex);
+        if (viewId === 'flashcard-view') {
+            this.resetFlashcardState();
+            this.ui.renderFlashcard(this.state.currentIndex);
+        }
         if (viewId === 'bank-view') this.ui.renderBank();
         if (viewId === 'stats-view') this.ui.updateStats();
+    }
+    
+    resetFlashcardState() {
+        const card = document.getElementById('fc-card');
+        if(card && card.classList.contains('is-flipped')) {
+            card.classList.remove('is-flipped');
+        }
     }
 
     submitAnswer(qId, answer) {

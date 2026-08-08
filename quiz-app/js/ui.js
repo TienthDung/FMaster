@@ -194,7 +194,57 @@ export class UI {
             container.appendChild(submitBtn);
         }
 
+        if (userAnswer && q.explanation) {
+            const explanationBox = document.createElement('div');
+            explanationBox.className = 'explanation-box';
+            explanationBox.innerHTML = `
+                <div class="explanation-title"><i class="fas fa-lightbulb"></i> Explanation</div>
+                <div class="explanation-text">${q.explanation}</div>
+            `;
+            container.appendChild(explanationBox);
+        }
+    }
 
+    renderFlashcard(index) {
+        const q = this.state.questions[index];
+        if (!q) return;
+
+        document.getElementById('fc-counter').textContent = `Q#${index + 1} · ${index + 1}/${this.state.questions.length}`;
+        const progress = ((index + 1) / this.state.questions.length) * 100;
+        document.getElementById('fc-progress').style.width = `${progress}%`;
+
+        document.getElementById('fc-question-text').textContent = q.question;
+        
+        // Render options on the front
+        const optContainer = document.getElementById('fc-options-container');
+        if (optContainer) {
+            optContainer.innerHTML = '';
+            if (q.options && q.options.length > 0) {
+                q.options.forEach((opt, i) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option-btn';
+                    btn.style.pointerEvents = 'none'; // Not clickable in flashcard view
+                    btn.style.marginBottom = '8px';
+                    const letter = String.fromCharCode(65 + i);
+                    btn.innerHTML = `<div class="option-letter">${letter}</div> <span class="flex-1" style="text-align: left;">${opt}</span>`;
+                    optContainer.appendChild(btn);
+                });
+            }
+        }
+        
+        let correctAnswers = Array.isArray(q.correctanswer) ? q.correctanswer.join(', ') : q.correctanswer;
+        document.getElementById('fc-answer-text').textContent = correctAnswers;
+
+        const expEl = document.getElementById('fc-explanation-text');
+        const expLabel = document.querySelector('.fc-explanation-label');
+        if (q.explanation) {
+            expEl.textContent = q.explanation;
+            expEl.style.display = 'block';
+            if(expLabel) expLabel.style.display = 'block';
+        } else {
+            expEl.style.display = 'none';
+            if(expLabel) expLabel.style.display = 'none';
+        }
     }
 
     renderBank() {
