@@ -324,14 +324,16 @@ class QuizApp {
             }
         });
 
-        if (viewId === 'dashboard-view') this.ui.updateDashboard();
+        if (viewId === 'dashboard-view') {
+            this.ui.updateDashboard();
+            this.ui.updateStats();
+        }
         if (viewId === 'practice-view') this.ui.renderQuestion(this.state.currentIndex);
         if (viewId === 'flashcard-view') {
             this.resetFlashcardState();
             this.ui.renderFlashcard(this.state.currentIndex);
         }
         if (viewId === 'bank-view') this.ui.renderBank();
-        if (viewId === 'stats-view') this.ui.updateStats();
     }
     
     resetFlashcardState() {

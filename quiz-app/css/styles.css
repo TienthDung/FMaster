@@ -1034,7 +1034,7 @@ body {
     top: 6px;
     left: 6px;
     height: 60px;
-    width: calc((100% - 12px) / 6);
+    width: calc((100% - 12px) / 5);
     background: rgba(255, 255, 255, 0.1);
     border-radius: 30px;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -1307,7 +1307,7 @@ body {
     .nav-indicator {
         height: 74px;
         top: 8px;
-        width: calc((100% - 16px) / 6);
+        width: calc((100% - 16px) / 5);
         left: 8px;
         border-radius: 37px;
     }

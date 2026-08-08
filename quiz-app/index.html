@@ -162,6 +162,73 @@
                     </button>
                 </div>
 
+                <div class="section-header mt-6 mb-4">STATISTICS</div>
+                
+                <div class="card chart-card text-center mb-4">
+                    <div class="donut-chart mx-auto" id="donut-chart">
+                        <div class="donut-inner">
+                            <h2 id="accuracy-display" class="text-color-main">67%</h2>
+                            <span class="text-gray text-xs">Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container mt-6 mb-2">
+                        <div class="progress-bar-fill bg-cyan" id="stats-overall-progress" style="width: 40%"></div>
+                    </div>
+                    <p class="text-gray text-sm" id="stats-answered-text">12/30 questions answered</p>
+                </div>
+
+                <div class="stats-summary-list mb-6">
+                    <div class="stat-row-card">
+                        <div class="stat-icon-circle bg-green-subtle text-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-color-main font-semibold">Correct</span>
+                                <span class="text-green font-bold" id="stats-correct-val">12</span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-green" id="bar-correct" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row-card mt-3">
+                        <div class="stat-icon-circle bg-red-subtle text-red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-color-main font-semibold">Incorrect</span>
+                                <span class="text-red font-bold" id="stats-incorrect-val">6</span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-red" id="bar-incorrect" style="width: 20%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row-card mt-3">
+                        <div class="stat-icon-circle bg-gray-subtle text-gray">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="stat-row-content">
+                            <div class="flex-between">
+                                <span class="text-color-main font-semibold">Unanswered</span>
+                                <span class="text-color-main font-bold" id="stats-unanswered-val">7</span>
+                            </div>
+                            <div class="progress-bar-container mt-2">
+                                <div class="progress-bar-fill bg-cyan" id="bar-unanswered" style="width: 23%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header mb-4">CATEGORY BREAKDOWN</div>
+                <div class="category-list mb-6" id="breakdown-list">
+                    <!-- Populated by JS -->
+                </div>
+
                 <div class="section-header flex-between mt-6">
                     <span>RECENT QUESTIONS</span>
                     <a href="#" class="text-blue text-sm" style="text-decoration:none;">View All</a>
@@ -236,12 +303,12 @@
                 <div class="fc-container" id="fc-container">
                     <div class="fc-card" id="fc-card">
                         <!-- Front Face -->
-                        <div class="fc-face fc-front">
-                            <div class="fc-content flex-col w-full h-full">
+                        <div class="fc-face fc-front" style="align-items: flex-start;">
+                            <div class="fc-content flex-col w-full" style="margin: auto 0;">
                                 <div id="fc-question-text" class="mb-4">
                                     Question text goes here...
                                 </div>
-                                <div id="fc-options-container" class="options-container w-full" style="flex: 1; overflow-y: auto;">
+                                <div id="fc-options-container" class="options-container w-full">
                                     <!-- Options populated by JS -->
                                 </div>
                             </div>
@@ -292,84 +359,6 @@
             </div>
         </section>
 
-        <!-- Stats View -->
-        <section id="stats-view" class="view hidden">
-            <header class="app-header">
-                <h1>Statistics</h1>
-                <div class="header-actions">
-                    <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
-                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
-                </div>
-            </header>
-
-            <div class="content scrollable pb-bar">
-                <div class="card chart-card text-center mb-4 mt-2">
-                    <div class="donut-chart mx-auto" id="donut-chart">
-                        <div class="donut-inner">
-                            <h2 id="accuracy-display" class="text-color-main">67%</h2>
-                            <span class="text-gray text-xs">Accuracy</span>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container mt-6 mb-2">
-                        <div class="progress-bar-fill bg-cyan" id="stats-overall-progress" style="width: 40%"></div>
-                    </div>
-                    <p class="text-gray text-sm" id="stats-answered-text">12/30 questions answered</p>
-                </div>
-
-                <div class="stats-summary-list mb-6">
-                    <div class="stat-row-card">
-                        <div class="stat-icon-circle bg-green-subtle text-green">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-row-content">
-                            <div class="flex-between">
-                                <span class="text-color-main font-semibold">Correct</span>
-                                <span class="text-green font-bold" id="stats-correct-val">12</span>
-                            </div>
-                            <div class="progress-bar-container mt-2">
-                                <div class="progress-bar-fill bg-green" id="bar-correct" style="width: 40%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row-card mt-3">
-                        <div class="stat-icon-circle bg-red-subtle text-red">
-                            <i class="fas fa-times-circle"></i>
-                        </div>
-                        <div class="stat-row-content">
-                            <div class="flex-between">
-                                <span class="text-color-main font-semibold">Incorrect</span>
-                                <span class="text-red font-bold" id="stats-incorrect-val">6</span>
-                            </div>
-                            <div class="progress-bar-container mt-2">
-                                <div class="progress-bar-fill bg-red" id="bar-incorrect" style="width: 20%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row-card mt-3">
-                        <div class="stat-icon-circle bg-gray-subtle text-gray">
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="stat-row-content">
-                            <div class="flex-between">
-                                <span class="text-color-main font-semibold">Unanswered</span>
-                                <span class="text-color-main font-bold" id="stats-unanswered-val">7</span>
-                            </div>
-                            <div class="progress-bar-container mt-2">
-                                <div class="progress-bar-fill bg-cyan" id="bar-unanswered" style="width: 23%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-header mb-4">CATEGORY BREAKDOWN</div>
-                <div class="category-list" id="breakdown-list">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </section>
-
         <!-- Settings View -->
         <section id="settings-view" class="view hidden">
             <header class="app-header">
@@ -414,10 +403,7 @@
             <button class="nav-item" data-target="flashcard-view" data-index="3">
                 <i class="fas fa-clone"></i>
             </button>
-            <button class="nav-item" data-target="stats-view" data-index="4">
-                <i class="fas fa-chart-bar"></i>
-            </button>
-            <button class="nav-item" data-target="settings-view" data-index="5">
+            <button class="nav-item" data-target="settings-view" data-index="4">
                 <i class="fas fa-cog"></i>
             </button>
         </nav>
