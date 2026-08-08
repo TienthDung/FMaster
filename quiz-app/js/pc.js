@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parts.length >= 5) {
                 let opts = parts[3].split('|').map(o => o.trim().replace(/\\r|\\n/g, ''));
                 let correctAnswers = parts[4].split('|').map(ans => ans.trim());
+                let explanation = parts.length > 5 ? parts[5].replace(/""/g, '"') : '';
 
                 result.push({
                     id: parts[0],
@@ -141,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     question: parts[2].replace(/""/g, '"'),
                     options: opts,
                     correctAnswers: correctAnswers,
+                    explanation: explanation,
                     userAnswers: [],
                     isSubmitted: false,
                     isCorrect: null,
@@ -442,6 +444,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             optionsContainer.appendChild(btn);
         });
+
+        // Explanation rendering
+        const existingExplanation = document.getElementById('explanation-container');
+        if (existingExplanation) {
+            existingExplanation.remove();
+        }
+        
+        if (q.isSubmitted && q.explanation) {
+            const explanationDiv = document.createElement('div');
+            explanationDiv.id = 'explanation-container';
+            explanationDiv.style.marginTop = '20px';
+            explanationDiv.style.padding = '16px';
+            explanationDiv.style.background = 'rgba(255, 255, 255, 0.03)';
+            explanationDiv.style.borderRadius = 'var(--radius-md)';
+            explanationDiv.style.borderLeft = '4px solid var(--info)';
+            explanationDiv.style.textAlign = 'left';
+            explanationDiv.innerHTML = `<strong style="color: var(--info); font-size: 1.1rem; display: block; margin-bottom: 8px;">Explanation:</strong><div style="color: var(--text-light); line-height: 1.5; font-size: 1rem;">${q.explanation}</div>`;
+            
+            // Insert it after the optionsContainer
+            optionsContainer.parentNode.insertBefore(explanationDiv, optionsContainer.nextSibling);
+        }
 
         if (btnSubmit) {
             if (q.isSubmitted) {
@@ -1174,11 +1197,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div style="margin-bottom: 8px;"><strong>${labels[optIdx] || '-'}.</strong> ${q.options[optIdx]}</div>`;
             }).join('');
             
+            let expHtml = '';
+            if (q.explanation) {
+                expHtml = `
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                        <strong style="color: var(--info); display: block; margin-bottom: 5px;">Explanation:</strong>
+                        <span style="font-size: 1rem; color: #ffffff; line-height: 1.5;">${q.explanation}</span>
+                    </div>
+                `;
+            }
+            
             fcBackContent.innerHTML = `
                 <div style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">Correct Answer:</div>
-                <div style="font-size: 1.3rem; font-weight: 400; color: var(--success); text-align: left;">
+                <div style="font-size: 1.3rem; font-weight: 400; color: #ffffff; text-align: left;">
                     ${correctTexts}
                 </div>
+                ${expHtml}
             `;
         }
         
@@ -1276,8 +1310,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 fcData = [...currentQuestions];
             } else {
                 fcData = currentQuestions.filter(q => 
+                    (q.id && q.id.toLowerCase().includes(term)) ||
                     q.question.toLowerCase().includes(term) || 
-                    q.correctAnswers.join(', ').toLowerCase().includes(term)
+                    (q.options && q.options.some(opt => opt.toLowerCase().includes(term))) ||
+                    (q.explanation && q.explanation.toLowerCase().includes(term))
                 );
             }
             fcIndex = 0;
