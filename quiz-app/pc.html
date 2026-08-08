@@ -259,9 +259,10 @@
             <div class="practice-header" style="justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <h1 style="font-size: 2rem; font-weight: 700;">Flashcards</h1>
                 <div style="display:flex; gap: 12px; align-items: center; width: 100%; max-width: 400px; justify-content: flex-end;">
-                    <div class="search-box practice-quick-search">
+                    <div class="search-box practice-quick-search" id="fc-quick-search-container">
                         <input type="text" id="fc-search-input" placeholder="Search in flashcards..." autocomplete="off">
-                        <button class="btn-ghost" title="Search"><i class="fas fa-search"></i></button>
+                        <button class="btn-ghost" id="btn-fc-quick-search" title="Search"><i class="fas fa-search"></i></button>
+                        <div id="fc-search-dropdown" class="quick-search-dropdown"></div>
                     </div>
                 </div>
             </div>

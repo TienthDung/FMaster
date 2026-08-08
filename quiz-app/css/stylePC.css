@@ -1807,12 +1807,6 @@ input:checked+.slider:before {
     100% { transform: translateX(50px) scale(0.95) rotateY(180deg); opacity: 0; }
 }
 
-#fc-search-input:focus {
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
 /* =========================================
    FLASHCARD OPTIONS & ACTIONS
    ========================================= */

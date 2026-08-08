@@ -1114,6 +1114,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let fcIndex = 0;
     
     const fcSearchInput = document.getElementById('fc-search-input');
+    const fcQuickSearchContainer = document.getElementById('fc-quick-search-container');
+    const btnFcQuickSearch = document.getElementById('btn-fc-quick-search');
+    const dropdownFcSearch = document.getElementById('fc-search-dropdown');
+    
     const fcCard = document.getElementById('fc-card');
     const fcFrontContent = document.getElementById('fc-front-content');
     const fcBackContent = document.getElementById('fc-back-content');
@@ -1303,21 +1307,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Search Logic
-    if (fcSearchInput) {
-        fcSearchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase().trim();
-            if (!term) {
-                fcData = [...currentQuestions];
-            } else {
-                fcData = currentQuestions.filter(q => 
-                    (q.id && q.id.toLowerCase().includes(term)) ||
-                    q.question.toLowerCase().includes(term) || 
-                    (q.options && q.options.some(opt => opt.toLowerCase().includes(term))) ||
-                    (q.explanation && q.explanation.toLowerCase().includes(term))
-                );
+    function renderFcSearch(query) {
+        if (!query.trim()) {
+            dropdownFcSearch.classList.remove('active');
+            return;
+        }
+
+        const qLower = query.toLowerCase();
+        let results = [];
+
+        fcData.forEach((q, idx) => {
+            if ((q.id && q.id.toLowerCase().includes(qLower)) ||
+                String(idx + 1).includes(qLower) ||
+                q.question.toLowerCase().includes(qLower) ||
+                (q.options && q.options.some(opt => opt.toLowerCase().includes(qLower))) ||
+                (q.explanation && q.explanation.toLowerCase().includes(qLower))) {
+                results.push({ q, idx });
             }
-            fcIndex = 0;
-            renderFlashcard(fcIndex, null);
+        });
+
+        dropdownFcSearch.innerHTML = '';
+
+        if (results.length === 0) {
+            dropdownFcSearch.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 0.9rem;">No flashcards found</div>';
+        } else {
+            results.slice(0, 10).forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'quick-search-item';
+
+                item.innerHTML = `
+                    <h5>Question ${result.idx + 1}</h5>
+                    <p>${result.q.question}</p>
+                `;
+
+                item.addEventListener('click', () => {
+                    fcIndex = result.idx;
+                    renderFlashcard(fcIndex, null);
+                    fcQuickSearchContainer.classList.remove('active');
+                    dropdownFcSearch.classList.remove('active');
+                });
+
+                dropdownFcSearch.appendChild(item);
+            });
+        }
+
+        dropdownFcSearch.classList.add('active');
+    }
+
+    if (fcSearchInput && btnFcQuickSearch && fcQuickSearchContainer && dropdownFcSearch) {
+        btnFcQuickSearch.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fcQuickSearchContainer.classList.toggle('active');
+            if (fcQuickSearchContainer.classList.contains('active')) {
+                fcSearchInput.focus();
+                renderFcSearch(fcSearchInput.value);
+            } else {
+                dropdownFcSearch.classList.remove('active');
+            }
+        });
+
+        fcSearchInput.addEventListener('click', (e) => e.stopPropagation());
+        dropdownFcSearch.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('click', () => {
+            fcQuickSearchContainer.classList.remove('active');
+            dropdownFcSearch.classList.remove('active');
+        });
+
+        fcSearchInput.addEventListener('input', (e) => {
+            renderFcSearch(e.target.value);
         });
     }
 
