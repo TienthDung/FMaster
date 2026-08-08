@@ -2025,3 +2025,75 @@ body {
 [data-theme="light"] .explanation-box {
     background: rgba(6, 182, 212, 0.05);
 }
+/* Flashcard Dedicated Option Styles */
+.fc-option {
+    width: 100%;
+    text-align: left;
+    padding: 8px 0;
+    color: var(--text-main);
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fc-option-letter {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .fc-option-letter {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+/* Mobile Search Box */
+.mobile-search-box {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-search-box input {
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    outline: none;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-search-box.active {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.mobile-search-box.active input {
+    width: 150px;
+    padding: 6px 12px;
+    opacity: 1;
+}
+
+[data-theme="light"] .mobile-search-box.active {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px var(--primary-subtle);
+}

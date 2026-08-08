@@ -213,7 +213,13 @@ export class UI {
         const progress = ((index + 1) / this.state.questions.length) * 100;
         document.getElementById('fc-progress').style.width = `${progress}%`;
 
-        document.getElementById('fc-question-text').textContent = q.question;
+        const typeEl = document.getElementById('fc-q-type');
+        if (typeEl) {
+            const isMultiple = Array.isArray(q.correctanswer) && q.correctanswer.length > 1;
+            typeEl.textContent = isMultiple ? "Multiple Choice" : "Single Choice";
+        }
+
+        document.getElementById('fc-question-text').textContent = `Question ${index + 1}: ${q.question}`;
         
         // Render options on the front
         const optContainer = document.getElementById('fc-options-container');
@@ -222,28 +228,34 @@ export class UI {
             if (q.options && q.options.length > 0) {
                 q.options.forEach((opt, i) => {
                     const btn = document.createElement('div');
-                    btn.className = 'option-btn';
+                    btn.className = 'fc-option';
                     btn.style.pointerEvents = 'none'; // Not clickable in flashcard view
                     btn.style.marginBottom = '8px';
                     const letter = String.fromCharCode(65 + i);
-                    btn.innerHTML = `<div class="option-letter">${letter}</div> <span class="flex-1" style="text-align: left;">${opt}</span>`;
+                    btn.innerHTML = `<div class="fc-option-letter">${letter}</div> <span class="flex-1" style="text-align: left;">${opt}</span>`;
                     optContainer.appendChild(btn);
                 });
             }
         }
         
-        let correctAnswers = Array.isArray(q.correctanswer) ? q.correctanswer.join(', ') : q.correctanswer;
-        document.getElementById('fc-answer-text').textContent = correctAnswers;
+        let correctAnswers = Array.isArray(q.correctanswer) ? q.correctanswer : [q.correctanswer];
+        let formattedAnswers = correctAnswers.map(ans => {
+            let idx = q.options ? q.options.indexOf(ans) : -1;
+            let letter = idx >= 0 ? String.fromCharCode(65 + idx) : '';
+            return letter ? `${letter}. ${ans}` : ans;
+        });
+        
+        document.getElementById('fc-answer-text').innerHTML = formattedAnswers.join('<br><br>');
 
         const expEl = document.getElementById('fc-explanation-text');
-        const expLabel = document.querySelector('.fc-explanation-label');
+        const dividerEl = document.getElementById('fc-divider');
         if (q.explanation) {
             expEl.textContent = q.explanation;
             expEl.style.display = 'block';
-            if(expLabel) expLabel.style.display = 'block';
+            if(dividerEl) dividerEl.style.display = 'block';
         } else {
             expEl.style.display = 'none';
-            if(expLabel) expLabel.style.display = 'none';
+            if(dividerEl) dividerEl.style.display = 'none';
         }
     }
 

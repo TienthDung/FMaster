@@ -223,7 +223,16 @@
                 <div class="top-progress-fill" id="fc-progress" style="width: 5%"></div>
             </div>
 
-            <div class="content pb-bar flex-col-center" style="height: calc(100vh - 140px); justify-content: center; overflow: hidden; padding: 20px;">
+            <div class="fc-tools" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+                <span id="fc-q-type" class="tag-pill" style="font-size: 0.75rem;">MCQ</span>
+                
+                <div class="mobile-search-box" id="fc-search-container">
+                    <input type="text" id="fc-search-input" placeholder="Search ID..." autocomplete="off">
+                    <button class="icon-btn" id="fc-search-btn" style="color: var(--text-muted);"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+
+            <div class="content pb-bar flex-col-center" style="height: calc(100vh - 180px); justify-content: center; overflow: hidden; padding: 20px;">
                 <div class="fc-container" id="fc-container">
                     <div class="fc-card" id="fc-card">
                         <!-- Front Face -->
@@ -239,11 +248,13 @@
                         </div>
                         <!-- Back Face -->
                         <div class="fc-face fc-back">
-                            <div class="fc-content">
-                                <div class="fc-answer-label text-sm text-cyan mb-2">CORRECT ANSWER</div>
-                                <div id="fc-answer-text" class="text-color-main font-semibold mb-4" style="font-size: 1.2rem;">Answer goes here...</div>
-                                <div class="fc-explanation-label text-sm text-gray mb-1">EXPLANATION</div>
-                                <div id="fc-explanation-text" class="text-sm text-gray" style="text-align: left;">Explanation goes here...</div>
+                            <div class="fc-content w-full h-full flex-col" style="justify-content: flex-start; text-align: left; align-items: flex-start; overflow-y: auto;">
+                                <div class="fc-answer-label text-sm text-cyan mb-2" style="align-self: flex-start;">CORRECT ANSWER</div>
+                                <div id="fc-answer-text" class="text-color-main font-semibold mb-4" style="font-size: 1.1rem; align-self: flex-start;">Answer goes here...</div>
+                                
+                                <hr id="fc-divider" class="w-full my-4" style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                
+                                <div id="fc-explanation-text" class="text-sm text-gray" style="align-self: flex-start;">Explanation goes here...</div>
                             </div>
                         </div>
                     </div>

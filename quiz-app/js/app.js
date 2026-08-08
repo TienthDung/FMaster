@@ -157,6 +157,46 @@ class QuizApp {
             swipeStartY = null;
         }, { passive: true });
 
+        // Flashcard Search
+        const fcSearchBtn = document.getElementById('fc-search-btn');
+        const fcSearchContainer = document.getElementById('fc-search-container');
+        const fcSearchInput = document.getElementById('fc-search-input');
+        
+        if (fcSearchBtn && fcSearchContainer && fcSearchInput) {
+            fcSearchBtn.addEventListener('click', () => {
+                fcSearchContainer.classList.toggle('active');
+                if (fcSearchContainer.classList.contains('active')) {
+                    fcSearchInput.focus();
+                } else {
+                    fcSearchInput.blur();
+                }
+            });
+            
+            fcSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.toLowerCase().trim();
+                    if (!query) return;
+                    
+                    const foundIndex = this.state.questions.findIndex(q => q.id.toLowerCase().includes(query));
+                    if (foundIndex !== -1) {
+                        this.state.currentIndex = foundIndex;
+                        this.ui.renderFlashcard(this.state.currentIndex);
+                        this.ui.showToast(`Found Question ID: ${this.state.questions[foundIndex].id}`);
+                        
+                        // Ensure card is front-facing when searching
+                        const card = document.getElementById('fc-card');
+                        if(card) card.classList.remove('is-flipped');
+                        
+                        // Auto-hide search bar after successful jump
+                        fcSearchContainer.classList.remove('active');
+                    } else {
+                        this.ui.showToast(`No question found matching "${query}"`, 'error');
+                    }
+                    e.target.blur(); // dismiss keyboard
+                }
+            });
+        }
+
         document.getElementById('btn-practice-back').addEventListener('click', () => {
             this.navigateTo('dashboard-view');
         });
