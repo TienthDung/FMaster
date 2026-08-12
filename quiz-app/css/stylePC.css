@@ -1645,6 +1645,7 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
 /* =========================================
    FLASHCARDS VIEW
    ========================================= */
@@ -1772,39 +1773,84 @@ input:checked+.slider:before {
 }
 
 @keyframes fcSlideOutLeft {
-    0% { transform: translateX(0) scale(1) rotateY(0); opacity: 1; }
-    100% { transform: translateX(-50px) scale(0.95) rotateY(0); opacity: 0; }
+    0% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
 }
 
 @keyframes fcSlideInRight {
-    0% { transform: translateX(50px) scale(0.95) rotateY(0); opacity: 0; }
-    100% { transform: translateX(0) scale(1) rotateY(0); opacity: 1; }
+    0% {
+        transform: translateX(50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes fcSlideOutRight {
-    0% { transform: translateX(0) scale(1) rotateY(0); opacity: 1; }
-    100% { transform: translateX(50px) scale(0.95) rotateY(0); opacity: 0; }
+    0% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
 }
 
 @keyframes fcSlideInLeft {
-    0% { transform: translateX(-50px) scale(0.95) rotateY(0); opacity: 0; }
-    100% { transform: translateX(0) scale(1) rotateY(0); opacity: 1; }
+    0% {
+        transform: translateX(-50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
 }
 
 /* If the card is flipped, we need different keyframes so it stays flipped during slide */
 .fc-card.is-flipped.slide-out-left {
     animation: fcSlideOutLeftFlipped 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
 }
+
 .fc-card.is-flipped.slide-out-right {
     animation: fcSlideOutRightFlipped 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
 }
+
 @keyframes fcSlideOutLeftFlipped {
-    0% { transform: translateX(0) scale(1) rotateY(180deg); opacity: 1; }
-    100% { transform: translateX(-50px) scale(0.95) rotateY(180deg); opacity: 0; }
+    0% {
+        transform: translateX(0) scale(1) rotateY(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50px) scale(0.95) rotateY(180deg);
+        opacity: 0;
+    }
 }
+
 @keyframes fcSlideOutRightFlipped {
-    0% { transform: translateX(0) scale(1) rotateY(180deg); opacity: 1; }
-    100% { transform: translateX(50px) scale(0.95) rotateY(180deg); opacity: 0; }
+    0% {
+        transform: translateX(0) scale(1) rotateY(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(50px) scale(0.95) rotateY(180deg);
+        opacity: 0;
+    }
 }
 
 /* =========================================
@@ -1849,6 +1895,7 @@ input:checked+.slider:before {
     color: var(--danger);
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
+
 .fc-btn-no-idea:hover {
     background: rgba(239, 68, 68, 0.2);
 }
@@ -1858,7 +1905,216 @@ input:checked+.slider:before {
     color: var(--success);
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
+
 .fc-btn-master:hover {
     background: rgba(16, 185, 129, 0.2);
 }
 
+
+/* Back Face (Answer) */
+.fc-back {
+    transform: rotateY(180deg);
+}
+
+.fc-content {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-main);
+}
+
+.fc-correct {
+    color: var(--success);
+}
+
+.fc-hint {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.7;
+}
+
+.fc-controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.fc-progress {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 20px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fc-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+/* Animation for sliding next/prev */
+.fc-card.slide-out-left {
+    animation: fcSlideOutLeft 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+.fc-card.slide-in-right {
+    animation: fcSlideInRight 0.3s forwards cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.fc-card.slide-out-right {
+    animation: fcSlideOutRight 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+.fc-card.slide-in-left {
+    animation: fcSlideInLeft 0.3s forwards cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+@keyframes fcSlideOutLeft {
+    0% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+}
+
+@keyframes fcSlideInRight {
+    0% {
+        transform: translateX(50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fcSlideOutRight {
+    0% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+}
+
+@keyframes fcSlideInLeft {
+    0% {
+        transform: translateX(-50px) scale(0.95) rotateY(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0) scale(1) rotateY(0);
+        opacity: 1;
+    }
+}
+
+/* If the card is flipped, we need different keyframes so it stays flipped during slide */
+.fc-card.is-flipped.slide-out-left {
+    animation: fcSlideOutLeftFlipped 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+.fc-card.is-flipped.slide-out-right {
+    animation: fcSlideOutRightFlipped 0.3s forwards cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+@keyframes fcSlideOutLeftFlipped {
+    0% {
+        transform: translateX(0) scale(1) rotateY(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50px) scale(0.95) rotateY(180deg);
+        opacity: 0;
+    }
+}
+
+@keyframes fcSlideOutRightFlipped {
+    0% {
+        transform: translateX(0) scale(1) rotateY(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(50px) scale(0.95) rotateY(180deg);
+        opacity: 0;
+    }
+}
+
+/* =========================================
+   FLASHCARD OPTIONS & ACTIONS
+   ========================================= */
+.fc-options {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.fc-option-item {
+    padding: 8px 16px;
+    font-size: 1.1rem;
+    color: #ffffff;
+}
+
+.fc-actions {
+    position: absolute;
+    bottom: 30px;
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-fc-action {
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.fc-btn-no-idea {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.fc-btn-no-idea:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.fc-btn-master {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.fc-btn-master:hover {
+    background: rgba(16, 185, 129, 0.2);
+}

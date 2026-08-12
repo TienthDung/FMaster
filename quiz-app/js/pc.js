@@ -46,12 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function executeViewLogic(viewId) {
-        if (viewId === 'home-view') updateHome();
+        if (viewId === 'home-view') {
+            if (typeof renderSubjectsGrid === 'function') renderSubjectsGrid();
+        }
         if (viewId === 'stats-view') updateDashboard();
-        if (viewId === 'search-view') updateSearch();
         if (viewId === 'practice-view') {
             focusedOptionIndex = 0; // reset focus
             renderQuestion();
+        }
+        if (viewId === 'flashcard-view') {
+            initFlashcards();
+        }
+        if (viewId === 'search-view') {
+            initSearchView();
         }
 
         // Update all segmented controls to fix background positions after view is visible
@@ -82,10 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updateNavActiveBg);
 
     // ---- Application State ----
+    let subjects = [];
+    let currentSubject = null;
+    let allSubjectsProgress = {};
     let currentQuestions = [];
     let currentQuestionIndex = 0;
     let focusedOptionIndex = 0;
     let currentSearchFilter = 'all';
+    let currentSearchSubject = 'all';
+    let globalQuestions = [];
 
     // Modal State
     let currentModalList = [];
@@ -156,42 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---- Home View Logic ----
-    function updateHome() {
-        if (currentQuestions.length === 0) return;
-        const total = currentQuestions.length;
-        const submitted = currentQuestions.filter(q => q.isSubmitted).length;
-        const pct = total === 0 ? 0 : Math.round((submitted / total) * 100);
-
-        document.getElementById('jump-ite-subtitle').textContent = `${total} questions • ${total - submitted} unanswered`;
-        document.getElementById('jump-ite-progress').style.width = `${pct}%`;
-        document.getElementById('jump-ite-status').textContent = submitted === 0 ? "Not started" : (submitted === total ? "Completed" : "In Progress");
-
-        const btnContinue = document.getElementById('btn-jump-continue');
-        btnContinue.innerHTML = submitted > 0 && submitted < total ? 'Continue <i class="fas fa-chevron-right ml-1"></i>' : 'Start <i class="fas fa-chevron-right ml-1"></i>';
-
-        const resumeInfo = document.getElementById('jump-ite-resume-info');
-        if (submitted > 0 && submitted < total) {
-            const firstUnanswered = currentQuestions.find(q => !q.isSubmitted);
-            if (firstUnanswered) {
-                document.getElementById('resume-q-title').textContent = `Resume at Question ${firstUnanswered.originalIndex + 1}:`;
-                document.getElementById('resume-q-text').textContent = firstUnanswered.question;
-                resumeInfo.style.display = 'block';
-            } else {
-                resumeInfo.style.display = 'none';
-            }
-        } else {
-            resumeInfo.style.display = 'none';
-        }
-    }
-
-    const btnJumpContinue = document.getElementById('btn-jump-continue');
-    const btnJumpRestart = document.getElementById('btn-jump-restart');
-
-    // Reset Modal Elements
-    const confirmResetModal = document.getElementById('confirm-reset-modal');
-    const btnCancelReset = document.getElementById('btn-cancel-reset');
-    const btnConfirmReset = document.getElementById('btn-confirm-reset');
-
     // Help Modal Elements
     const helpModal = document.getElementById('help-modal');
     const btnHelp = document.getElementById('btn-help');
@@ -209,20 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (btnJumpContinue) {
-        btnJumpContinue.addEventListener('click', () => {
-            // Find first unanswered
-            const idx = currentQuestions.findIndex(q => !q.isSubmitted);
-            currentQuestionIndex = idx !== -1 ? idx : 0;
-            switchView('practice-view');
-        });
-    }
-
-    if (btnJumpRestart) {
-        btnJumpRestart.addEventListener('click', () => {
-            confirmResetModal.classList.add('active');
-        });
-    }
+    // Reset Modal Elements
+    const confirmResetModal = document.getElementById('confirm-reset-modal');
+    const btnCancelReset = document.getElementById('btn-cancel-reset');
+    const btnConfirmReset = document.getElementById('btn-confirm-reset');
 
     if (btnCancelReset) {
         btnCancelReset.addEventListener('click', () => {
@@ -235,92 +201,21 @@ document.addEventListener('DOMContentLoaded', () => {
             currentQuestions.forEach(q => {
                 q.isSubmitted = false;
                 q.userAnswers = [];
-                q.isCorrect = null;
+                q.isCorrect = undefined;
             });
             saveProgress();
-            updateHome();
-            currentQuestionIndex = 0;
+            
+            // Also update allSubjectsProgress
+            if (currentSubject) {
+                allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0 };
+                renderSubjectsGrid();
+            }
+            
+            updateDashboard();
+            updateSearch();
+            renderQuestion();
             confirmResetModal.classList.remove('active');
-            switchView('practice-view');
         });
-    }
-
-    // ---- Search View Logic ----
-    const searchInput = document.getElementById('search-input');
-
-    if (searchInput) {
-        searchInput.addEventListener('input', updateSearch);
-    }
-
-    function updateSearch() {
-        const query = (searchInput ? searchInput.value.toLowerCase() : '');
-        let filtered = currentQuestions;
-
-        if (currentSearchFilter === 'correct') filtered = filtered.filter(q => q.isCorrect === true);
-        else if (currentSearchFilter === 'incorrect') filtered = filtered.filter(q => q.isCorrect === false);
-        else if (currentSearchFilter === 'unanswered') filtered = filtered.filter(q => !q.isSubmitted);
-        else if (currentSearchFilter === 'favorites') filtered = filtered.filter(q => q.isFavorite);
-        else if (currentSearchFilter === 'notes') filtered = filtered.filter(q => q.isNoted && q.noteText && q.noteText.trim() !== '');
-
-        if (query) {
-            filtered = filtered.filter(q => {
-                return (q.id && q.id.toLowerCase().includes(query)) ||
-                    String(q.originalIndex + 1).includes(query) ||
-                    q.question.toLowerCase().includes(query) ||
-                    q.options.some(opt => opt.toLowerCase().includes(query));
-            });
-        }
-
-        const listContainer = document.getElementById('search-results-list');
-        if (!listContainer) return;
-        listContainer.innerHTML = '';
-
-        if (filtered.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found.</p>';
-        } else {
-            filtered.forEach((q, index) => {
-                const item = document.createElement('div');
-                item.className = 'search-result-item glass-panel';
-
-                let badgeHtml = '';
-                if (q.isSubmitted) {
-                    if (q.isCorrect) badgeHtml = '<span class="badge" style="color:#34d399; background: rgba(52, 211, 153, 0.15);">Correct</span>';
-                    else badgeHtml = '<span class="badge" style="color:#f87171; background: rgba(248, 113, 113, 0.15);">Incorrect</span>';
-                } else {
-                    badgeHtml = '<span class="badge" style="color:var(--text-muted); background: rgba(255,255,255,0.05);">Unanswered</span>';
-                }
-
-                if (q.isFavorite) badgeHtml += '<span class="badge" style="color:#f59e0b; background: rgba(245, 158, 11, 0.15);"><i class="fas fa-star"></i></span>';
-                if (q.isNoted && q.noteText && q.noteText.trim() !== '') badgeHtml += '<span class="badge" style="color:#60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fas fa-sticky-note"></i></span>';
-
-                let noteHtml = '';
-                if (q.isNoted && q.noteText) {
-                    noteHtml = `
-                    <div style="margin-top: 12px; padding: 12px; background: rgba(96, 165, 250, 0.1); border-left: 3px solid #60a5fa; border-radius: 4px; font-size: 0.95rem; color: #bfdbfe; line-height: 1.5;">
-                        <i class="fas fa-sticky-note" style="margin-right: 6px;"></i> <strong>Note:</strong><br>
-                        ${q.noteText.replace(/\n/g, '<br>')}
-                    </div>`;
-                }
-
-                item.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Question ${q.originalIndex + 1}  &bull; ${q.type}
-                        </span>
-                        <div style="display: flex; gap: 6px;">${badgeHtml}</div>
-                    </div>
-                    <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
-                        ${q.question}
-                    </h4>
-                    ${noteHtml}
-                `;
-
-                item.addEventListener('click', () => {
-                    showModal(`Search Results`, filtered, index);
-                });
-                listContainer.appendChild(item);
-            });
-        }
     }
 
     // ---- Practice Logic ----
@@ -632,39 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ---- Main Search in Explorer ----
-    const mainSearchContainer = document.getElementById('main-search-container');
-    const btnMainSearch = document.getElementById('btn-main-search');
-    const inputMainSearch = document.getElementById('search-input');
-
-    if (btnMainSearch && mainSearchContainer && inputMainSearch) {
-        btnMainSearch.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!mainSearchContainer.classList.contains('active')) {
-                mainSearchContainer.classList.add('active');
-                inputMainSearch.focus();
-            } else {
-                if (inputMainSearch.value.trim() !== '') {
-                    // Clear the input on click when open
-                    inputMainSearch.value = '';
-                    // Trigger input event to update search results
-                    inputMainSearch.dispatchEvent(new Event('input'));
-                    inputMainSearch.focus();
-                } else {
-                    mainSearchContainer.classList.remove('active');
-                }
-            }
-        });
-
-        inputMainSearch.addEventListener('click', (e) => e.stopPropagation());
-
-        document.addEventListener('click', () => {
-            if (inputMainSearch.value.trim() === '') {
-                mainSearchContainer.classList.remove('active');
-            }
-        });
-    }
-
     function renderQuickSearch(query) {
         if (!query.trim()) {
             dropdownQuickSearch.classList.remove('active');
@@ -814,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- Progress Storage ----
     function saveProgress() {
+        if (!currentSubject) return;
         const progress = currentQuestions.map(q => ({
             id: q.id,
             isFavorite: q.isFavorite,
@@ -821,13 +684,21 @@ document.addEventListener('DOMContentLoaded', () => {
             noteText: q.noteText,
             isSubmitted: q.isSubmitted,
             userAnswers: q.userAnswers,
-            isCorrect: q.isCorrect
+            isCorrect: q.isCorrect,
+            fcStatus: q.fcStatus // added flashcard sync
         }));
-        localStorage.setItem('quiz_pc_progress', JSON.stringify(progress));
+        localStorage.setItem('quiz_pc_progress_' + currentSubject.id, JSON.stringify(progress));
+        
+        allSubjectsProgress[currentSubject.id] = {
+            total: currentQuestions.length,
+            submitted: currentQuestions.filter(q => q.isSubmitted).length,
+            fcMastered: currentQuestions.filter(q => q.fcStatus === 'mastered').length
+        };
     }
 
     function loadProgress() {
-        const saved = localStorage.getItem('quiz_pc_progress');
+        if (!currentSubject) return;
+        const saved = localStorage.getItem('quiz_pc_progress_' + currentSubject.id);
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -840,6 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         q.isSubmitted = p.isSubmitted;
                         q.userAnswers = p.userAnswers || [];
                         q.isCorrect = p.isCorrect;
+                        q.fcStatus = p.fcStatus || 'not_started';
                     }
                 });
             } catch (e) { console.error('Failed to load progress', e); }
@@ -847,19 +719,143 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---- Data Loading ----
-    fetch('data/ite302c.csv')
-        .then(res => {
-            if (!res.ok) throw new Error("Could not fetch CSV");
-            return res.text();
-        })
-        .then(text => {
-            currentQuestions = parseCSV(text);
-            loadProgress();
-            updateHome();
+    fetch('data/subjects.json')
+        .then(res => res.json())
+        .then(data => {
+            subjects = data;
+            
+            // Check local storage for all subjects progress summary
+            subjects.forEach(sub => {
+                const saved = localStorage.getItem('quiz_pc_progress_' + sub.id);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        const submitted = parsed.filter(q => q.isSubmitted).length;
+                        const fcMastered = parsed.filter(q => q.fcStatus === 'mastered').length;
+                        allSubjectsProgress[sub.id] = {
+                            total: parsed.length,
+                            submitted: submitted,
+                            fcMastered: fcMastered
+                        };
+                    } catch(e) {}
+                }
+            });
+            
+            renderSubjectsGrid();
         })
         .catch(err => {
-            console.error("CSV loading error:", err);
+            console.error("Subjects loading error:", err);
         });
+        
+    function renderSubjectsGrid() {
+        const grid = document.getElementById('subjects-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        subjects.forEach(sub => {
+            const prog = allSubjectsProgress[sub.id] || { total: 0, submitted: 0, fcMastered: 0 };
+            const pct = prog.total === 0 ? 0 : Math.round((prog.submitted / prog.total) * 100);
+            const fcPct = prog.total === 0 ? 0 : Math.round(((prog.fcMastered || 0) / prog.total) * 100);
+            
+            const card = document.createElement('div');
+            card.className = 'jump-card glass-panel';
+            card.style.display = 'flex';
+            card.style.flexDirection = 'column';
+            card.innerHTML = `
+                <div class="jump-header" style="margin-bottom: 8px;">
+                    <div class="jump-icon"><i class="${sub.icon || 'fas fa-book'}"></i></div>
+                    <span class="jump-badge">${prog.total} Qs</span>
+                </div>
+                <h3 style="margin-bottom: 12px;">${sub.id.toUpperCase()}</h3>
+                
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between;">
+                    <span>Practice: ${pct}%</span>
+                    <span>${prog.submitted} done</span>
+                </div>
+                <div class="progress-track" style="margin-bottom: 12px;">
+                    <div class="progress-fill" style="width: ${pct}%; background: linear-gradient(90deg, #00F2FE, #4FACFE);"></div>
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between;">
+                    <span>Flashcards: ${fcPct}%</span>
+                    <span>${prog.fcMastered || 0} mastered</span>
+                </div>
+                <div class="progress-track" style="margin-bottom: 16px;">
+                    <div class="progress-fill" style="width: ${fcPct}%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                </div>
+                
+                <div style="display:flex; gap:8px; margin-top: auto;">
+                    <button class="btn-primary btn-start-practice" data-id="${sub.id}" style="flex: 1; padding: 6px; font-size: 0.85rem;">Practice</button>
+                    <button class="btn-primary btn-start-fc" data-id="${sub.id}" style="flex: 1; padding: 6px; font-size: 0.85rem; background: var(--success); border-color: var(--success);">Flashcards</button>
+                    <button class="btn-ghost btn-restart" data-id="${sub.id}" style="padding: 6px; font-size: 0.85rem;" title="Restart All"><i class="fas fa-redo"></i></button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        // Add listeners
+        document.querySelectorAll('.btn-start-practice').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                loadSubject(id, 'practice-view');
+            });
+        });
+
+        document.querySelectorAll('.btn-start-fc').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                loadSubject(id, 'flashcard-view');
+            });
+        });
+        
+        document.querySelectorAll('.btn-restart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                if(confirm("Are you sure you want to restart progress for this subject?")) {
+                    localStorage.removeItem('quiz_pc_progress_' + id);
+                    if (currentSubject && currentSubject.id === id) {
+                        currentQuestions.forEach(q => {
+                            q.isSubmitted = false;
+                            q.isCorrect = undefined;
+                            q.userAnswers = [];
+                            q.fcStatus = 'not_started';
+                        });
+                        saveProgress();
+                    }
+                    allSubjectsProgress[id] = { total: allSubjectsProgress[id]?.total || 0, submitted: 0, fcMastered: 0 };
+                    renderSubjectsGrid();
+                }
+            });
+        });
+    }
+    
+    function loadSubject(id, targetView = 'practice-view') {
+        currentSubject = subjects.find(s => s.id === id);
+        if(!currentSubject) return;
+        
+        fetch('data/' + currentSubject.file)
+            .then(res => res.text())
+            .then(text => {
+                currentQuestions = parseCSV(text);
+                loadProgress();
+                
+                // Switch to requested view
+                currentQuestionIndex = 0;
+                switchView(targetView);
+                
+                // Set the pill filter active subject name
+                const activePill = document.querySelector('.filter-pills .pill.active');
+                if (activePill) {
+                    activePill.textContent = currentSubject.id.toUpperCase();
+                }
+                
+                if (typeof updateDashboard === 'function') updateDashboard();
+                if (typeof updateSearch === 'function') updateSearch();
+            })
+            .catch(err => {
+                console.error("CSV loading error:", err);
+            });
+    }
 
     // ---- Dashboard Logic ----
     function updateDashboard() {
@@ -889,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
             barGroup.className = 'bar-group';
             barGroup.innerHTML = `
                 <div class="bar bar-success" style="height: ${acc}%;"><span>${acc}%</span></div>
-                <span class="bar-label">ITE302C</span>
+                <span class="bar-label">${currentSubject ? currentSubject.id.toUpperCase() : 'SUBJECT'}</span>
             `;
             chartContainer.appendChild(barGroup);
         }
@@ -1153,6 +1149,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = currentQuestions.length;
         const percent = Math.round(((mastered + (learning * 0.5)) / total) * 100);
         if (fcProgressFill) fcProgressFill.style.width = `${percent}%`;
+        
+        saveProgress();
     }
 
     function initFlashcards() {
@@ -1176,7 +1174,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = fcData[index];
         
         // Render Question
-        if(fcFrontContent) fcFrontContent.textContent = `Question ${q.id}: ${q.question}`;
+        if(fcFrontContent) {
+            fcFrontContent.style.textAlign = 'left';
+            fcFrontContent.innerHTML = `<span style="color: #ffffff; font-size: 1.3rem;">Question ${q.id}: ${q.question}</span>`;
+        }
         
         // Render Options
         if(fcFrontOptions) {
@@ -1204,17 +1205,19 @@ document.addEventListener('DOMContentLoaded', () => {
             let expHtml = '';
             if (q.explanation) {
                 expHtml = `
-                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                        <strong style="color: var(--info); display: block; margin-bottom: 5px;">Explanation:</strong>
-                        <span style="font-size: 1rem; color: #ffffff; line-height: 1.5;">${q.explanation}</span>
+                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 20px 0;">
+                    <div style="text-align: left;">
+                        <span style="font-size: 1.1rem; color: #ffffff; line-height: 1.6;">${q.explanation}</span>
                     </div>
                 `;
             }
             
             fcBackContent.innerHTML = `
-                <div style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">Correct Answer:</div>
-                <div style="font-size: 1.3rem; font-weight: 400; color: #ffffff; text-align: left;">
-                    ${correctTexts}
+                <div style="text-align: left; width: 100%;">
+                    <div style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 12px;">Correct Answer:</div>
+                    <div style="font-size: 1.2rem; font-weight: 500; color: #ffffff;">
+                        ${correctTexts}
+                    </div>
                 </div>
                 ${expHtml}
             `;
@@ -1402,6 +1405,237 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // ==========================================
+    // MAIN SEARCH / EXPLORER LOGIC
+    // ==========================================
+    const searchViewTitle = document.getElementById('search-view-title');
+    const searchInput = document.getElementById('search-input');
+    const btnMainSearch = document.getElementById('btn-main-search');
+    const searchFilterPills = document.querySelectorAll('#search-filter-pills .pill');
+    const searchResultsList = document.getElementById('search-results-list');
+    
+    // NOTE: currentSearchFilter is already declared at the top of the file
+
+    function initSearchView() {
+        if (searchViewTitle) searchViewTitle.innerHTML = 'Global Question Explorer';
+        
+        // Dynamically populate subject dropdown if not done yet
+        const subjectSelect = document.getElementById('search-subject-select');
+        if (subjectSelect && subjectSelect.children.length <= 1) {
+            subjects.forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub.id;
+                opt.textContent = sub.id.toUpperCase();
+                opt.style.background = 'var(--bg-color)';
+                opt.style.color = 'var(--text-main)';
+                subjectSelect.appendChild(opt);
+            });
+            
+            // Bind change event to the select
+            subjectSelect.addEventListener('change', (e) => {
+                currentSearchSubject = e.target.value;
+                
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.value = '';
+                renderMainSearch();
+            });
+        }
+        
+        // Ensure all segmented controls update bg
+        setTimeout(() => window.updateAllSegmentedControls(), 50);
+
+        if (globalQuestions.length === 0) {
+            if (searchResultsList) searchResultsList.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);"><i class="fas fa-circle-notch fa-spin"></i> Loading all subjects...</div>';
+            loadGlobalQuestions().then(() => {
+                renderMainSearch();
+            });
+        } else {
+            renderMainSearch();
+        }
+    }
+
+    async function loadGlobalQuestions() {
+        globalQuestions = [];
+        for (const sub of subjects) {
+            try {
+                const res = await fetch('data/' + sub.file);
+                const text = await res.text();
+                const qList = parseCSV(text);
+                
+                // Load progress for this subject
+                const saved = localStorage.getItem('quiz_pc_progress_' + sub.id);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    parsed.forEach(p => {
+                        const q = qList.find(item => item.id === p.id);
+                        if (q) {
+                            q.isFavorite = p.isFavorite;
+                            q.isNoted = p.isNoted;
+                            q.noteText = p.noteText;
+                            q.isSubmitted = p.isSubmitted;
+                            q.userAnswers = p.userAnswers || [];
+                            q.isCorrect = p.isCorrect;
+                            q.fcStatus = p.fcStatus || 'not_started';
+                        }
+                    });
+                }
+                
+                qList.forEach(q => {
+                    q.subjectId = sub.id;
+                    globalQuestions.push(q);
+                });
+            } catch (err) {
+                console.error("Failed to load subject " + sub.id, err);
+            }
+        }
+    }
+
+    function renderMainSearch() {
+        if (!searchResultsList) return;
+        if (globalQuestions.length === 0) return; // Still loading
+
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        let filtered = globalQuestions;
+
+        // Apply Subject Filter
+        if (currentSearchSubject !== 'all') {
+            filtered = filtered.filter(q => q.subjectId === currentSearchSubject);
+        }
+
+        // Apply Pills Filter
+        if (currentSearchFilter !== 'all') {
+            filtered = filtered.filter(q => {
+                if (currentSearchFilter === 'correct') return q.isCorrect === true;
+                if (currentSearchFilter === 'incorrect') return q.isCorrect === false;
+                if (currentSearchFilter === 'unanswered') return !q.isSubmitted;
+                if (currentSearchFilter === 'favorites') return q.isFavorite === true;
+                if (currentSearchFilter === 'notes') return q.isNoted === true || (q.noteText && q.noteText.trim() !== '');
+                return true;
+            });
+        }
+
+        // Apply Text Query Filter
+        if (query) {
+            filtered = filtered.filter(q => {
+                return (q.id && String(q.id).toLowerCase().includes(query)) ||
+                       (q.question && q.question.toLowerCase().includes(query)) ||
+                       (q.options && q.options.some(opt => opt.toLowerCase().includes(query))) ||
+                       (q.explanation && q.explanation.toLowerCase().includes(query));
+            });
+        }
+
+        searchResultsList.innerHTML = '';
+        if (filtered.length === 0) {
+            searchResultsList.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No results found.</div>';
+            return;
+        }
+
+        // Render Cards
+        filtered.forEach(q => {
+            const card = document.createElement('div');
+            card.className = 'glass-panel search-card-item';
+            card.style.padding = '20px';
+            card.style.marginBottom = '16px';
+            card.style.cursor = 'pointer';
+            card.style.borderRadius = '24px'; // Curved corners like Apple design
+            card.style.background = 'rgba(255, 255, 255, 0.05)';
+            card.style.backdropFilter = 'blur(24px) saturate(180%)';
+            card.style.webkitBackdropFilter = 'blur(24px) saturate(180%)';
+            card.style.border = '1px solid rgba(255, 255, 255, 0.12)';
+            card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+            card.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+            card.onmouseenter = () => {
+                card.style.background = 'rgba(255, 255, 255, 0.1)';
+                card.style.transform = 'translateY(-4px)';
+                card.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.2)';
+                card.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            };
+            card.onmouseleave = () => {
+                card.style.background = 'rgba(255, 255, 255, 0.05)';
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+                card.style.border = '1px solid rgba(255, 255, 255, 0.12)';
+            };
+            
+            // Determine Status UI
+            let statusHtml = '';
+            if (q.isSubmitted) {
+                if (q.isCorrect) {
+                    statusHtml = `<span style="color: var(--success); font-size: 0.85rem; font-weight: 600;"><i class="fas fa-check-circle"></i> Correct</span>`;
+                } else {
+                    statusHtml = `<span style="color: var(--danger); font-size: 0.85rem; font-weight: 600;"><i class="fas fa-times-circle"></i> Incorrect</span>`;
+                }
+            } else {
+                statusHtml = `<span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;"><i class="fas fa-circle"></i> Unanswered</span>`;
+            }
+            
+            let badgesHtml = '';
+            if (q.isFavorite) badgesHtml += `<i class="fas fa-star" style="color: #fbbf24; margin-right: 6px;" title="Favorite"></i>`;
+            if (q.isNoted || (q.noteText && q.noteText.trim())) badgesHtml += `<i class="fas fa-sticky-note" style="color: var(--info); margin-right: 6px;" title="Has Note"></i>`;
+            if (q.fcStatus === 'mastered') badgesHtml += `<i class="fas fa-brain" style="color: #10b981;" title="Flashcard Mastered"></i>`;
+            
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span class="badge" style="background: rgba(0,242,254,0.15); color: #00F2FE; border: 1px solid rgba(0,242,254,0.3); font-size: 0.75rem;">${q.subjectId.toUpperCase()}</span>
+                        <strong style="color: var(--primary);">Q${q.id}</strong>
+                        ${statusHtml}
+                    </div>
+                    <div>${badgesHtml}</div>
+                </div>
+                <div style="font-size: 1rem; color: #fff; line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    ${q.question}
+                </div>
+                <div style="text-align: right;">
+                    <button class="btn-ghost btn-jump" style="padding: 4px 12px; font-size: 0.85rem; pointer-events: none;"><i class="fas fa-info-circle" style="margin-right: 6px;"></i>View Details</button>
+                </div>
+            `;
+            
+            // Click on card
+            card.addEventListener('click', () => {
+                const indexInFiltered = filtered.indexOf(q);
+                const searchTitle = currentSearchFilter === 'all' ? 'Search Results' : `Filtered: ${currentSearchFilter}`;
+                if (typeof showModal === 'function') {
+                    showModal(searchTitle, filtered, indexInFiltered);
+                }
+            });
+            
+            searchResultsList.appendChild(card);
+        });
+    }
+
+    // Attach Search Events
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            renderMainSearch();
+        });
+    }
+    if (btnMainSearch) {
+        btnMainSearch.addEventListener('click', () => {
+            renderMainSearch();
+        });
+    }
+
+    if (searchFilterPills) {
+        searchFilterPills.forEach(pill => {
+            pill.addEventListener('click', (e) => {
+                // Update active class
+                searchFilterPills.forEach(p => p.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                // Move background pill
+                const activeBg = document.querySelector('#search-filter-pills .pill-active-bg');
+                if (activeBg) {
+                    activeBg.style.width = e.currentTarget.offsetWidth + 'px';
+                    activeBg.style.transform = `translateX(${e.currentTarget.offsetLeft}px)`;
+                }
+                
+                currentSearchFilter = e.currentTarget.getAttribute('data-filter') || 'all';
+                renderMainSearch();
+            });
+        });
+    }
 
     // Initial load hook - if we navigate to flashcards, make sure they're initialized
     navItems.forEach(item => {

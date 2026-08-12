@@ -105,38 +105,8 @@
             </div>
 
             <h2 class="section-title">Jump Back In</h2>
-            <div class="jump-back-grid">
-                <div class="jump-card glass-panel jump-ite">
-                    <div class="jump-header">
-                        <div class="jump-icon"><i class="fas fa-laptop-code"></i></div>
-                        <span class="jump-badge">Mixed</span>
-                    </div>
-                    <h3>ITE302C</h3>
-                    <p id="jump-ite-subtitle">Total questions • Unfinished</p>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="jump-ite-progress" style="width: 0%"></div>
-                    </div>
-
-                    <div id="jump-ite-resume-info"
-                        style="display: none; margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;"
-                            id="resume-q-title">Resume at Question X:</div>
-                        <div style="font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                            id="resume-q-text">Loading...</div>
-                    </div>
-
-                    <div class="jump-footer" style="align-items: center; margin-top: 16px;">
-                        <span id="jump-ite-status">Not started</span>
-                        <div style="display:flex; gap:8px;">
-                            <button id="btn-jump-restart" class="btn-ghost"
-                                style="padding: 4px 8px; font-size: 0.85rem;" title="Restart"><i
-                                    class="fas fa-redo"></i></button>
-                            <button id="btn-jump-continue" class="btn-primary"
-                                style="padding: 4px 12px; font-size: 0.85rem;">Start <i
-                                    class="fas fa-chevron-right ml-1"></i></button>
-                        </div>
-                    </div>
-                </div>
+            <div class="jump-back-grid" id="subjects-grid">
+                <!-- Subject cards will be dynamically injected here by pc.js -->
             </div>
         </section>
 
@@ -289,21 +259,28 @@
         <!-- SEARCH / BANK VIEW -->
         <section id="search-view" class="view">
             <div class="search-header flex justify-between items-center mb-6">
-                <h1 style="font-size: 2rem; font-weight: 700;">Question Explorer</h1>
+                <h1 id="search-view-title" style="font-size: 2rem; font-weight: 700;">Question Explorer</h1>
                 <div class="search-box" id="main-search-container">
                     <input type="text" id="search-input" placeholder="Search keywords or ID..." autocomplete="off">
                     <button class="btn-ghost" id="btn-main-search" title="Search"><i class="fas fa-search"></i></button>
                 </div>
             </div>
 
-            <div class="filter-pills segmented-control" id="search-filter-pills">
-                <div class="pill-active-bg"></div>
-                <button class="pill active" data-filter="all">All</button>
-                <button class="pill" data-filter="correct">Correct</button>
-                <button class="pill" data-filter="incorrect">Incorrect</button>
-                <button class="pill" data-filter="unanswered">Unanswered</button>
-                <button class="pill" data-filter="favorites">Favorites</button>
-                <button class="pill" data-filter="notes">Notes</button>
+            <div class="search-filters-row" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                <div class="filter-pills segmented-control" id="search-filter-pills" style="margin-bottom: 0;">
+                    <div class="pill-active-bg"></div>
+                    <button class="pill active" data-filter="all">All Status</button>
+                    <button class="pill" data-filter="correct">Correct</button>
+                    <button class="pill" data-filter="incorrect">Incorrect</button>
+                    <button class="pill" data-filter="unanswered">Unanswered</button>
+                    <button class="pill" data-filter="favorites">Favorites</button>
+                    <button class="pill" data-filter="notes">Notes</button>
+                </div>
+
+                <select id="search-subject-select" class="glass-panel" style="padding: 10px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.1); outline: none; cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 500; color-scheme: dark;">
+                    <option value="all" style="background: var(--bg-color); color: var(--text-main);">All Subjects</option>
+                    <!-- Subject options injected here -->
+                </select>
             </div>
 
             <div class="search-results" id="search-results-list">
@@ -317,8 +294,7 @@
                 <h1 style="font-size: 2rem; font-weight: 700;">Performance Dashboard</h1>
                 <div class="filter-pills segmented-control" style="margin-bottom: 0;">
                     <div class="pill-active-bg"></div>
-                    <button class="pill active">All Subjects</button>
-                    <button class="pill">ITE302C</button>
+                    <button class="pill active">Current Subject</button>
                 </div>
             </div>
 

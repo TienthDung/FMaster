@@ -5,5 +5,12 @@
         "file": "ite302c.csv",
         "icon": "fas fa-balance-scale",
         "description": "Ethical considerations in data-driven systems."
+    },
+    {
+        "id": "imo301c",
+        "name": "IMO301c - IT Project Management",
+        "file": "imo301c.csv",
+        "icon": "fas fa-project-diagram",
+        "description": "IT Project Management and Security Policies."
     }
 ]
