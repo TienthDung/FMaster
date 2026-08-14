@@ -309,6 +309,8 @@ export class UI {
             
             // Apply filter
             if (this.activeFilter === 'favorites' && !q.isFavorite) return;
+            if (this.activeFilter === 'correct' && (!ans || !this.checkIsCorrect(q, ans))) return;
+            if (this.activeFilter === 'incorrect' && (!ans || this.checkIsCorrect(q, ans))) return;
             if (this.activeFilter === 'tf' && q.type !== 'true_false') return;
             if (this.activeFilter === 'single' && q.type !== 'single_choice') return;
             if (this.activeFilter === 'multiple' && q.type !== 'multiple_choice') return;
@@ -357,6 +359,20 @@ export class UI {
         
         // Update filter counts
         document.getElementById('count-favorites').textContent = favCount;
+        
+        let totalCorrect = 0, totalIncorrect = 0;
+        this.state.questions.forEach(q => {
+            const ans = answers[q.id];
+            if (ans) {
+                if (this.checkIsCorrect(q, ans)) totalCorrect++;
+                else totalIncorrect++;
+            }
+        });
+        const countCorrectEl = document.getElementById('count-correct');
+        const countIncorrectEl = document.getElementById('count-incorrect');
+        if (countCorrectEl) countCorrectEl.textContent = totalCorrect;
+        if (countIncorrectEl) countIncorrectEl.textContent = totalIncorrect;
+
         const tfCount = this.state.questions.filter(q => q.type === 'true_false').length;
         document.getElementById('count-tf').textContent = tfCount;
         const singleCount = this.state.questions.filter(q => q.type === 'single_choice').length;
