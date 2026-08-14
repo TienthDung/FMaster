@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let focusedOptionIndex = 0;
     let currentSearchFilter = 'all';
     let currentSearchSubject = 'all';
+    let currentSearchType = 'all';
     let globalQuestions = [];
 
     // Modal State
@@ -278,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
 
         const qText = document.querySelector('.question-text');
-        qText.textContent = q.question;
+        qText.textContent = `Question ${q.id}: ${q.question}`;
 
         if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-muted)';
         if (btnNote) btnNote.style.color = q.isNoted ? '#60a5fa' : 'var(--text-muted)';
@@ -784,18 +785,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="progress-fill" style="width: ${fcPct}%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
                 </div>
                 
-                <div style="display:flex; gap:8px; margin-top: auto;">
-                    <button class="btn-primary btn-start-practice" data-id="${sub.id}" style="flex: 1; padding: 6px; font-size: 0.85rem;">Practice</button>
-                    <button class="btn-primary btn-start-fc" data-id="${sub.id}" style="flex: 1; padding: 6px; font-size: 0.85rem; background: var(--success); border-color: var(--success);">Flashcards</button>
-                    <button class="btn-ghost btn-restart" data-id="${sub.id}" style="padding: 6px; font-size: 0.85rem;" title="Restart All"><i class="fas fa-redo"></i></button>
+                <div style="display:flex; gap:12px; margin-top: auto;">
+                    <button class="apple-btn apple-btn-fc btn-start-fc" data-id="${sub.id}">
+                        <i class="fas fa-layer-group"></i> Flashcards
+                    </button>
+                    <button class="apple-btn apple-btn-practice btn-start-practice" data-id="${sub.id}">
+                        <i class="fas fa-dumbbell"></i> Practice
+                    </button>
+                    <button class="btn-ghost btn-restart" data-id="${sub.id}" style="padding: 10px 12px; font-size: 0.9rem; border-radius: 12px; background: rgba(255,255,255,0.05);" title="Restart All">
+                        <i class="fas fa-redo"></i>
+                    </button>
                 </div>
             `;
             grid.appendChild(card);
         });
         
         // Add listeners
+        // Make the whole card clickable for Practice
+        document.querySelectorAll('.jump-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                const id = card.querySelector('.btn-start-practice').dataset.id;
+                loadSubject(id, 'practice-view');
+            });
+        });
+
         document.querySelectorAll('.btn-start-practice').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const id = e.currentTarget.dataset.id;
                 loadSubject(id, 'practice-view');
             });
@@ -803,6 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.btn-start-fc').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const id = e.currentTarget.dataset.id;
                 loadSubject(id, 'flashcard-view');
             });
@@ -810,6 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.btn-restart').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const id = e.currentTarget.dataset.id;
                 if(confirm("Are you sure you want to restart progress for this subject?")) {
                     localStorage.removeItem('quiz_pc_progress_' + id);
@@ -921,76 +940,171 @@ document.addEventListener('DOMContentLoaded', () => {
         listContainer.innerHTML = '';
 
         if (currentModalList.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No questions found in this category.</p>';
+            listContainer.innerHTML = '<div style="text-align:center; padding: 40px; color:var(--text-muted);"><i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 16px;"></i><p>No questions found in this category.</p></div>';
             return;
         }
 
         const q = currentModalList[currentModalIndex];
 
-        // Header (Index & Type)
+        // Header (Index & Type Badges)
         const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
         header.style.marginBottom = '20px';
-        header.style.fontSize = '0.9rem';
-        header.style.color = 'var(--text-muted)';
-        header.style.fontWeight = '600';
-        header.style.textTransform = 'uppercase';
-        header.textContent = `QUESTION ${q.originalIndex + 1} (${currentModalIndex + 1} OF ${currentModalList.length}) - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+        
+        const badgeStyle = 'padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;';
+        
+        const countBadge = document.createElement('span');
+        countBadge.style.cssText = `${badgeStyle} background: rgba(255,255,255,0.1); color: var(--text-muted);`;
+        countBadge.textContent = `Question ${currentModalIndex + 1} of ${currentModalList.length}`;
+        
+        const typeBadge = document.createElement('span');
+        const isMulti = q.type === 'multiple_choice';
+        typeBadge.style.cssText = `${badgeStyle} background: ${isMulti ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)'}; color: ${isMulti ? '#34d399' : '#60a5fa'}; border: 1px solid ${isMulti ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'};`;
+        typeBadge.innerHTML = `<i class="fas ${isMulti ? 'fa-check-square' : 'fa-dot-circle'}" style="margin-right: 6px;"></i>${isMulti ? 'Multiple Choice' : 'Single Choice'}`;
+        
+        header.appendChild(countBadge);
+        header.appendChild(typeBadge);
         listContainer.appendChild(header);
 
         // Question Text
         const qText = document.createElement('h3');
-        qText.style.fontSize = '1.3rem';
+        qText.style.fontSize = '1.25rem';
         qText.style.fontWeight = '500';
         qText.style.marginBottom = '24px';
-        qText.textContent = q.question;
+        qText.style.lineHeight = '1.6';
+        qText.textContent = `Question ${q.id}: ${q.question}`;
         listContainer.appendChild(qText);
 
         // Options
         const optionsList = document.createElement('div');
         optionsList.className = 'options-list';
+        optionsList.style.display = 'flex';
+        optionsList.style.flexDirection = 'column';
+        optionsList.style.gap = '12px';
 
         q.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.textContent = opt;
-            btn.disabled = true; // Read-only
-
+            btn.style.textAlign = 'left';
+            btn.style.padding = '14px 20px';
+            btn.style.borderRadius = '12px';
+            btn.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            btn.style.background = 'rgba(255, 255, 255, 0.03)';
+            btn.style.fontSize = '1rem';
+            btn.style.cursor = 'default';
+            
+            const labelChar = String.fromCharCode(65 + idx);
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = `${labelChar}. `;
+            labelSpan.style.fontWeight = '600';
+            labelSpan.style.marginRight = '8px';
+            labelSpan.style.opacity = '0.7';
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = opt;
+            
+            btn.appendChild(labelSpan);
+            btn.appendChild(textSpan);
+            
             const isSelected = q.userAnswers.includes(String(idx));
             const isCorrectAns = q.correctAnswers.includes(String(idx));
 
             if (isCorrectAns) {
-                btn.classList.add('correct');
+                btn.style.background = 'rgba(16, 185, 129, 0.15)';
+                btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                btn.style.color = '#34d399';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-check-circle';
+                icon.style.float = 'right';
+                btn.appendChild(icon);
             } else if (isSelected && !isCorrectAns) {
-                btn.classList.add('incorrect');
+                btn.style.background = 'rgba(239, 68, 68, 0.15)';
+                btn.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                btn.style.color = '#f87171';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-times-circle';
+                icon.style.float = 'right';
+                btn.appendChild(icon);
             }
 
             optionsList.appendChild(btn);
         });
 
         listContainer.appendChild(optionsList);
+        
+        // Explanation
+        if (q.explanation && q.explanation.trim() !== '') {
+            const explBox = document.createElement('div');
+            explBox.style.marginTop = '24px';
+            explBox.style.padding = '16px 20px';
+            explBox.style.background = 'rgba(16, 185, 129, 0.05)';
+            explBox.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+            explBox.style.borderLeft = '4px solid #10b981';
+            explBox.style.borderRadius = '12px';
+            explBox.style.fontSize = '0.95rem';
+            explBox.style.color = 'var(--text-main)';
+            explBox.style.lineHeight = '1.6';
+            explBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 8px; color: #34d399;"><i class="fas fa-lightbulb" style="margin-right: 6px;"></i> Explanation</div>${q.explanation.replace(/\n/g, '<br>')}`;
+            listContainer.appendChild(explBox);
+        }
 
         if (q.isNoted && q.noteText) {
             const noteBox = document.createElement('div');
-            noteBox.style.marginTop = '24px';
-            noteBox.style.padding = '16px';
-            noteBox.style.background = 'rgba(96, 165, 250, 0.1)';
-            noteBox.style.borderLeft = '3px solid #60a5fa';
-            noteBox.style.borderRadius = '8px';
-            noteBox.style.fontSize = '1rem';
+            noteBox.style.marginTop = '16px';
+            noteBox.style.padding = '16px 20px';
+            noteBox.style.background = 'rgba(96, 165, 250, 0.05)';
+            noteBox.style.border = '1px solid rgba(96, 165, 250, 0.2)';
+            noteBox.style.borderLeft = '4px solid #3b82f6';
+            noteBox.style.borderRadius = '12px';
+            noteBox.style.fontSize = '0.95rem';
             noteBox.style.color = '#bfdbfe';
-            noteBox.style.lineHeight = '1.5';
-            noteBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 6px;"><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Note:</div>${q.noteText.replace(/\n/g, '<br>')}`;
+            noteBox.style.lineHeight = '1.6';
+            noteBox.innerHTML = `<div style="font-weight: 600; margin-bottom: 8px; color: #60a5fa;"><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Note</div>${q.noteText.replace(/\n/g, '<br>')}`;
             listContainer.appendChild(noteBox);
         }
 
-        // Footer (Prev/Next hint)
-        const hint = document.createElement('div');
-        hint.style.marginTop = '24px';
-        hint.style.textAlign = 'center';
+        // Footer (Nav Buttons)
+        const footerDiv = document.createElement('div');
+        footerDiv.style.marginTop = '32px';
+        footerDiv.style.paddingTop = '20px';
+        footerDiv.style.borderTop = '1px solid rgba(255,255,255,0.08)';
+        footerDiv.style.display = 'flex';
+        footerDiv.style.justifyContent = 'space-between';
+        footerDiv.style.alignItems = 'center';
+        
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'btn-ghost';
+        btnPrev.innerHTML = '<i class="fas fa-chevron-left" style="margin-right: 8px;"></i> Previous';
+        btnPrev.style.padding = '10px 16px';
+        btnPrev.style.borderRadius = '12px';
+        btnPrev.disabled = currentModalIndex === 0;
+        if(btnPrev.disabled) btnPrev.style.opacity = '0.3';
+        else {
+            btnPrev.onclick = () => { currentModalIndex--; renderModalQuestion(); };
+        }
+        
+        const hint = document.createElement('span');
         hint.style.color = 'var(--text-muted)';
-        hint.style.fontSize = '0.85rem';
-        hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Use Left/Right arrow keys to navigate';
-        listContainer.appendChild(hint);
+        hint.style.fontSize = '0.8rem';
+        hint.innerHTML = '<i class="fas fa-keyboard" style="margin-right: 4px;"></i> Use Left/Right keys';
+        
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn-primary';
+        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right" style="margin-left: 8px;"></i>';
+        btnNext.style.padding = '10px 16px';
+        btnNext.style.borderRadius = '12px';
+        btnNext.disabled = currentModalIndex === currentModalList.length - 1;
+        if(btnNext.disabled) btnNext.style.opacity = '0.3';
+        else {
+            btnNext.onclick = () => { currentModalIndex++; renderModalQuestion(); };
+        }
+        
+        footerDiv.appendChild(btnPrev);
+        footerDiv.appendChild(hint);
+        footerDiv.appendChild(btnNext);
+        listContainer.appendChild(footerDiv);
     }
 
     function setupModalTrigger(type, title, list) {
@@ -1442,6 +1556,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
+        // Dynamically bind change event to type select
+        const typeSelect = document.getElementById('search-type-select');
+        if (typeSelect && !typeSelect.dataset.bound) {
+            typeSelect.dataset.bound = 'true';
+            typeSelect.addEventListener('change', (e) => {
+                currentSearchType = e.target.value;
+                
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.value = '';
+                renderMainSearch();
+            });
+        }
+        
         // Ensure all segmented controls update bg
         setTimeout(() => window.updateAllSegmentedControls(), 50);
 
@@ -1501,6 +1628,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply Subject Filter
         if (currentSearchSubject !== 'all') {
             filtered = filtered.filter(q => q.subjectId === currentSearchSubject);
+        }
+
+        // Apply Type Filter
+        if (currentSearchType !== 'all') {
+            filtered = filtered.filter(q => q.type === currentSearchType);
         }
 
         // Apply Pills Filter

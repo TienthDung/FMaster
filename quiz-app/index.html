@@ -244,10 +244,12 @@
             <header class="app-header">
                 <div class="flex-align">
                     <button class="icon-btn mr-2" id="btn-practice-back"><i class="fas fa-arrow-left"></i></button>
-                    <h1 id="question-counter" class="text-md">Q#1 · 1/30</h1>
+                    <h1 id="question-counter" class="text-md" style="font-weight:600; color:var(--primary);">0%</h1>
                 </div>
-                <div class="header-actions">
-                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
+                <div class="header-actions" id="practice-quick-stats" style="display:flex; gap:12px; font-size:0.9rem; align-items:center;">
+                    <span style="color:var(--text-muted);" title="Unanswered"><i class="far fa-circle"></i> <span id="hdr-unans">0</span></span>
+                    <span style="color:#34d399;" title="Correct"><i class="fas fa-check-circle"></i> <span id="hdr-correct">0</span></span>
+                    <span style="color:#f87171;" title="Incorrect"><i class="fas fa-times-circle"></i> <span id="hdr-incorrect">0</span></span>
                 </div>
             </header>
             <div class="top-progress">
@@ -280,10 +282,10 @@
             <header class="app-header">
                 <div class="flex-align">
                     <button class="icon-btn mr-2" id="btn-flashcard-back"><i class="fas fa-arrow-left"></i></button>
-                    <h1 id="fc-counter" class="text-md">Q#1 · 1/30</h1>
+                    <h1 id="fc-counter" class="text-md" style="font-weight:600; color:var(--primary);">0%</h1>
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
+                    <!-- Flashcards don't use correct/incorrect tracking in this UI -->
                 </div>
             </header>
             <div class="top-progress">

@@ -1104,15 +1104,22 @@ body {
 }
 
 .modal-content {
-    width: 600px;
+    width: 650px;
     max-width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: 0;
     border-radius: var(--radius-xl);
     transform: scale(0.95) translateY(10px);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    overflow: hidden;
 }
 
 .modal-overlay.active .modal-content {
@@ -1123,20 +1130,23 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 16px;
-    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .modal-body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    padding: 24px;
     gap: 16px;
 }
 
@@ -2117,4 +2127,56 @@ input:checked+.slider:before {
 
 .fc-btn-master:hover {
     background: rgba(16, 185, 129, 0.2);
+}
+
+/* Apple Design Buttons for Dashboard */
+.apple-btn {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.apple-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+.apple-btn:active {
+    transform: scale(0.96) translateY(0);
+}
+.apple-btn i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.apple-btn-practice {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%);
+    border-top: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa; /* Light blue text for better contrast */
+}
+.apple-btn-practice:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #93c5fd;
+}
+
+.apple-btn-fc {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.25) 100%);
+    border-top: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399; /* Light green text */
+}
+.apple-btn-fc:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #6ee7b7;
 }

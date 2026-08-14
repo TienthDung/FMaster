@@ -129,12 +129,36 @@ export class UI {
         const q = this.state.questions[index];
         if (!q) return;
 
-        document.getElementById('question-counter').textContent = `Question ${index + 1} - ${this.state.questions.length}`;
-        document.getElementById('q-type-badge').textContent = q.type.toUpperCase();
-        document.getElementById('question-text').textContent = q.question;
+        // Update quick stats in header and calculate actual progress
+        let correct = 0, wrong = 0, unans = 0;
+        this.state.questions.forEach(question => {
+            const ans = this.state.userAnswers[question.id];
+            if (!ans || ans.length === 0) {
+                unans++;
+            } else {
+                if (this.checkIsCorrect(question, ans)) correct++;
+                else wrong++;
+            }
+        });
+
+        const answeredCount = correct + wrong;
+        const totalQuestions = this.state.questions.length;
+        const progress = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+        const progressFloat = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+
+        document.getElementById('question-counter').textContent = `${progress}%`;
+        document.getElementById('practice-progress').style.width = `${progressFloat}%`;
         
-        const progress = ((index + 1) / this.state.questions.length) * 100;
-        document.getElementById('practice-progress').style.width = `${progress}%`;
+        const unansEl = document.getElementById('hdr-unans');
+        const correctEl = document.getElementById('hdr-correct');
+        const incorrectEl = document.getElementById('hdr-incorrect');
+        
+        if (unansEl) unansEl.textContent = unans;
+        if (correctEl) correctEl.textContent = correct;
+        if (incorrectEl) incorrectEl.textContent = wrong;
+
+        document.getElementById('q-type-badge').textContent = q.type.toUpperCase();
+        document.getElementById('question-text').textContent = `Question ${q.id}: ${q.question}`;
 
         const btnFavorite = document.getElementById('btn-favorite');
         if (btnFavorite) {
@@ -209,9 +233,10 @@ export class UI {
         const q = this.state.questions[index];
         if (!q) return;
 
-        document.getElementById('fc-counter').textContent = `Q#${index + 1} · ${index + 1}/${this.state.questions.length}`;
-        const progress = ((index + 1) / this.state.questions.length) * 100;
-        document.getElementById('fc-progress').style.width = `${progress}%`;
+        const progress = Math.round(((index + 1) / this.state.questions.length) * 100);
+        document.getElementById('fc-counter').textContent = `${progress}%`;
+        const progressFloat = ((index + 1) / this.state.questions.length) * 100;
+        document.getElementById('fc-progress').style.width = `${progressFloat}%`;
 
         const typeEl = document.getElementById('fc-q-type');
         if (typeEl) {
@@ -219,7 +244,7 @@ export class UI {
             typeEl.textContent = isMultiple ? "Multiple Choice" : "Single Choice";
         }
 
-        document.getElementById('fc-question-text').textContent = `Question ${index + 1}: ${q.question}`;
+        document.getElementById('fc-question-text').textContent = `Question ${q.id}: ${q.question}`;
         
         // Render options on the front
         const optContainer = document.getElementById('fc-options-container');
