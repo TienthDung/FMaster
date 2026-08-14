@@ -9,7 +9,7 @@
         // Chỉ chuyển hướng sang PC nếu chiều rộng >= 1024px VÀ không phải là màn hình cảm ứng
         // (iPad Pro M1 có độ phân giải >1024px nhưng maxTouchPoints > 0 nên sẽ không bị chuyển)
         if (window.innerWidth >= 1024 && navigator.maxTouchPoints === 0) {
-            window.location.href = "pc.html";
+            window.location.href = "pc_view.html";
         }
     </script>
     <link rel="stylesheet" href="css/styles.css">
@@ -163,7 +163,7 @@
                 </div>
 
                 <div class="section-header mt-6 mb-4">STATISTICS</div>
-                
+
                 <div class="card chart-card text-center mb-4">
                     <div class="donut-chart mx-auto" id="donut-chart">
                         <div class="donut-inner">
@@ -246,10 +246,14 @@
                     <button class="icon-btn mr-2" id="btn-practice-back"><i class="fas fa-arrow-left"></i></button>
                     <h1 id="question-counter" class="text-md" style="font-weight:600; color:var(--primary);">0%</h1>
                 </div>
-                <div class="header-actions" id="practice-quick-stats" style="display:flex; gap:12px; font-size:0.9rem; align-items:center;">
-                    <span style="color:var(--text-muted);" title="Unanswered"><i class="far fa-circle"></i> <span id="hdr-unans">0</span></span>
-                    <span style="color:#34d399;" title="Correct"><i class="fas fa-check-circle"></i> <span id="hdr-correct">0</span></span>
-                    <span style="color:#f87171;" title="Incorrect"><i class="fas fa-times-circle"></i> <span id="hdr-incorrect">0</span></span>
+                <div class="header-actions" id="practice-quick-stats"
+                    style="display:flex; gap:12px; font-size:0.9rem; align-items:center;">
+                    <span style="color:var(--text-muted);" title="Unanswered"><i class="far fa-circle"></i> <span
+                            id="hdr-unans">0</span></span>
+                    <span style="color:#34d399;" title="Correct"><i class="fas fa-check-circle"></i> <span
+                            id="hdr-correct">0</span></span>
+                    <span style="color:#f87171;" title="Incorrect"><i class="fas fa-times-circle"></i> <span
+                            id="hdr-incorrect">0</span></span>
                 </div>
             </header>
             <div class="top-progress">
@@ -292,16 +296,19 @@
                 <div class="top-progress-fill" id="fc-progress" style="width: 5%"></div>
             </div>
 
-            <div class="fc-tools" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+            <div class="fc-tools"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
                 <span id="fc-q-type" class="tag-pill" style="font-size: 0.75rem;">MCQ</span>
-                
+
                 <div class="mobile-search-box" id="fc-search-container">
                     <input type="text" id="fc-search-input" placeholder="Search ID..." autocomplete="off">
-                    <button class="icon-btn" id="fc-search-btn" style="color: var(--text-muted);"><i class="fas fa-search"></i></button>
+                    <button class="icon-btn" id="fc-search-btn" style="color: var(--text-muted);"><i
+                            class="fas fa-search"></i></button>
                 </div>
             </div>
 
-            <div class="content pb-bar flex-col-center" style="height: calc(100vh - 180px); justify-content: center; overflow: hidden; padding: 20px;">
+            <div class="content pb-bar flex-col-center"
+                style="height: calc(100vh - 180px); justify-content: center; overflow: hidden; padding: 20px;">
                 <div class="fc-container" id="fc-container">
                     <div class="fc-card" id="fc-card">
                         <!-- Front Face -->
@@ -317,13 +324,18 @@
                         </div>
                         <!-- Back Face -->
                         <div class="fc-face fc-back">
-                            <div class="fc-content w-full h-full flex-col" style="justify-content: flex-start; text-align: left; align-items: flex-start; overflow-y: auto;">
-                                <div class="fc-answer-label text-sm text-cyan mb-2" style="align-self: flex-start;">CORRECT ANSWER</div>
-                                <div id="fc-answer-text" class="text-color-main font-semibold mb-4" style="font-size: 1.1rem; align-self: flex-start;">Answer goes here...</div>
-                                
-                                <hr id="fc-divider" class="w-full my-4" style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                                
-                                <div id="fc-explanation-text" class="text-sm text-gray" style="align-self: flex-start;">Explanation goes here...</div>
+                            <div class="fc-content w-full h-full flex-col"
+                                style="justify-content: flex-start; text-align: left; align-items: flex-start; overflow-y: auto;">
+                                <div class="fc-answer-label text-sm text-cyan mb-2" style="align-self: flex-start;">
+                                    CORRECT ANSWER</div>
+                                <div id="fc-answer-text" class="text-color-main font-semibold mb-4"
+                                    style="font-size: 1.1rem; align-self: flex-start;">Answer goes here...</div>
+
+                                <hr id="fc-divider" class="w-full my-4"
+                                    style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+
+                                <div id="fc-explanation-text" class="text-sm text-gray" style="align-self: flex-start;">
+                                    Explanation goes here...</div>
                             </div>
                         </div>
                     </div>
