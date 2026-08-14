@@ -199,22 +199,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnConfirmReset) {
         btnConfirmReset.addEventListener('click', () => {
-            currentQuestions.forEach(q => {
-                q.isSubmitted = false;
-                q.userAnswers = [];
-                q.isCorrect = undefined;
-            });
-            saveProgress();
-            
-            // Also update allSubjectsProgress
-            if (currentSubject) {
-                allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0 };
+            const targetId = btnConfirmReset.dataset.targetId;
+            if (targetId) {
+                localStorage.removeItem('quiz_pc_progress_' + targetId);
+                if (currentSubject && currentSubject.id === targetId) {
+                    currentQuestions.forEach(q => {
+                        q.isSubmitted = false;
+                        q.isCorrect = undefined;
+                        q.userAnswers = [];
+                        q.fcStatus = 'not_started';
+                    });
+                    saveProgress();
+                }
+                allSubjectsProgress[targetId] = { total: allSubjectsProgress[targetId]?.total || 0, submitted: 0, fcMastered: 0 };
                 renderSubjectsGrid();
+                delete btnConfirmReset.dataset.targetId;
+            } else {
+                currentQuestions.forEach(q => {
+                    q.isSubmitted = false;
+                    q.userAnswers = [];
+                    q.isCorrect = undefined;
+                });
+                saveProgress();
+                
+                // Also update allSubjectsProgress
+                if (currentSubject) {
+                    allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0 };
+                    renderSubjectsGrid();
+                }
+                
+                updateDashboard();
+                updateSearch();
+                renderQuestion();
             }
-            
-            updateDashboard();
-            updateSearch();
-            renderQuestion();
             confirmResetModal.classList.remove('active');
         });
     }
@@ -830,20 +847,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = e.currentTarget.dataset.id;
-                if(confirm("Are you sure you want to restart progress for this subject?")) {
-                    localStorage.removeItem('quiz_pc_progress_' + id);
-                    if (currentSubject && currentSubject.id === id) {
-                        currentQuestions.forEach(q => {
-                            q.isSubmitted = false;
-                            q.isCorrect = undefined;
-                            q.userAnswers = [];
-                            q.fcStatus = 'not_started';
-                        });
-                        saveProgress();
-                    }
-                    allSubjectsProgress[id] = { total: allSubjectsProgress[id]?.total || 0, submitted: 0, fcMastered: 0 };
-                    renderSubjectsGrid();
-                }
+                confirmResetModal.classList.add('active');
+                btnConfirmReset.dataset.targetId = id;
             });
         });
     }
