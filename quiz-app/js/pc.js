@@ -137,6 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseCSV(text) {
         const lines = text.split('\n');
         const result = [];
+        
+        let isN4Format = false;
+        if (lines.length > 0) {
+            const header = lines[0].toLowerCase();
+            if (header.includes('đáp án a') && header.includes('đáp án đúng')) {
+                isN4Format = true;
+            }
+        }
+        
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
@@ -144,25 +153,67 @@ document.addEventListener('DOMContentLoaded', () => {
             const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
             const parts = line.split(regex).map(p => p.replace(/^"|"$/g, '').trim());
 
-            if (parts.length >= 5) {
-                let opts = parts[3].split('|').map(o => o.trim().replace(/\\r|\\n/g, ''));
-                let correctAnswers = parts[4].split('|').map(ans => ans.trim());
-                let explanation = parts.length > 5 ? parts[5].replace(/""/g, '"') : '';
+            if (isN4Format) {
+                if (parts.length >= 7) {
+                    const opts = [
+                        parts[2].replace(/""/g, '"'),
+                        parts[3].replace(/""/g, '"'),
+                        parts[4].replace(/""/g, '"'),
+                        parts[5].replace(/""/g, '"')
+                    ].filter(Boolean);
+                    
+                    const answerLetter = parts[6].toUpperCase();
+                    let correctAnswers = [];
+                    if (answerLetter === 'A') correctAnswers.push('0');
+                    if (answerLetter === 'B') correctAnswers.push('1');
+                    if (answerLetter === 'C') correctAnswers.push('2');
+                    if (answerLetter === 'D') correctAnswers.push('3');
+                    
+                    let explanation = parts.length > 7 ? parts[7].replace(/""/g, '"') : '';
+                    
+                    // Format explanation: split A, B, C, D options into new lines
+                    explanation = explanation.replace(/(,\s*)([A-D]\.)/g, '<br>$2');
 
-                result.push({
-                    id: parts[0],
-                    type: parts[1],
-                    question: parts[2].replace(/""/g, '"'),
-                    options: opts,
-                    correctAnswers: correctAnswers,
-                    explanation: explanation,
-                    userAnswers: [],
-                    isSubmitted: false,
-                    isCorrect: null,
-                    isFavorite: false,
-                    isNoted: false,
-                    originalIndex: result.length // Store index to jump to
-                });
+                    if (parts.length > 8 && parts[8]) {
+                        explanation += '<br><br><strong>Ví dụ:</strong> ' + parts[8].replace(/""/g, '"');
+                    }
+                    
+                    result.push({
+                        id: parts[0],
+                        type: 'single_choice',
+                        question: parts[1].replace(/""/g, '"'),
+                        options: opts,
+                        correctAnswers: correctAnswers,
+                        explanation: explanation,
+                        userAnswers: [],
+                        isSubmitted: false,
+                        isCorrect: null,
+                        isFavorite: false,
+                        isNoted: false,
+                        originalIndex: result.length
+                    });
+                }
+            } else {
+                if (parts.length >= 5) {
+                    let opts = parts[3].split('|').map(o => o.trim().replace(/\\r|\\n/g, ''));
+                    let correctAnswers = parts[4].split('|').map(ans => ans.trim());
+                    let explanation = parts.length > 5 ? parts[5].replace(/""/g, '"') : '';
+
+                    result.push({
+                        id: parts[0],
+                        type: parts[1],
+                        question: parts[2].replace(/""/g, '"'),
+                        options: opts,
+                        correctAnswers: correctAnswers,
+                        explanation: explanation,
+                        userAnswers: [],
+                        isSubmitted: false,
+                        isCorrect: null,
+                        isFavorite: false,
+                        isNoted: false,
+                        originalIndex: result.length // Store index to jump to
+                    });
+                }
             }
         }
         return result;
@@ -183,6 +234,105 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCloseHelpModal && helpModal) {
         btnCloseHelpModal.addEventListener('click', () => {
             helpModal.classList.remove('active');
+        });
+    }
+
+    // N4 Revision Elements
+    const btnN4Revision = document.getElementById('btn-n4-revision');
+    const n4ChapterModal = document.getElementById('n4-chapter-modal');
+    const btnCancelN4 = document.getElementById('btn-cancel-n4');
+    const btnN4Chap15 = document.getElementById('btn-n4-chap15');
+    const btnN4Chap16 = document.getElementById('btn-n4-chap16');
+    const btnN4Chap17 = document.getElementById('btn-n4-chap17');
+    const btnN4Chap18 = document.getElementById('btn-n4-chap18');
+    const btnN4Chap19 = document.getElementById('btn-n4-chap19');
+
+
+    if (btnN4Revision && n4ChapterModal) {
+        btnN4Revision.addEventListener('click', () => {
+            n4ChapterModal.classList.add('active');
+        });
+    }
+
+    if (btnCancelN4 && n4ChapterModal) {
+        btnCancelN4.addEventListener('click', () => {
+            n4ChapterModal.classList.remove('active');
+        });
+    }
+
+    function loadN4Chapter(file, chapterName) {
+        if(n4ChapterModal) n4ChapterModal.classList.remove('active');
+        fetch('data/' + file)
+            .then(res => res.text())
+            .then(text => {
+                currentQuestions = parseCSV(text);
+                currentSubject = { id: 'n4-' + chapterName.replace(' ', '').toLowerCase(), name: 'N4 - ' + chapterName };
+                
+                // Set default progress if not found
+                if(!allSubjectsProgress[currentSubject.id]) {
+                    allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0, fcMastered: 0 };
+                }
+
+                const saved = localStorage.getItem('quiz_pc_progress_' + currentSubject.id);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        parsed.forEach(p => {
+                            const q = currentQuestions.find(item => item.id === p.id);
+                            if (q) {
+                                q.isFavorite = p.isFavorite;
+                                q.isNoted = p.isNoted;
+                                q.noteText = p.noteText;
+                                q.userAnswers = p.userAnswers;
+                                q.isSubmitted = p.isSubmitted;
+                                q.isCorrect = p.isCorrect;
+                                q.fcStatus = p.fcStatus || 'not_started';
+                            }
+                        });
+                    } catch(e) {}
+                }
+
+                currentQuestionIndex = 0;
+                switchView('practice-view');
+
+                const activePill = document.querySelector('.filter-pills .pill.active');
+                if (activePill) {
+                    activePill.textContent = currentSubject.id.toUpperCase();
+                }
+                
+                if (typeof updateDashboard === 'function') updateDashboard();
+                if (typeof updateSearch === 'function') updateSearch();
+            })
+            .catch(err => console.error('Failed to load ' + chapterName, err));
+    }
+
+    if (btnN4Chap15) {
+        btnN4Chap15.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap15.csv', 'Chap 15');
+        });
+    }
+
+    if (btnN4Chap16) {
+        btnN4Chap16.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap16.csv', 'Chap 16');
+        });
+    }
+
+    if (btnN4Chap17) {
+        btnN4Chap17.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap17.csv', 'Chap 17');
+        });
+    }
+
+    if (btnN4Chap18) {
+        btnN4Chap18.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap18.csv', 'Chap 18');
+        });
+    }
+
+    if (btnN4Chap19) {
+        btnN4Chap19.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap19.csv', 'Chap 19');
         });
     }
 
@@ -296,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
 
         const qText = document.querySelector('.question-text');
-        qText.textContent = `Question ${q.id}: ${q.question}`;
+        qText.textContent = q.question;
 
         if (btnFav) btnFav.style.color = q.isFavorite ? '#f59e0b' : 'var(--text-muted)';
         if (btnNote) btnNote.style.color = q.isNoted ? '#60a5fa' : 'var(--text-muted)';
@@ -1295,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render Question
         if(fcFrontContent) {
             fcFrontContent.style.textAlign = 'left';
-            fcFrontContent.innerHTML = `<span style="color: #ffffff; font-size: 1.3rem;">Question ${q.id}: ${q.question}</span>`;
+            fcFrontContent.innerHTML = `<span style="color: #ffffff; font-size: 1.3rem;">${q.question}</span>`;
         }
         
         // Render Options
