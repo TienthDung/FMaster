@@ -173,6 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Format explanation: split A, B, C, D options into new lines
                     explanation = explanation.replace(/(,\s*)([A-D]\.)/g, '<br>$2');
+                    // Handle Kanji format: split by " | B:"
+                    explanation = explanation.replace(/(\s*\|\s*)([A-D]:)/g, '<br>$2');
+                    // Highlight the conclusion "=>"
+                    explanation = explanation.replace(/(\s*=>\s*)/g, '<br><br><span style="color: #3b82f6; font-weight: 600;">=> </span>');
 
                     if (parts.length > 8 && parts[8]) {
                         explanation += '<br><br><strong>Ví dụ:</strong> ' + parts[8].replace(/""/g, '"');
@@ -246,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnN4Chap17 = document.getElementById('btn-n4-chap17');
     const btnN4Chap18 = document.getElementById('btn-n4-chap18');
     const btnN4Chap19 = document.getElementById('btn-n4-chap19');
+    const btnN4Chap20 = document.getElementById('btn-n4-chap20');
 
 
     if (btnN4Revision && n4ChapterModal) {
@@ -260,8 +265,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // N4 Kanji Elements
+    const btnN4Kanji = document.getElementById('btn-n4-kanji');
+    const n4KanjiModal = document.getElementById('n4-kanji-modal');
+    const btnCancelN4Kanji = document.getElementById('btn-cancel-n4-kanji');
+    const btnN4KanjiBai15 = document.getElementById('btn-n4-kanji-bai15');
+    const btnN4KanjiBai16 = document.getElementById('btn-n4-kanji-bai16');
+    const btnN4KanjiBai17 = document.getElementById('btn-n4-kanji-bai17');
+    const btnN4KanjiBai18 = document.getElementById('btn-n4-kanji-bai18');
+    const btnN4KanjiBai19 = document.getElementById('btn-n4-kanji-bai19');
+    const btnN4KanjiBai20 = document.getElementById('btn-n4-kanji-bai20');
+    const btnN4KanjiBai21 = document.getElementById('btn-n4-kanji-bai21');
+    const btnN4KanjiBai22 = document.getElementById('btn-n4-kanji-bai22');
+    const btnN4KanjiBai23 = document.getElementById('btn-n4-kanji-bai23');
+
+    if (btnN4Kanji && n4KanjiModal) {
+        btnN4Kanji.addEventListener('click', () => {
+            n4KanjiModal.classList.add('active');
+        });
+    }
+
+    if (btnCancelN4Kanji && n4KanjiModal) {
+        btnCancelN4Kanji.addEventListener('click', () => {
+            n4KanjiModal.classList.remove('active');
+        });
+    }
+
     function loadN4Chapter(file, chapterName) {
         if(n4ChapterModal) n4ChapterModal.classList.remove('active');
+        if(n4KanjiModal) n4KanjiModal.classList.remove('active');
         fetch('data/' + file)
             .then(res => res.text())
             .then(text => {
@@ -333,6 +365,66 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnN4Chap19) {
         btnN4Chap19.addEventListener('click', () => {
             loadN4Chapter('N4/Chap19.csv', 'Chap 19');
+        });
+    }
+
+    if (btnN4Chap20) {
+        btnN4Chap20.addEventListener('click', () => {
+            loadN4Chapter('N4/Chap20.csv', 'Chap 20');
+        });
+    }
+
+    if (btnN4KanjiBai15) {
+        btnN4KanjiBai15.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai15.csv', 'Kanji Bài 15');
+        });
+    }
+
+    if (btnN4KanjiBai16) {
+        btnN4KanjiBai16.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai16.csv', 'Kanji Bài 16');
+        });
+    }
+
+    if (btnN4KanjiBai17) {
+        btnN4KanjiBai17.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai17.csv', 'Kanji Bài 17');
+        });
+    }
+
+    if (btnN4KanjiBai18) {
+        btnN4KanjiBai18.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai18.csv', 'Kanji Bài 18');
+        });
+    }
+
+    if (btnN4KanjiBai19) {
+        btnN4KanjiBai19.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai19.csv', 'Kanji Bài 19');
+        });
+    }
+
+    if (btnN4KanjiBai20) {
+        btnN4KanjiBai20.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai20.csv', 'Kanji Bài 20');
+        });
+    }
+
+    if (btnN4KanjiBai21) {
+        btnN4KanjiBai21.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai21.csv', 'Kanji Bài 21');
+        });
+    }
+
+    if (btnN4KanjiBai22) {
+        btnN4KanjiBai22.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai22.csv', 'Kanji Bài 22');
+        });
+    }
+
+    if (btnN4KanjiBai23) {
+        btnN4KanjiBai23.addEventListener('click', () => {
+            loadN4Chapter('N4/Kanji/Quiz_Kanji_Bai23.csv', 'Kanji Bài 23');
         });
     }
 

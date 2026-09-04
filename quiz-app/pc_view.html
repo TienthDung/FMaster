@@ -136,6 +136,29 @@
                     <!-- Desc -->
                     <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0; position: relative; z-index: 1;">Practice Vocabulary & Grammar</p>
                 </div>
+                
+                <!-- Kanji N4 Box -->
+                <div class="jump-card glass-panel" id="btn-n4-kanji" style="cursor: pointer; display: flex; flex-direction: column; background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(15,23,42,0.4) 100%); border-left: 4px solid #3b82f6; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 30px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    
+                    <!-- Watermark -->
+                    <div style="position: absolute; top: -10px; right: -10px; font-size: 7rem; opacity: 0.05; color: #3b82f6; transform: rotate(15deg);">
+                        <i class="fas fa-language"></i>
+                    </div>
+
+                    <!-- Header with Icon -->
+                    <div class="jump-header" style="margin-bottom: 16px; position: relative; z-index: 1;">
+                        <div class="jump-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; border-radius: 12px; font-size: 1.4rem;">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <span class="jump-badge" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); font-weight: 600;">JLPT N4</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 style="margin-bottom: 8px; font-size: 1.6rem; background: linear-gradient(90deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: 0.5px; position: relative; z-index: 1;">漢字 Kanji Revision</h3>
+                    
+                    <!-- Desc -->
+                    <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0; position: relative; z-index: 1;">Practice Kanji Characters</p>
+                </div>
             </div>
         </section>
 
@@ -416,6 +439,12 @@
         .chapter-pill-btn:active {
             transform: translateY(0);
         }
+        .kanji-pill-btn:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-2px);
+        }
     </style>
     <div id="n4-chapter-modal" class="modal-overlay">
         <div class="modal-content glass-panel" style="width: 360px; text-align: center; padding: 32px 24px; background: rgba(15, 23, 42, 0.85); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); border: 1px solid rgba(239, 68, 68, 0.2);">
@@ -432,9 +461,37 @@
                     <button class="chapter-pill-btn" id="btn-n4-chap17">Chapter 17</button>
                     <button class="chapter-pill-btn" id="btn-n4-chap18">Chapter 18</button>
                     <button class="chapter-pill-btn" id="btn-n4-chap19">Chapter 19</button>
+                    <button class="chapter-pill-btn" id="btn-n4-chap20">Chapter 20</button>
                 </div>
 
                 <button class="btn-ghost" id="btn-cancel-n4" style="width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 500; color: #94a3b8; background: rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#f8fafc';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8';">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- N4 Kanji Chapter Modal -->
+    <div id="n4-kanji-modal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 360px; text-align: center; padding: 32px 24px; background: rgba(15, 23, 42, 0.85); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); border: 1px solid rgba(59, 130, 246, 0.2);">
+            <div class="modal-body" style="padding: 0;">
+                <div style="font-size: 2.5rem; background: linear-gradient(135deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;">
+                    <i class="fas fa-language"></i>
+                </div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 8px; font-weight: 700; color: #f8fafc;">Select Kanji Lesson</h2>
+                <p style="color: #94a3b8; margin-bottom: 24px; font-size: 0.9rem; line-height: 1.5;">Choose a lesson to start practicing.</p>
+                
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai15">Bài 15</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai16">Bài 16</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai17">Bài 17</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai18">Bài 18</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai19">Bài 19</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai20">Bài 20</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai21">Bài 21</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai22">Bài 22</button>
+                    <button class="chapter-pill-btn kanji-pill-btn" id="btn-n4-kanji-bai23">Bài 23</button>
+                </div>
+
+                <button class="btn-ghost" id="btn-cancel-n4-kanji" style="width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 500; color: #94a3b8; background: rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#f8fafc';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8';">Cancel</button>
             </div>
         </div>
     </div>
