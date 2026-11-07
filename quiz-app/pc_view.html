@@ -159,6 +159,29 @@
                     <!-- Desc -->
                     <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0; position: relative; z-index: 1;">Practice Kanji Characters</p>
                 </div>
+                
+                <!-- Kanji Flashcard Box -->
+                <div class="jump-card glass-panel" id="btn-kanji-flashcard" style="cursor: pointer; display: flex; flex-direction: column; background: linear-gradient(135deg, rgba(234,179,8,0.05) 0%, rgba(15,23,42,0.4) 100%); border-left: 4px solid #eab308; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 30px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    
+                    <!-- Watermark -->
+                    <div style="position: absolute; top: -10px; right: -10px; font-size: 7rem; opacity: 0.05; color: #eab308; transform: rotate(-15deg);">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+
+                    <!-- Header with Icon -->
+                    <div class="jump-header" style="margin-bottom: 16px; position: relative; z-index: 1;">
+                        <div class="jump-icon" style="background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; border-radius: 12px; font-size: 1.4rem;">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="jump-badge" style="background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); font-weight: 600;">Flashcard</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 style="margin-bottom: 8px; font-size: 1.6rem; background: linear-gradient(90deg, #eab308, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: 0.5px; position: relative; z-index: 1;">Kanji Cards</h3>
+                    
+                    <!-- Desc -->
+                    <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0; position: relative; z-index: 1;">Learn Kanji Vocabularies</p>
+                </div>
             </div>
         </section>
 
@@ -334,6 +357,7 @@
                         <option value="all" style="background: var(--bg-color); color: var(--text-main);">All Types</option>
                         <option value="multiple_choice" style="background: var(--bg-color); color: var(--text-main);">Multiple Choice</option>
                         <option value="single_choice" style="background: var(--bg-color); color: var(--text-main);">Single Choice</option>
+                        <option value="true_false" style="background: var(--bg-color); color: var(--text-main);">True / False</option>
                     </select>
 
                     <select id="search-subject-select" class="glass-panel" style="padding: 10px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.1); outline: none; cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 500; color-scheme: dark;">
@@ -492,6 +516,25 @@
                 </div>
 
                 <button class="btn-ghost" id="btn-cancel-n4-kanji" style="width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 500; color: #94a3b8; background: rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#f8fafc';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8';">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanji Flashcard Chapter Modal -->
+    <div id="kanji-flashcard-modal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 500px; max-width: 90%; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.05); padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div class="modal-body" style="padding: 0; text-align: center;">
+                <div style="width: 64px; height: 64px; background: rgba(234, 179, 8, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; color: #eab308; font-size: 2rem; border: 1px solid rgba(234, 179, 8, 0.2);">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 8px; font-weight: 700; color: #f8fafc;">Kanji Flashcards</h2>
+                <p style="color: #94a3b8; margin-bottom: 24px; font-size: 0.9rem; line-height: 1.5;">Choose a chapter to learn Kanji.</p>
+                
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;" id="kanji-flashcard-chapter-list">
+                    <!-- Chapters will be populated dynamically -->
+                </div>
+
+                <button class="btn-ghost" id="btn-cancel-kanji-flashcard" style="width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 500; color: #94a3b8; background: rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#f8fafc';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8';">Cancel</button>
             </div>
         </div>
     </div>

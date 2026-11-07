@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseCSV(text) {
         const lines = text.split('\n');
         const result = [];
-        
+
         let isN4Format = false;
         if (lines.length > 0) {
             const header = lines[0].toLowerCase();
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isN4Format = true;
             }
         }
-        
+
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
@@ -161,16 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         parts[4].replace(/""/g, '"'),
                         parts[5].replace(/""/g, '"')
                     ].filter(Boolean);
-                    
+
                     const answerLetter = parts[6].toUpperCase();
                     let correctAnswers = [];
                     if (answerLetter === 'A') correctAnswers.push('0');
                     if (answerLetter === 'B') correctAnswers.push('1');
                     if (answerLetter === 'C') correctAnswers.push('2');
                     if (answerLetter === 'D') correctAnswers.push('3');
-                    
+
                     let explanation = parts.length > 7 ? parts[7].replace(/""/g, '"') : '';
-                    
+
                     // Format explanation: split A, B, C, D options into new lines
                     explanation = explanation.replace(/(,\s*)([A-D]\.)/g, '<br>$2');
                     // Handle Kanji format: split by " | B:"
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parts.length > 8 && parts[8]) {
                         explanation += '<br><br><strong>Ví dụ:</strong> ' + parts[8].replace(/""/g, '"');
                     }
-                    
+
                     result.push({
                         id: parts[0],
                         type: 'single_choice',
@@ -292,16 +292,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadN4Chapter(file, chapterName) {
-        if(n4ChapterModal) n4ChapterModal.classList.remove('active');
-        if(n4KanjiModal) n4KanjiModal.classList.remove('active');
+        if (n4ChapterModal) n4ChapterModal.classList.remove('active');
+        if (n4KanjiModal) n4KanjiModal.classList.remove('active');
         fetch('data/' + file)
             .then(res => res.text())
             .then(text => {
                 currentQuestions = parseCSV(text);
                 currentSubject = { id: 'n4-' + chapterName.replace(' ', '').toLowerCase(), name: 'N4 - ' + chapterName };
-                
+
                 // Set default progress if not found
-                if(!allSubjectsProgress[currentSubject.id]) {
+                if (!allSubjectsProgress[currentSubject.id]) {
                     allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0, fcMastered: 0 };
                 }
 
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 q.fcStatus = p.fcStatus || 'not_started';
                             }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
 
                 currentQuestionIndex = 0;
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (activePill) {
                     activePill.textContent = currentSubject.id.toUpperCase();
                 }
-                
+
                 if (typeof updateDashboard === 'function') updateDashboard();
                 if (typeof updateSearch === 'function') updateSearch();
             })
@@ -463,13 +463,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     q.isCorrect = undefined;
                 });
                 saveProgress();
-                
+
                 // Also update allSubjectsProgress
                 if (currentSubject) {
                     allSubjectsProgress[currentSubject.id] = { total: currentQuestions.length, submitted: 0 };
                     renderSubjectsGrid();
                 }
-                
+
                 updateDashboard();
                 updateSearch();
                 renderQuestion();
@@ -488,11 +488,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updatePracticeProgress() {
         if (currentQuestions.length === 0) return;
-        
+
         let answered = 0;
         let correctCount = 0;
         let incorrectCount = 0;
-        
+
         currentQuestions.forEach(q => {
             if (q.isSubmitted) {
                 answered++;
@@ -500,17 +500,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 else incorrectCount++;
             }
         });
-        
+
         const total = currentQuestions.length;
         const unansweredCount = total - answered;
         const progressPercent = total > 0 ? (answered / total) * 100 : 0;
-        
+
         const fillEl = document.getElementById('practice-progress-fill');
         const textEl = document.getElementById('practice-progress-text');
         const unansEl = document.getElementById('practice-stat-unanswered');
         const corrEl = document.getElementById('practice-stat-correct');
         const incorrEl = document.getElementById('practice-stat-incorrect');
-        
+
         if (fillEl) fillEl.style.width = `${progressPercent}%`;
         if (textEl) textEl.textContent = `${Math.round(progressPercent)}%`;
         if (unansEl) unansEl.textContent = unansweredCount;
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderQuestion(direction = '') {
         if (currentQuestions.length === 0) return;
-        
+
         updatePracticeProgress();
         const q = currentQuestions[currentQuestionIndex];
 
@@ -535,7 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE'}`;
+        const typeLabel = q.type === 'multiple_choice' ? 'MULTIPLE CHOICE' : (q.type === 'true_false' ? 'TRUE / FALSE' : 'SINGLE CHOICE');
+        document.querySelector('.question-indicator').textContent = `QUESTION ${currentQuestionIndex + 1} - ${typeLabel}`;
 
         const qText = document.querySelector('.question-text');
         qText.textContent = q.question;
@@ -569,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
         q.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            
+
             const letter = String.fromCharCode(65 + idx); // 0 -> A, 1 -> B
             btn.innerHTML = `
                 <div class="option-indicator">${letter}</div>
@@ -605,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (existingExplanation) {
             existingExplanation.remove();
         }
-        
+
         if (q.isSubmitted && q.explanation) {
             const explanationDiv = document.createElement('div');
             explanationDiv.id = 'explanation-container';
@@ -616,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             explanationDiv.style.borderLeft = '4px solid var(--info)';
             explanationDiv.style.textAlign = 'left';
             explanationDiv.innerHTML = `<strong style="color: var(--info); font-size: 1.1rem; display: block; margin-bottom: 8px;">Explanation:</strong><div style="color: var(--text-light); line-height: 1.5; font-size: 1rem;">${q.explanation}</div>`;
-            
+
             // Insert it after the optionsContainer
             optionsContainer.parentNode.insertBefore(explanationDiv, optionsContainer.nextSibling);
         }
@@ -654,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (q.isSubmitted) return;
 
         const idxStr = String(idx);
-        if (q.type === 'single_choice') {
+        if (q.type === 'single_choice' || q.type === 'true_false') {
             q.userAnswers = [idxStr];
         } else {
             if (q.userAnswers.includes(idxStr)) {
@@ -948,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fcStatus: q.fcStatus // added flashcard sync
         }));
         localStorage.setItem('quiz_pc_progress_' + currentSubject.id, JSON.stringify(progress));
-        
+
         allSubjectsProgress[currentSubject.id] = {
             total: currentQuestions.length,
             submitted: currentQuestions.filter(q => q.isSubmitted).length,
@@ -983,7 +984,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             subjects = data;
-            
+
             // Check local storage for all subjects progress summary
             subjects.forEach(sub => {
                 const saved = localStorage.getItem('quiz_pc_progress_' + sub.id);
@@ -997,26 +998,26 @@ document.addEventListener('DOMContentLoaded', () => {
                             submitted: submitted,
                             fcMastered: fcMastered
                         };
-                    } catch(e) {}
+                    } catch (e) { }
                 }
             });
-            
+
             renderSubjectsGrid();
         })
         .catch(err => {
             console.error("Subjects loading error:", err);
         });
-        
+
     function renderSubjectsGrid() {
         const grid = document.getElementById('subjects-grid');
         if (!grid) return;
         grid.innerHTML = '';
-        
+
         subjects.forEach(sub => {
             const prog = allSubjectsProgress[sub.id] || { total: 0, submitted: 0, fcMastered: 0 };
             const pct = prog.total === 0 ? 0 : Math.round((prog.submitted / prog.total) * 100);
             const fcPct = prog.total === 0 ? 0 : Math.round(((prog.fcMastered || 0) / prog.total) * 100);
-            
+
             const card = document.createElement('div');
             card.className = 'jump-card glass-panel';
             card.style.display = 'flex';
@@ -1058,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             grid.appendChild(card);
         });
-        
+
         // Add listeners
         // Make the whole card clickable for Practice
         document.querySelectorAll('.jump-card').forEach(card => {
@@ -1084,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadSubject(id, 'flashcard-view');
             });
         });
-        
+
         document.querySelectorAll('.btn-restart').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1094,27 +1095,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     function loadSubject(id, targetView = 'practice-view') {
         currentSubject = subjects.find(s => s.id === id);
-        if(!currentSubject) return;
-        
+        if (!currentSubject) return;
+
         fetch('data/' + currentSubject.file)
             .then(res => res.text())
             .then(text => {
                 currentQuestions = parseCSV(text);
                 loadProgress();
-                
+
                 // Switch to requested view
                 currentQuestionIndex = 0;
                 switchView(targetView);
-                
+
                 // Set the pill filter active subject name
                 const activePill = document.querySelector('.filter-pills .pill.active');
                 if (activePill) {
                     activePill.textContent = currentSubject.id.toUpperCase();
                 }
-                
+
                 if (typeof updateDashboard === 'function') updateDashboard();
                 if (typeof updateSearch === 'function') updateSearch();
             })
@@ -1199,18 +1200,25 @@ document.addEventListener('DOMContentLoaded', () => {
         header.style.justifyContent = 'space-between';
         header.style.alignItems = 'center';
         header.style.marginBottom = '20px';
-        
+
         const badgeStyle = 'padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;';
-        
+
         const countBadge = document.createElement('span');
         countBadge.style.cssText = `${badgeStyle} background: rgba(255,255,255,0.1); color: var(--text-muted);`;
         countBadge.textContent = `Question ${currentModalIndex + 1} of ${currentModalList.length}`;
-        
+
         const typeBadge = document.createElement('span');
         const isMulti = q.type === 'multiple_choice';
-        typeBadge.style.cssText = `${badgeStyle} background: ${isMulti ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)'}; color: ${isMulti ? '#34d399' : '#60a5fa'}; border: 1px solid ${isMulti ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'};`;
-        typeBadge.innerHTML = `<i class="fas ${isMulti ? 'fa-check-square' : 'fa-dot-circle'}" style="margin-right: 6px;"></i>${isMulti ? 'Multiple Choice' : 'Single Choice'}`;
-        
+        const isTF = q.type === 'true_false';
+        const badgeColor = isMulti ? '#34d399' : (isTF ? '#f59e0b' : '#60a5fa');
+        const badgeBg = isMulti ? 'rgba(16, 185, 129, 0.15)' : (isTF ? 'rgba(245, 158, 11, 0.15)' : 'rgba(59, 130, 246, 0.15)');
+        const badgeBorder = isMulti ? 'rgba(16, 185, 129, 0.3)' : (isTF ? 'rgba(245, 158, 11, 0.3)' : 'rgba(59, 130, 246, 0.3)');
+        const badgeIcon = isMulti ? 'fa-check-square' : (isTF ? 'fa-check-double' : 'fa-dot-circle');
+        const badgeText = isMulti ? 'Multiple Choice' : (isTF ? 'True / False' : 'Single Choice');
+
+        typeBadge.style.cssText = `${badgeStyle} background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};`;
+        typeBadge.innerHTML = `<i class="fas ${badgeIcon}" style="margin-right: 6px;"></i>${badgeText}`;
+
         header.appendChild(countBadge);
         header.appendChild(typeBadge);
         listContainer.appendChild(header);
@@ -1241,20 +1249,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.background = 'rgba(255, 255, 255, 0.03)';
             btn.style.fontSize = '1rem';
             btn.style.cursor = 'default';
-            
+
             const labelChar = String.fromCharCode(65 + idx);
             const labelSpan = document.createElement('span');
             labelSpan.textContent = `${labelChar}. `;
             labelSpan.style.fontWeight = '600';
             labelSpan.style.marginRight = '8px';
             labelSpan.style.opacity = '0.7';
-            
+
             const textSpan = document.createElement('span');
             textSpan.textContent = opt;
-            
+
             btn.appendChild(labelSpan);
             btn.appendChild(textSpan);
-            
+
             const isSelected = q.userAnswers.includes(String(idx));
             const isCorrectAns = q.correctAnswers.includes(String(idx));
 
@@ -1280,7 +1288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         listContainer.appendChild(optionsList);
-        
+
         // Explanation
         if (q.explanation && q.explanation.trim() !== '') {
             const explBox = document.createElement('div');
@@ -1320,34 +1328,34 @@ document.addEventListener('DOMContentLoaded', () => {
         footerDiv.style.display = 'flex';
         footerDiv.style.justifyContent = 'space-between';
         footerDiv.style.alignItems = 'center';
-        
+
         const btnPrev = document.createElement('button');
         btnPrev.className = 'btn-ghost';
         btnPrev.innerHTML = '<i class="fas fa-chevron-left" style="margin-right: 8px;"></i> Previous';
         btnPrev.style.padding = '10px 16px';
         btnPrev.style.borderRadius = '12px';
         btnPrev.disabled = currentModalIndex === 0;
-        if(btnPrev.disabled) btnPrev.style.opacity = '0.3';
+        if (btnPrev.disabled) btnPrev.style.opacity = '0.3';
         else {
             btnPrev.onclick = () => { currentModalIndex--; renderModalQuestion(); };
         }
-        
+
         const hint = document.createElement('span');
         hint.style.color = 'var(--text-muted)';
         hint.style.fontSize = '0.8rem';
         hint.innerHTML = '<i class="fas fa-keyboard" style="margin-right: 4px;"></i> Use Left/Right keys';
-        
+
         const btnNext = document.createElement('button');
         btnNext.className = 'btn-primary';
         btnNext.innerHTML = 'Next <i class="fas fa-chevron-right" style="margin-left: 8px;"></i>';
         btnNext.style.padding = '10px 16px';
         btnNext.style.borderRadius = '12px';
         btnNext.disabled = currentModalIndex === currentModalList.length - 1;
-        if(btnNext.disabled) btnNext.style.opacity = '0.3';
+        if (btnNext.disabled) btnNext.style.opacity = '0.3';
         else {
             btnNext.onclick = () => { currentModalIndex++; renderModalQuestion(); };
         }
-        
+
         footerDiv.appendChild(btnPrev);
         footerDiv.appendChild(hint);
         footerDiv.appendChild(btnNext);
@@ -1469,12 +1477,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     let fcData = []; // Filtered list for flashcards
     let fcIndex = 0;
-    
+
     const fcSearchInput = document.getElementById('fc-search-input');
     const fcQuickSearchContainer = document.getElementById('fc-quick-search-container');
     const btnFcQuickSearch = document.getElementById('btn-fc-quick-search');
     const dropdownFcSearch = document.getElementById('fc-search-dropdown');
-    
+
     const fcCard = document.getElementById('fc-card');
     const fcFrontContent = document.getElementById('fc-front-content');
     const fcBackContent = document.getElementById('fc-back-content');
@@ -1492,7 +1500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateFcStats() {
         if (!currentQuestions || currentQuestions.length === 0) return;
-        
+
         let mastered = 0;
         let learning = 0;
         let notStarted = 0;
@@ -1510,7 +1518,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = currentQuestions.length;
         const percent = Math.round(((mastered + (learning * 0.5)) / total) * 100);
         if (fcProgressFill) fcProgressFill.style.width = `${percent}%`;
-        
+
         saveProgress();
     }
 
@@ -1525,23 +1533,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFlashcard(index, direction = null) {
         if (fcData.length === 0) {
-            if(fcFrontContent) fcFrontContent.textContent = "No flashcards found.";
-            if(fcFrontOptions) fcFrontOptions.innerHTML = "";
-            if(fcBackContent) fcBackContent.textContent = "";
-            if(fcProgress) fcProgress.textContent = "0 / 0";
+            if (fcFrontContent) fcFrontContent.textContent = "No flashcards found.";
+            if (fcFrontOptions) fcFrontOptions.innerHTML = "";
+            if (fcBackContent) fcBackContent.textContent = "";
+            if (fcProgress) fcProgress.textContent = "0 / 0";
             return;
         }
 
         const q = fcData[index];
-        
+
         // Render Question
-        if(fcFrontContent) {
+        if (fcFrontContent) {
             fcFrontContent.style.textAlign = 'left';
             fcFrontContent.innerHTML = `<span style="color: #ffffff; font-size: 1.3rem;">${q.question}</span>`;
         }
-        
+
         // Render Options
-        if(fcFrontOptions) {
+        if (fcFrontOptions) {
             fcFrontOptions.innerHTML = "";
             if (q.options && q.options.length > 0) {
                 const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -1556,13 +1564,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Render Answer
-        if(fcBackContent) {
+        if (fcBackContent) {
             const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
             const correctTexts = q.correctAnswers.map(idx => {
                 const optIdx = parseInt(idx);
                 return `<div style="margin-bottom: 8px;"><strong>${labels[optIdx] || '-'}.</strong> ${q.options[optIdx]}</div>`;
             }).join('');
-            
+
             let expHtml = '';
             if (q.explanation) {
                 expHtml = `
@@ -1572,7 +1580,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }
-            
+
             fcBackContent.innerHTML = `
                 <div style="text-align: left; width: 100%;">
                     <div style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 12px;">Correct Answer:</div>
@@ -1583,10 +1591,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${expHtml}
             `;
         }
-        
-        if(fcProgress) fcProgress.textContent = `${index + 1} / ${fcData.length}`;
 
-        if(fcCard) {
+        if (fcProgress) fcProgress.textContent = `${index + 1} / ${fcData.length}`;
+
+        if (fcCard) {
             // Temporarily disable transition to snap back instantly without glitch
             fcCard.style.transition = 'none';
             fcCard.classList.remove('is-flipped');
@@ -1597,7 +1605,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply slide animation if direction is provided
         if (direction && fcCard) {
             fcCard.classList.remove('slide-out-left', 'slide-out-right', 'slide-in-left', 'slide-in-right');
-            
+
             // Force reflow to restart animation
             void fcCard.offsetWidth;
 
@@ -1606,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (direction === 'prev') {
                 fcCard.classList.add('slide-in-left');
             }
-            
+
             setTimeout(() => {
                 fcCard.classList.remove('slide-in-right', 'slide-in-left');
             }, 300);
@@ -1631,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const q = fcData[fcIndex];
             q.fcStatus = 'learning';
             updateFcStats();
-            
+
             // Advance to next card
             btnFcNext.click();
         });
@@ -1644,7 +1652,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const q = fcData[fcIndex];
             q.fcStatus = 'mastered';
             updateFcStats();
-            
+
             // Advance to next card
             btnFcNext.click();
         });
@@ -1746,19 +1754,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keyboard controls for Flashcard (only when view is active)
     document.addEventListener('keydown', (e) => {
         const flashcardView = document.getElementById('flashcard-view');
-        if(!flashcardView) return;
+        if (!flashcardView) return;
         const isFlashcardView = flashcardView.classList.contains('active');
         if (!isFlashcardView) return;
-        
+
         // Don't trigger if user is typing in search box
         if (document.activeElement === fcSearchInput) return;
 
         if (e.key === 'ArrowRight') {
             e.preventDefault();
-            if(btnFcNext) btnFcNext.click();
+            if (btnFcNext) btnFcNext.click();
         } else if (e.key === 'ArrowLeft') {
             e.preventDefault();
-            if(btnFcPrev) btnFcPrev.click();
+            if (btnFcPrev) btnFcPrev.click();
         } else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
             e.preventDefault();
             if (fcData.length > 0 && fcCard) {
@@ -1775,12 +1783,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnMainSearch = document.getElementById('btn-main-search');
     const searchFilterPills = document.querySelectorAll('#search-filter-pills .pill');
     const searchResultsList = document.getElementById('search-results-list');
-    
+
     // NOTE: currentSearchFilter is already declared at the top of the file
 
     function initSearchView() {
         if (searchViewTitle) searchViewTitle.innerHTML = 'Global Question Explorer';
-        
+
         // Dynamically populate subject dropdown if not done yet
         const subjectSelect = document.getElementById('search-subject-select');
         if (subjectSelect && subjectSelect.children.length <= 1) {
@@ -1792,30 +1800,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 opt.style.color = 'var(--text-main)';
                 subjectSelect.appendChild(opt);
             });
-            
+
             // Bind change event to the select
             subjectSelect.addEventListener('change', (e) => {
                 currentSearchSubject = e.target.value;
-                
+
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) searchInput.value = '';
                 renderMainSearch();
             });
         }
-        
+
         // Dynamically bind change event to type select
         const typeSelect = document.getElementById('search-type-select');
         if (typeSelect && !typeSelect.dataset.bound) {
             typeSelect.dataset.bound = 'true';
             typeSelect.addEventListener('change', (e) => {
                 currentSearchType = e.target.value;
-                
+
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) searchInput.value = '';
                 renderMainSearch();
             });
         }
-        
+
         // Ensure all segmented controls update bg
         setTimeout(() => window.updateAllSegmentedControls(), 50);
 
@@ -1836,7 +1844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('data/' + sub.file);
                 const text = await res.text();
                 const qList = parseCSV(text);
-                
+
                 // Load progress for this subject
                 const saved = localStorage.getItem('quiz_pc_progress_' + sub.id);
                 if (saved) {
@@ -1854,7 +1862,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }
-                
+
                 qList.forEach(q => {
                     q.subjectId = sub.id;
                     globalQuestions.push(q);
@@ -1898,9 +1906,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (query) {
             filtered = filtered.filter(q => {
                 return (q.id && String(q.id).toLowerCase().includes(query)) ||
-                       (q.question && q.question.toLowerCase().includes(query)) ||
-                       (q.options && q.options.some(opt => opt.toLowerCase().includes(query))) ||
-                       (q.explanation && q.explanation.toLowerCase().includes(query));
+                    (q.question && q.question.toLowerCase().includes(query)) ||
+                    (q.options && q.options.some(opt => opt.toLowerCase().includes(query))) ||
+                    (q.explanation && q.explanation.toLowerCase().includes(query));
             });
         }
 
@@ -1936,7 +1944,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
                 card.style.border = '1px solid rgba(255, 255, 255, 0.12)';
             };
-            
+
             // Determine Status UI
             let statusHtml = '';
             if (q.isSubmitted) {
@@ -1948,12 +1956,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 statusHtml = `<span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;"><i class="fas fa-circle"></i> Unanswered</span>`;
             }
-            
+
             let badgesHtml = '';
             if (q.isFavorite) badgesHtml += `<i class="fas fa-star" style="color: #fbbf24; margin-right: 6px;" title="Favorite"></i>`;
             if (q.isNoted || (q.noteText && q.noteText.trim())) badgesHtml += `<i class="fas fa-sticky-note" style="color: var(--info); margin-right: 6px;" title="Has Note"></i>`;
             if (q.fcStatus === 'mastered') badgesHtml += `<i class="fas fa-brain" style="color: #10b981;" title="Flashcard Mastered"></i>`;
-            
+
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                     <div style="display: flex; gap: 12px; align-items: center;">
@@ -1970,7 +1978,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn-ghost btn-jump" style="padding: 4px 12px; font-size: 0.85rem; pointer-events: none;"><i class="fas fa-info-circle" style="margin-right: 6px;"></i>View Details</button>
                 </div>
             `;
-            
+
             // Click on card
             card.addEventListener('click', () => {
                 const indexInFiltered = filtered.indexOf(q);
@@ -1979,7 +1987,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showModal(searchTitle, filtered, indexInFiltered);
                 }
             });
-            
+
             searchResultsList.appendChild(card);
         });
     }
@@ -2002,14 +2010,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update active class
                 searchFilterPills.forEach(p => p.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                
+
                 // Move background pill
                 const activeBg = document.querySelector('#search-filter-pills .pill-active-bg');
                 if (activeBg) {
                     activeBg.style.width = e.currentTarget.offsetWidth + 'px';
                     activeBg.style.transform = `translateX(${e.currentTarget.offsetLeft}px)`;
                 }
-                
+
                 currentSearchFilter = e.currentTarget.getAttribute('data-filter') || 'all';
                 renderMainSearch();
             });
@@ -2031,7 +2039,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // We also need to hook into the CSV load success to init flashcards if we are on the view
     if (typeof updateHome === 'function') {
         const originalUpdateHome = updateHome;
-        updateHome = function() {
+        updateHome = function () {
             originalUpdateHome();
             const flashcardView = document.getElementById('flashcard-view');
             if (flashcardView && flashcardView.classList.contains('active')) {
@@ -2042,7 +2050,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 }
+
 );
+
 
 
 

@@ -12,5 +12,12 @@
         "file": "imo301c.csv",
         "icon": "fas fa-project-diagram",
         "description": "IT Project Management and Security Policies."
+    },
+    {
+        "id": "enw493c",
+        "name": "ENW493c - Academic Writing & Research",
+        "file": "enw493c.csv",
+        "icon": "fas fa-feather-alt",
+        "description": "Academic Writing, Research Methodology & Ethics."
     }
 ]
