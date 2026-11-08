@@ -17,6 +17,7 @@ class QuizApp {
     async init() {
         this.setupEventListeners();
         this.setupSmartNav();
+        this.setupLiquidNavIndicator();
         const subjects = await fetchSubjects();
         this.ui.renderSubjects(subjects);
     }
@@ -46,6 +47,7 @@ class QuizApp {
 
         document.querySelectorAll('.nav-item').forEach(nav => {
             nav.addEventListener('click', (e) => {
+                if (this.justScrubbed) return;
                 const target = e.currentTarget.getAttribute('data-target');
                 this.navigateTo(target);
             });
@@ -215,13 +217,14 @@ class QuizApp {
         const bottomNav = document.getElementById('bottom-nav');
 
         const hideNav = () => {
-            if (!bottomNav.classList.contains('hidden')) {
+            if (bottomNav && (bottomNav.classList.contains('is-touching') || bottomNav.classList.contains('is-dragging'))) return;
+            if (bottomNav && !bottomNav.classList.contains('hidden')) {
                 bottomNav.classList.add('nav-hidden');
             }
         };
 
         const showNav = () => {
-            bottomNav.classList.remove('nav-hidden');
+            if (bottomNav) bottomNav.classList.remove('nav-hidden');
             resetTimer();
         };
         
@@ -232,7 +235,7 @@ class QuizApp {
 
         const events = ['touchstart', 'mousemove', 'scroll', 'click'];
         events.forEach(evt => document.addEventListener(evt, () => {
-            if (!bottomNav.classList.contains('nav-hidden')) {
+            if (bottomNav && !bottomNav.classList.contains('nav-hidden')) {
                 resetTimer();
             }
         }, { passive: true }));
@@ -259,6 +262,152 @@ class QuizApp {
 
         // Initial timer start
         resetTimer();
+    }
+
+    setupLiquidNavIndicator() {
+        const bottomNav = document.getElementById('bottom-nav');
+        const indicator = document.getElementById('nav-indicator');
+        if (!bottomNav || !indicator) return;
+
+        const navItems = Array.from(bottomNav.querySelectorAll('.nav-item'));
+        if (navItems.length === 0) return;
+
+        let isInteracting = false;
+        let isDragging = false;
+        let currentHoverIdx = -1;
+        let lastMoveX = 0;
+
+        const getItemWidth = () => (bottomNav.clientWidth - 12) / navItems.length;
+
+        const getActiveIndex = () => {
+            const activeItem = bottomNav.querySelector('.nav-item.active');
+            return activeItem ? parseInt(activeItem.getAttribute('data-index')) : 0;
+        };
+
+        const updateIndicatorPosition = (touchX, isMoving = false) => {
+            const navRect = bottomNav.getBoundingClientRect();
+            const itemWidth = getItemWidth();
+            const totalWidth = (navItems.length - 1) * itemWidth;
+
+            // Offset relative to padding (6px)
+            const targetX = (touchX - navRect.left - 6) - (itemWidth / 2);
+            const clampedX = Math.max(0, Math.min(totalWidth, targetX));
+
+            // Fluid stretching / liquid jelly effect based on movement (scaled larger)
+            let scaleX = 1.28;
+            let scaleY = 1.20;
+            if (isMoving && lastMoveX !== 0) {
+                const deltaX = Math.abs(touchX - lastMoveX);
+                scaleX = Math.min(1.38, 1.28 + deltaX * 0.02);
+                scaleY = Math.max(1.10, 2.48 - scaleX); // preserve liquid volume
+            }
+            lastMoveX = touchX;
+
+            indicator.style.transition = 'none';
+            indicator.style.transform = `translate3d(${clampedX}px, 0, 0) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+
+            // Calculate closest nav item
+            const closestIdx = Math.max(0, Math.min(navItems.length - 1, Math.round(clampedX / itemWidth)));
+            if (closestIdx !== currentHoverIdx) {
+                currentHoverIdx = closestIdx;
+                navItems.forEach((item, idx) => {
+                    item.classList.toggle('is-hovered', idx === closestIdx);
+                });
+                if (window.navigator && window.navigator.vibrate) {
+                    try { window.navigator.vibrate(8); } catch (e) {}
+                }
+            }
+        };
+
+        const startInteraction = (clientX, clientY) => {
+            const navRect = bottomNav.getBoundingClientRect();
+            if (clientY < navRect.top - 60 || clientY > navRect.bottom + 60) return;
+
+            isInteracting = true;
+            isDragging = false;
+            lastMoveX = clientX;
+            bottomNav.classList.add('is-touching');
+            indicator.classList.add('is-active-touch');
+
+            updateIndicatorPosition(clientX, false);
+        };
+
+        const moveInteraction = (clientX, clientY, e) => {
+            if (!isInteracting) return;
+            const navRect = bottomNav.getBoundingClientRect();
+            if (clientY < navRect.top - 80 || clientY > navRect.bottom + 80) return;
+
+            isDragging = true;
+            if (e && e.cancelable) e.preventDefault();
+
+            indicator.classList.add('is-dragging');
+            updateIndicatorPosition(clientX, true);
+        };
+
+        const endInteraction = () => {
+            if (!isInteracting) return;
+            isInteracting = false;
+
+            bottomNav.classList.remove('is-touching');
+            indicator.classList.remove('is-active-touch', 'is-dragging');
+            navItems.forEach(item => item.classList.remove('is-hovered'));
+
+            // Apple Spring return to resting size and snap into place
+            indicator.style.transition = 'transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+
+            if (currentHoverIdx >= 0 && currentHoverIdx < navItems.length) {
+                const targetItem = navItems[currentHoverIdx];
+                const targetView = targetItem.getAttribute('data-target');
+                indicator.style.transform = `translateX(${currentHoverIdx * 100}%) scale(1)`;
+
+                if (isDragging) {
+                    this.justScrubbed = true;
+                    setTimeout(() => { this.justScrubbed = false; }, 250);
+                    if (targetView) this.navigateTo(targetView);
+                }
+            } else {
+                const activeIdx = getActiveIndex();
+                indicator.style.transform = `translateX(${activeIdx * 100}%) scale(1)`;
+            }
+
+            currentHoverIdx = -1;
+            lastMoveX = 0;
+            isDragging = false;
+        };
+
+        // --- Touch Listeners ---
+        bottomNav.addEventListener('touchstart', (e) => {
+            if (e.touches.length !== 1) return;
+            startInteraction(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        bottomNav.addEventListener('touchmove', (e) => {
+            if (!isInteracting || e.touches.length !== 1) return;
+            moveInteraction(e.touches[0].clientX, e.touches[0].clientY, e);
+        }, { passive: false });
+
+        bottomNav.addEventListener('touchend', endInteraction);
+        bottomNav.addEventListener('touchcancel', endInteraction);
+
+        // --- Mouse Listeners (Desktop & Chrome DevTools Emulation) ---
+        let isMouseDown = false;
+        bottomNav.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            isMouseDown = true;
+            startInteraction(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            moveInteraction(e.clientX, e.clientY, e);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isMouseDown) {
+                isMouseDown = false;
+                endInteraction();
+            }
+        });
     }
 
     async loadSubject(subject) {
@@ -319,7 +468,8 @@ class QuizApp {
                 const index = nav.getAttribute('data-index');
                 const indicator = document.getElementById('nav-indicator');
                 if (indicator) {
-                    indicator.style.transform = `translateX(${index * 100}%)`;
+                    indicator.style.transition = 'transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+                    indicator.style.transform = `translateX(${index * 100}%) scale(1)`;
                 }
             }
         });
