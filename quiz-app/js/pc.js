@@ -2054,6 +2054,145 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+
+    // ==========================================
+    // UNIVERSAL PC LIQUID HOVER GLOW & BUBBLE BOUNCE
+    // ==========================================
+    function setupUniversalPCEffects() {
+        const PC_SELECTOR = [
+            '.stat-card',
+            '.jump-card',
+            '.option-btn',
+            '.apple-btn',
+            '.btn-action',
+            '.btn-primary',
+            '.btn-ghost',
+            '.btn-restart',
+            '.carousel-arrow',
+            '.nav-item',
+            '.pill',
+            '.mode-btn',
+            '.fc-card-face',
+            '.fc-option-item',
+            '.explanation-card',
+            '.quick-search-item',
+            '.icon-btn',
+            '.btn-close-modal',
+            '[data-bubble-touch]'
+        ].join(', ');
+
+        let activeHoverEl = null;
+        let activeRect = null;
+
+        const updatePosition = (element, clientX, clientY) => {
+            if (!element) return;
+            if (element !== activeHoverEl || !activeRect) {
+                activeHoverEl = element;
+                activeRect = element.getBoundingClientRect();
+            }
+            const posX = clientX - activeRect.left;
+            const posY = clientY - activeRect.top;
+            element.style.setProperty('--mouse-x', `${posX}px`);
+            element.style.setProperty('--mouse-y', `${posY}px`);
+        };
+
+        const triggerRipple = (element, clientX, clientY) => {
+            if (!element || element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') return;
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'liquid-touch-ripple';
+            ripple.style.left = `${clientX - rect.left}px`;
+            ripple.style.top = `${clientY - rect.top}px`;
+            element.appendChild(ripple);
+            setTimeout(() => {
+                if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+            }, 550);
+        };
+
+        // Smooth Hover Tracking (Zero-latency arithmetic coordinate mapping)
+        document.addEventListener('mousemove', (e) => {
+            if (e.target && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                const target = e.target.closest ? e.target.closest(PC_SELECTOR) : null;
+                if (target) {
+                    updatePosition(target, e.clientX, e.clientY);
+                } else if (activeHoverEl) {
+                    activeHoverEl = null;
+                    activeRect = null;
+                }
+            }
+        }, { passive: true });
+
+        // Invalidate cached rect on scroll/resize
+        window.addEventListener('scroll', () => { activeRect = null; }, { passive: true });
+        window.addEventListener('resize', () => { activeRect = null; }, { passive: true });
+        const mainContentEl = document.querySelector('.main-content');
+        if (mainContentEl) {
+            mainContentEl.addEventListener('scroll', () => { activeRect = null; }, { passive: true });
+        }
+
+        let currentActiveTarget = null;
+        let startClientX = 0;
+        let startClientY = 0;
+
+        const handlePressStart = (clientX, clientY, targetEl) => {
+            if (!targetEl || targetEl.tagName === 'INPUT' || targetEl.tagName === 'TEXTAREA') return;
+            const target = targetEl.closest ? targetEl.closest(PC_SELECTOR) : null;
+            if (!target) return;
+
+            currentActiveTarget = target;
+            startClientX = clientX;
+            startClientY = clientY;
+
+            updatePosition(target, clientX, clientY);
+            triggerRipple(target, clientX, clientY);
+
+            target.classList.remove('is-bubble-bouncing');
+            target.classList.add('is-glass-touching');
+        };
+
+        const handlePressEnd = () => {
+            if (!currentActiveTarget) return;
+            const target = currentActiveTarget;
+            currentActiveTarget = null;
+
+            target.classList.remove('is-glass-touching');
+            target.classList.add('is-bubble-bouncing');
+
+            setTimeout(() => {
+                target.classList.remove('is-bubble-bouncing');
+            }, 480);
+        };
+
+        // Mouse listeners
+        document.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            handlePressStart(e.clientX, e.clientY, e.target);
+        });
+
+        document.addEventListener('mouseup', handlePressEnd);
+
+        // Touch support (e.g. iPad Pro M1 / touch-enabled PC laptops)
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                const t = e.touches[0];
+                handlePressStart(t.clientX, t.clientY, e.target);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                const t = e.touches[0];
+                if (currentActiveTarget) {
+                    updatePosition(currentActiveTarget, t.clientX, t.clientY);
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', handlePressEnd, { passive: true });
+        document.addEventListener('touchcancel', handlePressEnd, { passive: true });
+    }
+
+    setupUniversalPCEffects();
 }
 
 );

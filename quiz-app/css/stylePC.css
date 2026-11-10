@@ -27,6 +27,26 @@
     --glass-saturation: 1.2;
 }
 
+:root[data-theme="light"] {
+    --bg-color: #f8fafc;
+    --sidebar-bg: rgba(255, 255, 255, 0.32);
+    --surface-color: rgba(255, 255, 255, 0.28);
+    --surface-highlight: rgba(255, 255, 255, 0.65);
+
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-subtle: rgba(37, 99, 235, 0.12);
+
+    --cyan: #0284c7;
+    --success: #059669;
+    --danger: #dc2626;
+
+    --text-main: #020617;
+    --text-muted: #334155;
+
+    --border-color: rgba(255, 255, 255, 0.45);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -2328,10 +2348,12 @@ input:checked+.slider:before {
         opacity: 0;
         transform: translateY(18px) scale(0.97);
     }
+
     65% {
         opacity: 1;
         transform: translateY(-3px) scale(1.01);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -2418,18 +2440,30 @@ input:checked+.slider:before {
 }
 
 /* 3. Toast thông báo kết quả PC */
+.toast-icon {
+    font-size: 1.3rem !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .toast-correct .toast-icon i,
 .toast.toast-correct i,
 .toast-correct .toast-icon {
     color: #10B981 !important;
-    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.65));
 }
 
 .toast-incorrect .toast-icon i,
 .toast.toast-incorrect i,
 .toast-incorrect .toast-icon {
     color: #EF4444 !important;
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.65));
 }
 
 /* 4. Thẻ thống kê bài tập trong Modal và Dashboard PC */
@@ -2443,3 +2477,271 @@ input:checked+.slider:before {
     color: #EF4444 !important;
 }
 
+/* ==============================================================
+   LIGHT THEME OVERRIDES (PC VIEW - LIQUID GLASS)
+   - Kính lỏng trong suốt pha lê & chữ tương phản sâu
+   ============================================================== */
+[data-theme="light"] body {
+    color: var(--text-main);
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.65) 0%, rgba(226, 232, 240, 0.75) 100%), url('../img/light_theme.jpeg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+[data-theme="light"] .bg-shapes .shape {
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 15px 45px rgba(37, 99, 235, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+[data-theme="light"] .glass-panel,
+[data-theme="light"] .sidebar,
+[data-theme="light"] .main-content,
+[data-theme="light"] .stat-card,
+[data-theme="light"] .jump-card,
+[data-theme="light"] .modal-content,
+[data-theme="light"] .fc-card-face {
+    background: rgba(255, 255, 255, 0.26) !important;
+    backdrop-filter: blur(25px) saturate(175%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(25px) saturate(175%);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.85) !important;
+    box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.85), 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .option-btn {
+    background: rgba(255, 255, 255, 0.28) !important;
+    backdrop-filter: blur(20px) saturate(175%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(20px) saturate(175%);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.85) !important;
+    color: #020617 !important;
+    font-weight: 550;
+    box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.85), 0 4px 16px rgba(15, 23, 42, 0.03) !important;
+}
+
+[data-theme="light"] .option-btn:hover {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(37, 99, 235, 0.4) !important;
+    box-shadow: inset 0 1px 2px #ffffff, 0 8px 25px rgba(37, 99, 235, 0.08) !important;
+}
+
+[data-theme="light"] .option-indicator {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #020617;
+    font-weight: 600;
+}
+
+[data-theme="light"] .option-btn.selected {
+    background: rgba(239, 246, 255, 0.65) !important;
+    border-color: var(--primary) !important;
+    box-shadow: inset 0 1px 2px #ffffff, 0 0 20px rgba(37, 99, 235, 0.2) !important;
+}
+
+[data-theme="light"] .stat-info h3,
+[data-theme="light"] .page-header h1 {
+    color: #020617 !important;
+    font-weight: 700;
+}
+
+[data-theme="light"] .stat-info span,
+[data-theme="light"] .page-header p {
+    color: #334155 !important;
+    font-weight: 500;
+}
+
+[data-theme="light"] .question-text {
+    color: #020617 !important;
+    font-weight: 600;
+}
+
+/* ==============================================================
+   UNIVERSAL LIQUID HOVER GLOW & BUBBLE BOUNCE (PC VIEW)
+   - Ánh sáng phản quang dạng thấu kính khi di chuyển chuột (Hover Glow Spotlight)
+   - Hiệu ứng đàn hồi nẩy nẩy bong bóng khi click chuột (Bubble Jelly Bounce)
+   ============================================================== */
+.stat-card,
+.jump-card,
+.option-btn,
+.apple-btn,
+.btn-action,
+.btn-primary,
+.btn-ghost,
+.btn-restart,
+.carousel-arrow,
+.nav-item,
+.pill,
+.mode-btn,
+.fc-card-face,
+.fc-option-item,
+.explanation-card,
+.quick-search-item,
+.icon-btn,
+.btn-close-modal,
+[data-bubble-touch] {
+    position: relative;
+    overflow: hidden;
+    transform-origin: center center;
+    will-change: transform, box-shadow;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* 2. Lớp ánh sáng phát quang Soft White Liquid Glass khi Hover & Trượt chuột (Tinh tế & Nhạy bén) */
+.stat-card::after,
+.jump-card::after,
+.option-btn::after,
+.apple-btn::after,
+.btn-action::after,
+.btn-primary::after,
+.btn-restart::after,
+.carousel-arrow::after,
+.nav-item::after,
+.pill::after,
+.mode-btn::after,
+.fc-card-face::after,
+.explanation-card::after,
+.quick-search-item::after,
+.icon-btn::after,
+[data-bubble-touch]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(circle 110px at var(--mouse-x, var(--touch-x, 50%)) var(--mouse-y, var(--touch-y, 50%)),
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.05) 45%,
+            transparent 75%);
+    mix-blend-mode: overlay;
+    transition: opacity 0.15s ease-out;
+    z-index: 6;
+}
+
+/* Khi hover chuột hoặc khi ấn giữ: Ánh sáng trắng mềm mại bừng sáng và trượt theo con trỏ chuột tức thì */
+.stat-card:hover::after,
+.jump-card:hover::after,
+.option-btn:hover::after,
+.apple-btn:hover::after,
+.btn-action:hover::after,
+.btn-primary:hover::after,
+.btn-restart:hover::after,
+.carousel-arrow:hover::after,
+.nav-item:hover::after,
+.pill:hover::after,
+.mode-btn:hover::after,
+.fc-card-face:hover::after,
+.explanation-card:hover::after,
+.quick-search-item:hover::after,
+.icon-btn:hover::after,
+[data-bubble-touch]:hover::after,
+.is-glass-touching::after {
+    opacity: 1 !important;
+    transition: opacity 0.08s ease-out !important;
+}
+
+/* Lớp phát sáng trong giao diện Light Theme (Trắng ngọc mềm phản quang pha lê tinh tế) */
+[data-theme="light"] .stat-card::after,
+[data-theme="light"] .jump-card::after,
+[data-theme="light"] .option-btn::after,
+[data-theme="light"] .apple-btn::after,
+[data-theme="light"] .btn-action::after,
+[data-theme="light"] .btn-primary::after,
+[data-theme="light"] .btn-restart::after,
+[data-theme="light"] .carousel-arrow::after,
+[data-theme="light"] .nav-item::after,
+[data-theme="light"] .pill::after,
+[data-theme="light"] .mode-btn::after,
+[data-theme="light"] .fc-card-face::after,
+[data-theme="light"] .explanation-card::after,
+[data-theme="light"] .quick-search-item::after,
+[data-theme="light"] .icon-btn::after,
+[data-theme="light"] [data-bubble-touch]::after {
+    background: radial-gradient(circle 150px at var(--mouse-x, var(--touch-x, 50%)) var(--mouse-y, var(--touch-y, 50%)),
+            rgba(255, 255, 255, 0.32) 0%,
+            rgba(255, 255, 255, 0.10) 45%,
+            transparent 75%);
+    mix-blend-mode: normal;
+}
+
+/* 3. Hiệu ứng gợn sóng nước phát sáng khi Click (Liquid Water Ripple Wave) */
+.liquid-touch-ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0) 70%);
+    animation: liquidRippleSpread 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    z-index: 10;
+}
+
+[data-theme="light"] .liquid-touch-ripple {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 70%);
+}
+
+@keyframes liquidRippleSpread {
+    0% {
+        transform: scale(0.2);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform: scale(18);
+        opacity: 0;
+    }
+}
+
+/* 4. Trạng thái .is-glass-touching: Co lún nhẹ nhàng với viền phản quang trắng dịu khi ấn chuột */
+.is-glass-touching {
+    transform: scale(0.97, 0.965) translateY(1.5px) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.25),
+        0 0 16px rgba(255, 255, 255, 0.08),
+        0 6px 20px rgba(0, 0, 0, 0.25) !important;
+    transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
+}
+
+[data-theme="light"] .is-glass-touching {
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.95),
+        0 0 16px rgba(255, 255, 255, 0.5),
+        0 6px 18px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 5. Trạng thái .is-bubble-bouncing: Nẩy nẩy bồng bềnh dập dềnh khi nhả chuột */
+@keyframes bubbleJellyRecoil {
+    0% {
+        transform: scale(0.97, 0.965) translateY(1.5px);
+    }
+
+    30% {
+        transform: scale(1.035, 0.975) translateY(-3px);
+    }
+
+    55% {
+        transform: scale(0.988, 1.015) translateY(1px);
+    }
+
+    75% {
+        transform: scale(1.008, 0.996) translateY(-0.5px);
+    }
+
+    90% {
+        transform: scale(0.999, 1.001) translateY(0);
+    }
+
+    100% {
+        transform: scale(1, 1) translateY(0);
+    }
+}
+
+.is-bubble-bouncing {
+    animation: bubbleJellyRecoil 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
