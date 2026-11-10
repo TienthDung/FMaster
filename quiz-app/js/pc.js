@@ -34,8 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentView = viewId;
 
                 executeViewLogic(viewId);
-
-                setTimeout(() => { isTransitioning = false; }, 500);
+                isTransitioning = false;
             }, 300);
         } else {
             nextViewEl.classList.add('active');
@@ -69,24 +68,200 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
     }
 
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            if (item.dataset.target) switchView(item.dataset.target);
-        });
-    });
+    // ---- Liquid Glass Sidebar Navigation & Scrubbing ----
+    let justScrubbed = false;
 
-    function updateNavActiveBg() {
+    function updateNavActiveBg(animate = true) {
+        const navMenu = document.querySelector('.nav-menu');
         const activeItem = document.querySelector('.nav-menu .nav-item.active[data-target]');
         const navBg = document.querySelector('.nav-active-bg');
-        if (activeItem && navBg) {
-            navBg.style.transform = `translateY(${activeItem.offsetTop}px)`;
+        if (activeItem && navBg && navMenu) {
+            if (animate) {
+                navBg.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s ease';
+            } else {
+                navBg.style.transition = 'none';
+            }
+            const menuRect = navMenu.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            const targetY = itemRect.top - menuRect.top;
+
+            navBg.style.transform = `translate3d(0, ${targetY}px, 0) scale(1, 1)`;
             navBg.style.height = `${activeItem.offsetHeight}px`;
         }
     }
 
-    // Initialize nav background position
-    setTimeout(updateNavActiveBg, 50);
-    window.addEventListener('resize', updateNavActiveBg);
+    function setupSidebarLiquidScrubber() {
+        const navMenu = document.querySelector('.nav-menu');
+        const navBg = document.querySelector('.nav-active-bg');
+        if (!navMenu || !navBg) return;
+
+        const navItemList = Array.from(navMenu.querySelectorAll('.nav-item[data-target]'));
+        if (navItemList.length === 0) return;
+
+        let isInteracting = false;
+        let isDragging = false;
+        let currentHoverIdx = -1;
+        let lastMoveY = 0;
+
+        const getActiveIndex = () => {
+            const activeItem = navMenu.querySelector('.nav-item.active[data-target]');
+            return activeItem ? navItemList.indexOf(activeItem) : 0;
+        };
+
+        const updateScrubbingPosition = (clientY, isMoving = false) => {
+            const menuRect = navMenu.getBoundingClientRect();
+            const firstItem = navItemList[0];
+            const lastItem = navItemList[navItemList.length - 1];
+            const itemHeight = firstItem.offsetHeight || 48;
+            const minY = firstItem.offsetTop;
+            const maxY = lastItem.offsetTop;
+
+            // Target Y offset relative to nav-menu top, centered on cursor
+            const relativeY = clientY - menuRect.top - (itemHeight / 2);
+            const clampedY = Math.max(minY, Math.min(maxY, relativeY));
+
+            // Fluid stretching / liquid jelly effect along Y axis
+            let scaleY = 1.0;
+            let scaleX = 1.0;
+            if (isMoving && lastMoveY !== 0) {
+                const deltaY = Math.abs(clientY - lastMoveY);
+                scaleY = Math.min(1.28, 1.0 + deltaY * 0.015);
+                scaleX = Math.max(0.92, 2.0 - scaleY); // volume conservation
+            }
+            lastMoveY = clientY;
+
+            navBg.style.transition = 'none';
+            navBg.style.transform = `translate3d(0, ${clampedY.toFixed(1)}px, 0) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+
+            // Determine closest nav item
+            let closestIdx = 0;
+            let minDistance = Infinity;
+            navItemList.forEach((item, idx) => {
+                const dist = Math.abs(item.offsetTop - clampedY);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestIdx = idx;
+                }
+            });
+
+            if (closestIdx !== currentHoverIdx) {
+                currentHoverIdx = closestIdx;
+                navItemList.forEach((item, idx) => {
+                    item.classList.toggle('is-hovered', idx === closestIdx);
+                });
+            }
+        };
+
+        const startInteraction = (clientX, clientY) => {
+            const menuRect = navMenu.getBoundingClientRect();
+            if (clientX < menuRect.left - 20 || clientX > menuRect.right + 20) return;
+            if (clientY < menuRect.top - 20 || clientY > menuRect.bottom + 20) return;
+
+            isInteracting = true;
+            isDragging = false;
+            lastMoveY = clientY;
+            currentHoverIdx = getActiveIndex();
+            // Không can thiệp vị trí ở startInteraction để giữ nguyên hiệu ứng trượt cho click bình thường
+        };
+
+        const moveInteraction = (clientX, clientY, e) => {
+            if (!isInteracting) return;
+            const deltaY = Math.abs(clientY - lastMoveY);
+            if (!isDragging && deltaY > 4) {
+                isDragging = true;
+                navBg.classList.add('is-dragging', 'is-active-touch');
+                if (e && e.cancelable) e.preventDefault();
+            }
+            if (isDragging) {
+                updateScrubbingPosition(clientY, true);
+            }
+        };
+
+        const endInteraction = () => {
+            if (!isInteracting) return;
+            const wasDragging = isDragging;
+            isInteracting = false;
+            isDragging = false;
+
+            navBg.classList.remove('is-active-touch', 'is-dragging');
+            navItemList.forEach(item => item.classList.remove('is-hovered'));
+
+            if (wasDragging && currentHoverIdx >= 0 && currentHoverIdx < navItemList.length) {
+                const targetItem = navItemList[currentHoverIdx];
+                const targetView = targetItem.dataset.target;
+                justScrubbed = true;
+                setTimeout(() => { justScrubbed = false; }, 200);
+
+                if (targetView && targetView !== currentView) {
+                    switchView(targetView);
+                } else {
+                    updateNavActiveBg(true);
+                }
+            }
+
+            currentHoverIdx = -1;
+            lastMoveY = 0;
+        };
+
+        // Mouse Drag / Scrubbing
+        navMenu.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            startInteraction(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isInteracting) return;
+            moveInteraction(e.clientX, e.clientY, e);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isInteracting) endInteraction();
+        });
+
+        // Touch Drag / Scrubbing for Touchscreen laptops / Tablets
+        navMenu.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                startInteraction(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        navMenu.addEventListener('touchmove', (e) => {
+            if (isInteracting && e.touches && e.touches.length === 1) {
+                moveInteraction(e.touches[0].clientX, e.touches[0].clientY, e);
+            }
+        }, { passive: false });
+
+        navMenu.addEventListener('touchend', endInteraction, { passive: true });
+        navMenu.addEventListener('touchcancel', endInteraction, { passive: true });
+
+        // Normal click behavior on nav-items
+        navItemList.forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (justScrubbed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                const target = item.dataset.target;
+                if (target) switchView(target);
+            });
+        });
+
+        // Initial setup
+        setTimeout(() => updateNavActiveBg(false), 60);
+        window.addEventListener('resize', () => updateNavActiveBg(false));
+
+        const sidebarEl = document.querySelector('.sidebar');
+        if (sidebarEl) {
+            sidebarEl.addEventListener('transitionend', (e) => {
+                if (e.propertyName === 'width') {
+                    updateNavActiveBg(false);
+                }
+            });
+        }
+    }
+
+    setupSidebarLiquidScrubber();
 
     // ---- Application State ----
     let subjects = [];
