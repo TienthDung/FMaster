@@ -224,7 +224,9 @@ body {
 .logo-icon {
     width: 36px;
     height: 36px;
-    background-color: var(--primary);
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -278,9 +280,14 @@ body {
 }
 
 .nav-item:hover {
-    color: var(--text-main);
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: scale(0.98);
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 15px rgba(0, 0, 0, 0.15);
+    transform: translateX(4px);
 }
 
 .nav-item.active {
@@ -386,26 +393,35 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px) scale(1.01);
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.45) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.05), 0 16px 36px rgba(0, 0, 0, 0.35) !important;
 }
 
 .stat-icon {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background-color: var(--surface-highlight);
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.4rem;
-    color: var(--primary);
+    color: #ffffff !important;
+}
+
+.stat-icon i {
+    color: #ffffff !important;
 }
 
 .stat-info span {
@@ -437,14 +453,17 @@ body {
     padding: 24px;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .jump-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px) scale(1.01);
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.45) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 0 24px rgba(255, 255, 255, 0.06), 0 18px 40px rgba(0, 0, 0, 0.35) !important;
 }
 
 .jump-header {
@@ -458,12 +477,18 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background-color: var(--primary-subtle);
-    color: var(--primary);
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
+}
+
+.jump-icon i {
+    color: #ffffff !important;
 }
 
 .jump-badge {
@@ -693,9 +718,10 @@ body {
 .option-btn:hover .option-indicator,
 .option-btn.focused .option-indicator {
     color: #fff;
-    border-color: rgba(100, 255, 218, 0.5);
-    background: rgba(100, 255, 218, 0.15);
-    box-shadow: inset 0 1px 1px rgba(100, 255, 218, 0.2), 0 0 15px rgba(100, 255, 218, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    border-top-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .option-btn.selected .option-indicator {
@@ -721,11 +747,13 @@ body {
 
 .option-btn:hover,
 .option-btn.focused {
-    border-color: rgba(100, 255, 218, 0.3);
-    background-color: rgba(21, 21, 21, 0.142);
-    ;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    transform: translateY(-2px) scale(1.008);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .option-btn.selected {
@@ -788,11 +816,14 @@ body {
 }
 
 .btn-action:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-main);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) url(#de-glass-distortion);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .btn-action:active {
@@ -911,7 +942,8 @@ body {
 }
 
 .pill:hover {
-    color: var(--text-main);
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .pill.active {
@@ -1002,11 +1034,18 @@ body {
     width: 64px;
     height: 64px;
     font-size: 1.8rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #ffffff !important;
+}
+
+.flex-col-center .stat-icon i {
+    color: #ffffff !important;
 }
 
 .flex-col-center h3 {
@@ -1262,8 +1301,12 @@ body {
 }
 
 .search-box .btn-ghost:hover {
-    color: var(--text-main);
-    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(12px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.08);
 }
 
 .search-box.active .btn-ghost {
@@ -1320,15 +1363,42 @@ body {
 }
 
 .toast.toast-correct {
-    border-left-color: var(--success);
-    background: rgba(16, 185, 129, 0.1);
-    border-top: 1px solid rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.35);
+    border-top-color: rgba(16, 185, 129, 0.6);
+    border-left: 4px solid #10B981;
+    background: rgba(15, 23, 42, 0.75);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 15px rgba(16, 185, 129, 0.15);
 }
 
 .toast.toast-incorrect {
-    border-left-color: var(--danger);
-    background: rgba(239, 68, 68, 0.1);
-    border-top: 1px solid rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.35);
+    border-top-color: rgba(239, 68, 68, 0.6);
+    border-left: 4px solid #EF4444;
+    background: rgba(15, 23, 42, 0.75);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
+.toast.toast-correct i,
+.toast.toast-correct .toast-icon i {
+    color: #10B981 !important;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+
+.toast.toast-incorrect i,
+.toast.toast-incorrect .toast-icon i {
+    color: #EF4444 !important;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+}
+
+.toast.toast-warning i,
+.toast.toast-warning .toast-icon i {
+    color: #F59E0B !important;
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+}
+
+.toast.toast-info i,
+.toast.toast-info .toast-icon i {
+    color: #3B82F6 !important;
 }
 
 .toast.toast-hiding {
@@ -1423,10 +1493,14 @@ body {
 }
 
 .carousel-arrow:hover {
-    background: rgba(59, 130, 246, 0.2);
-    border-color: rgba(59, 130, 246, 0.4);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(18px) saturate(140%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(18px) saturate(140%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), 0 10px 25px rgba(0, 0, 0, 0.35);
+    transform: scale(1.08) translateY(-2px);
+    color: #ffffff;
 }
 
 .carousel-arrow:active {
@@ -2136,21 +2210,23 @@ input:checked+.slider:before {
     font-size: 0.9rem;
     font-weight: 500;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--text-main);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(72, 72, 72, 0);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .apple-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 16px rgba(0, 0, 0, 0.2);
+    color: #ffffff !important;
 }
 
 .apple-btn:active {
@@ -2160,30 +2236,210 @@ input:checked+.slider:before {
 .apple-btn i {
     margin-right: 8px;
     font-size: 1.1em;
+    color: #ffffff !important;
 }
 
 .apple-btn-practice {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%);
-    border-top: 1px solid rgba(59, 130, 246, 0.3);
-    color: #60a5fa;
-    /* Light blue text for better contrast */
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    border-top: 1px solid rgba(59, 130, 246, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 15px rgba(59, 130, 246, 0.08) !important;
 }
 
 .apple-btn-practice:hover {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%);
-    border-color: rgba(59, 130, 246, 0.5);
-    color: #93c5fd;
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border-color: rgba(59, 130, 246, 0.65) !important;
+    border-top-color: rgba(59, 130, 246, 0.85) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 20px rgba(59, 130, 246, 0.25) !important;
 }
 
 .apple-btn-fc {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.25) 100%);
-    border-top: 1px solid rgba(16, 185, 129, 0.3);
-    color: #34d399;
-    /* Light green text */
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    border-top: 1px solid rgba(16, 185, 129, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 15px rgba(16, 185, 129, 0.08) !important;
 }
 
 .apple-btn-fc:hover {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
-    border-color: rgba(16, 185, 129, 0.5);
-    color: #6ee7b7;
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border-color: rgba(16, 185, 129, 0.65) !important;
+    border-top-color: rgba(16, 185, 129, 0.85) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 20px rgba(16, 185, 129, 0.25) !important;
 }
+
+.apple-btn-practice i,
+.apple-btn-fc i {
+    color: #ffffff !important;
+}
+
+.btn-restart {
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.btn-restart i {
+    color: #ffffff !important;
+}
+
+/* Liquid Glass Explanation Container & Card (PC View) */
+.explanation-container {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 40px;
+    display: block;
+    clear: both;
+}
+
+.explanation-card,
+.apple-explanation-card,
+.explanation-box {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    background-color: rgba(72, 72, 72, 0);
+    backdrop-filter: blur(10px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
+    border: 1px solid rgba(100, 255, 218, 0.12);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 25px rgba(100, 255, 218, 0.06);
+    overflow: hidden;
+    box-sizing: border-box;
+    transform-origin: center top;
+    animation: appleExplanationSpring 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes appleExplanationSpring {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+    65% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.explanation-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.explanation-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-main);
+    font-weight: 450;
+    letter-spacing: -0.01em;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+/* ==============================================================
+   UNIVERSAL ICON STYLING & SEMANTIC TRUE/FALSE COLORS (PC)
+   ============================================================== */
+.stat-icon,
+.jump-icon,
+.logo-icon {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+}
+
+.stat-icon i,
+.jump-icon i,
+.logo-icon i,
+.stat-card .stat-icon i,
+.flex-col-center .stat-icon i {
+    color: #ffffff !important;
+}
+
+/* GIỮ LẠI MÀU CHO TRUE (XANH LÁ) VÀ FALSE (ĐỎ) PC */
+/* 1. Icon thống kê trên thanh tiến độ Practice (pc_view.html) */
+.stat-badge .fa-check-circle {
+    color: #10B981 !important;
+}
+
+.stat-badge .fa-times-circle {
+    color: #EF4444 !important;
+}
+
+/* 2. Vòng tròn chỉ thị và khung nút đáp án khi Submit True / False */
+.option-btn.correct,
+[data-theme="light"] .option-btn.correct {
+    border-color: #10B981 !important;
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+.option-btn.correct .option-indicator,
+[data-theme="light"] .option-btn.correct .option-indicator {
+    color: #10B981 !important;
+    border-color: #10B981 !important;
+    background: rgba(16, 185, 129, 0.2) !important;
+}
+
+.option-btn.incorrect,
+[data-theme="light"] .option-btn.incorrect {
+    border-color: #EF4444 !important;
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3) !important;
+}
+
+.option-btn.incorrect .option-indicator,
+[data-theme="light"] .option-btn.incorrect .option-indicator {
+    color: #EF4444 !important;
+    border-color: #EF4444 !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* 3. Toast thông báo kết quả PC */
+.toast-correct .toast-icon i,
+.toast.toast-correct i,
+.toast-correct .toast-icon {
+    color: #10B981 !important;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+
+.toast-incorrect .toast-icon i,
+.toast.toast-incorrect i,
+.toast-incorrect .toast-icon {
+    color: #EF4444 !important;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+}
+
+/* 4. Thẻ thống kê bài tập trong Modal và Dashboard PC */
+.stat-badge.correct i,
+[data-type="correct"] .stat-icon i {
+    color: #10B981 !important;
+}
+
+.stat-badge.incorrect i,
+[data-type="incorrect"] .stat-icon i {
+    color: #EF4444 !important;
+}
+

@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let iconHtml = '';
         if (type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>';
-        else if (type === 'info') iconHtml = '<i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.2rem;"></i>';
-        else if (type === 'correct') iconHtml = '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.4rem;"></i>';
-        else if (type === 'incorrect') iconHtml = '<i class="fas fa-times-circle" style="color: var(--danger); font-size: 1.4rem;"></i>';
+        else if (type === 'info') iconHtml = '<i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.2rem;"></i>';
+        else if (type === 'correct') iconHtml = '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.4rem;"></i>';
+        else if (type === 'incorrect') iconHtml = '<i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.4rem;"></i>';
 
         toast.innerHTML = `
-            ${iconHtml}
+            <div class="toast-icon" style="display: flex; align-items: center; justify-content: center;">${iconHtml}</div>
             <div style="font-size: 0.95rem; font-weight: 500;">${message}</div>
         `;
 
@@ -607,19 +607,24 @@ document.addEventListener('DOMContentLoaded', () => {
             existingExplanation.remove();
         }
 
-        if (q.isSubmitted && q.explanation) {
+        const expText = q.explanation || q['giải thích'] || q['giai_thich'] || q['Explanation'] || q.Explanation;
+
+        if (q.isSubmitted && expText) {
             const explanationDiv = document.createElement('div');
             explanationDiv.id = 'explanation-container';
-            explanationDiv.style.marginTop = '20px';
-            explanationDiv.style.padding = '16px';
-            explanationDiv.style.background = 'rgba(255, 255, 255, 0.03)';
-            explanationDiv.style.borderRadius = 'var(--radius-md)';
-            explanationDiv.style.borderLeft = '4px solid var(--info)';
-            explanationDiv.style.textAlign = 'left';
-            explanationDiv.innerHTML = `<strong style="color: var(--info); font-size: 1.1rem; display: block; margin-bottom: 8px;">Explanation:</strong><div style="color: var(--text-light); line-height: 1.5; font-size: 1rem;">${q.explanation}</div>`;
+            explanationDiv.className = 'explanation-container';
+            explanationDiv.innerHTML = `
+                <div class="explanation-card">
+                    <div class="explanation-title">EXPLANATION</div>
+                    <div class="explanation-text">${expText}</div>
+                </div>
+            `;
 
             // Insert it after the optionsContainer
             optionsContainer.parentNode.insertBefore(explanationDiv, optionsContainer.nextSibling);
+            setTimeout(() => {
+                explanationDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
         }
 
         if (btnSubmit) {

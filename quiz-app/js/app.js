@@ -18,6 +18,7 @@ class QuizApp {
         this.setupEventListeners();
         this.setupSmartNav();
         this.setupLiquidNavIndicator();
+        this.setupUniversalTouchEffects();
         const subjects = await fetchSubjects();
         this.ui.renderSubjects(subjects);
     }
@@ -217,7 +218,7 @@ class QuizApp {
         const bottomNav = document.getElementById('bottom-nav');
 
         const hideNav = () => {
-            if (bottomNav && (bottomNav.classList.contains('is-touching') || bottomNav.classList.contains('is-dragging'))) return;
+            if (bottomNav && (bottomNav.classList.contains('is-nav-touching') || bottomNav.classList.contains('is-dragging'))) return;
             if (bottomNav && !bottomNav.classList.contains('hidden')) {
                 bottomNav.classList.add('nav-hidden');
             }
@@ -326,7 +327,7 @@ class QuizApp {
             isInteracting = true;
             isDragging = false;
             lastMoveX = clientX;
-            bottomNav.classList.add('is-touching');
+            bottomNav.classList.add('is-nav-touching');
             indicator.classList.add('is-active-touch');
 
             updateIndicatorPosition(clientX, false);
@@ -348,7 +349,7 @@ class QuizApp {
             if (!isInteracting) return;
             isInteracting = false;
 
-            bottomNav.classList.remove('is-touching');
+            bottomNav.classList.remove('is-nav-touching');
             indicator.classList.remove('is-active-touch', 'is-dragging');
             navItems.forEach(item => item.classList.remove('is-hovered'));
 
@@ -406,6 +407,178 @@ class QuizApp {
             if (isMouseDown) {
                 isMouseDown = false;
                 endInteraction();
+            }
+        });
+    }
+
+    setupUniversalTouchEffects() {
+        const TOUCH_SELECTOR = [
+            '.card',
+            '.action-card',
+            '.stat-row-card',
+            '.subject-card',
+            '.option-btn',
+            '.question-card',
+            '.explanation-card',
+            '.apple-explanation-card',
+            '.explanation-box',
+            '.fc-container',
+            '.fc-face',
+            '.grid-item',
+            '.recent-item',
+            '.pill',
+            '.mode-btn',
+            '.apple-btn',
+            '.icon-btn',
+            '.category-card',
+            '.donut-chart',
+            '.mobile-search-box',
+            '.theme-switcher-vertical',
+            '.tag-pill',
+            '.btn',
+            '.btn-liquid-submit',
+            '[data-bubble-touch]'
+        ].join(', ');
+
+        let currentActiveTarget = null;
+        let startClientX = 0;
+        let startClientY = 0;
+        let isScrolledDistance = 0;
+
+        const updateCoordinates = (element, clientX, clientY) => {
+            if (!element) return;
+            const rect = element.getBoundingClientRect();
+            const posX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+            const posY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+            element.style.setProperty('--touch-x', `${posX.toFixed(1)}px`);
+            element.style.setProperty('--touch-y', `${posY.toFixed(1)}px`);
+        };
+
+        const triggerRippleAtPoint = (element, clientX, clientY) => {
+            if (!element || element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') return;
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'liquid-touch-ripple';
+            ripple.style.left = `${clientX - rect.left}px`;
+            ripple.style.top = `${clientY - rect.top}px`;
+            element.appendChild(ripple);
+            setTimeout(() => {
+                if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+            }, 550);
+        };
+
+        const handleTouchStart = (clientX, clientY, originalTarget) => {
+            // Ignore touches on bottom navigation (bottom nav uses dedicated is-nav-touching)
+            if (originalTarget && originalTarget.closest && originalTarget.closest('#bottom-nav')) return;
+
+            const targetElement = originalTarget.closest ? originalTarget.closest(TOUCH_SELECTOR) : null;
+            if (!targetElement) return;
+
+            currentActiveTarget = targetElement;
+            startClientX = clientX;
+            startClientY = clientY;
+            isScrolledDistance = 0;
+
+            updateCoordinates(targetElement, clientX, clientY);
+            triggerRippleAtPoint(targetElement, clientX, clientY);
+
+            targetElement.classList.remove('is-bubble-bouncing');
+            targetElement.classList.add('is-glass-touching');
+        };
+
+        const handleTouchMove = (clientX, clientY) => {
+            // Hiệu ứng vuốt chạm (Fluid Swipe-Touch): Ánh sáng lỏng trượt mượt mà theo ngón tay
+            const elementUnderFinger = document.elementFromPoint(clientX, clientY);
+            if (!elementUnderFinger) return;
+
+            // Bỏ qua nếu vuốt vào khu vực bottom nav
+            if (elementUnderFinger.closest && elementUnderFinger.closest('#bottom-nav')) {
+                if (currentActiveTarget) {
+                    currentActiveTarget.classList.remove('is-glass-touching');
+                    currentActiveTarget = null;
+                }
+                return;
+            }
+
+            const newTarget = elementUnderFinger.closest ? elementUnderFinger.closest(TOUCH_SELECTOR) : null;
+
+            // Nếu ngón tay vuốt trượt sang một container/nút lân cận
+            if (newTarget !== currentActiveTarget) {
+                if (currentActiveTarget) {
+                    currentActiveTarget.classList.remove('is-glass-touching');
+                }
+                currentActiveTarget = newTarget;
+                if (currentActiveTarget) {
+                    currentActiveTarget.classList.remove('is-bubble-bouncing');
+                    currentActiveTarget.classList.add('is-glass-touching');
+                }
+            }
+
+            if (currentActiveTarget) {
+                updateCoordinates(currentActiveTarget, clientX, clientY);
+            }
+
+            const diffX = Math.abs(clientX - startClientX);
+            const diffY = Math.abs(clientY - startClientY);
+            isScrolledDistance = Math.max(isScrolledDistance, Math.hypot(diffX, diffY));
+        };
+
+        const handleTouchEnd = () => {
+            if (!currentActiveTarget) return;
+            const target = currentActiveTarget;
+            currentActiveTarget = null;
+
+            target.classList.remove('is-glass-touching');
+
+            // Nếu là chạm hoặc vuốt nhẹ (không phải cuộn lướt nhanh cả trang), kích hoạt nẩy bong bóng
+            if (isScrolledDistance < 25) {
+                target.classList.add('is-bubble-bouncing');
+
+                if (window.navigator && window.navigator.vibrate) {
+                    try { window.navigator.vibrate(8); } catch (e) {}
+                }
+
+                setTimeout(() => {
+                    target.classList.remove('is-bubble-bouncing');
+                }, 480);
+            }
+        };
+
+        // Mobile touch listeners
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                const t = e.touches[0];
+                handleTouchStart(t.clientX, t.clientY, e.target);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                const t = e.touches[0];
+                handleTouchMove(t.clientX, t.clientY);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', handleTouchEnd, { passive: true });
+        document.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+        // Desktop mouse support for testing & previewing
+        let isMouseDownOnContainer = false;
+        document.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            isMouseDownOnContainer = true;
+            handleTouchStart(e.clientX, e.clientY, e.target);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isMouseDownOnContainer) return;
+            handleTouchMove(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isMouseDownOnContainer) {
+                isMouseDownOnContainer = false;
+                handleTouchEnd();
             }
         });
     }

@@ -26,11 +26,18 @@ export class UI {
         toast.className = `toast toast-${type}`;
         
         let icon = 'fa-exclamation-triangle';
-        if (type === 'correct') icon = 'fa-check-circle';
-        if (type === 'incorrect') icon = 'fa-times-circle';
+        let color = '#f59e0b';
+        if (type === 'correct') {
+            icon = 'fa-check-circle';
+            color = '#10b981';
+        }
+        if (type === 'incorrect') {
+            icon = 'fa-times-circle';
+            color = '#ef4444';
+        }
 
         toast.innerHTML = `
-            <div class="toast-icon"><i class="fas ${icon}"></i></div>
+            <div class="toast-icon"><i class="fas ${icon}" style="color: ${color} !important;"></i></div>
             <div class="toast-content">${message}</div>
         `;
 
@@ -218,14 +225,31 @@ export class UI {
             container.appendChild(submitBtn);
         }
 
-        if (userAnswer && q.explanation) {
-            const explanationBox = document.createElement('div');
-            explanationBox.className = 'explanation-box';
-            explanationBox.innerHTML = `
-                <div class="explanation-title"><i class="fas fa-lightbulb"></i> Explanation</div>
-                <div class="explanation-text">${q.explanation}</div>
+        // Reset explanation container
+        let expContainer = document.getElementById('explanation-container');
+        if (!expContainer && container && container.parentNode) {
+            expContainer = document.createElement('div');
+            expContainer.id = 'explanation-container';
+            expContainer.className = 'explanation-container';
+            container.parentNode.insertBefore(expContainer, container.nextSibling);
+        }
+        if (expContainer) {
+            expContainer.innerHTML = '';
+        }
+
+        const expText = q.explanation || q['giải thích'] || q['giai_thich'] || q['Explanation'] || q.Explanation;
+
+        if (userAnswer && expText && expContainer) {
+            expContainer.innerHTML = `
+                <div class="explanation-card">
+                    <div class="explanation-title">EXPLANATION</div>
+                    <div class="explanation-text">${expText}</div>
+                </div>
             `;
-            container.appendChild(explanationBox);
+
+            setTimeout(() => {
+                expContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
         }
     }
 

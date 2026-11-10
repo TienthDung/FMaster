@@ -379,11 +379,17 @@ body {
     font-size: 1.2rem;
     padding: 8px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    border-radius: 50%;
 }
 
 .icon-btn:hover {
-    color: var(--text-main);
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(12px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.08);
 }
 
 .content {
@@ -495,8 +501,19 @@ body {
     cursor: pointer;
     background-color: var(--surface-color);
     color: var(--text-muted);
-    transition: 0.3s;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     border: 1px solid var(--border-color);
+}
+
+.mode-btn:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 18px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
 }
 
 .mode-btn.active {
@@ -518,14 +535,20 @@ body {
     gap: 16px;
     cursor: pointer;
     text-align: left;
-    transition: 0.2s;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     backdrop-filter: blur(10px) url(#de-glass-distortion);
     -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .action-card:hover {
-    border-color: rgba(100, 255, 218, 0.3);
-    background-color: rgba(196, 196, 196, 0.14);
+    transform: translateY(-3px) scale(1.01);
+    background-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.06), 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .action-icon {
@@ -537,6 +560,14 @@ body {
     align-items: center;
     font-size: 1.2rem;
     flex-shrink: 0;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.action-icon i {
+    color: #ffffff !important;
 }
 
 .action-text {
@@ -668,7 +699,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 1.05rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     align-items: center;
     gap: 16px;
@@ -697,10 +728,21 @@ body {
 }
 
 .option-btn:hover {
-    border-color: rgba(100, 255, 218, 0.3);
-    background-color: rgba(196, 196, 196, 0.14);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.008);
+    background-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.option-btn:hover .option-letter {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.4);
+    border-top-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .option-btn.selected {
@@ -804,6 +846,18 @@ body {
     font-size: 0.9rem;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.pill:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 18px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
 }
 
 .pill.active {
@@ -890,11 +944,22 @@ body {
     justify-content: center;
     background-color: rgba(196, 196, 196, 0.14);
     color: var(--text-main);
-    transition: 0.2s;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
     gap: 4px;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+}
+
+.grid-item:hover {
+    transform: translateY(-2px) scale(1.04);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 16px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
 }
 
 .grid-item-icon {
@@ -978,6 +1043,17 @@ body {
     backdrop-filter: blur(10px) url(#de-glass-distortion);
     -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.stat-row-card:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 .stat-icon-circle {
@@ -989,6 +1065,14 @@ body {
     align-items: center;
     font-size: 1.2rem;
     flex-shrink: 0;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.stat-icon-circle i {
+    color: #ffffff !important;
 }
 
 .stat-row-content {
@@ -1107,30 +1191,28 @@ body {
 
 .nav-item.active i {
     transform: scale(1.15);
-    color: #00F2FE;
-    text-shadow: 0 0 12px rgba(0, 242, 254, 0.7);
+    color: #ffffff !important;
 }
 
 /* Khi vuốt chạm: tắt trạng thái sáng của icon active đang mở */
-.bottom-nav.is-touching .nav-item.active i {
+.bottom-nav.is-nav-touching .nav-item.active i {
     transform: scale(1);
     color: var(--text-muted);
     text-shadow: none;
 }
 
-.bottom-nav.is-touching .nav-item.active {
+.bottom-nav.is-nav-touching .nav-item.active {
     color: var(--text-muted);
 }
 
 /* Chỉ khi nav-indicator đụng trúng icon nào thì icon đó mới sáng lên */
-.bottom-nav.is-touching .nav-item.is-hovered i,
+.bottom-nav.is-nav-touching .nav-item.is-hovered i,
 .nav-item.is-hovered i {
-    transform: scale(1.3) translateY(-3px) !important;
-    color: #00F2FE !important;
-    text-shadow: 0 0 16px rgba(0, 242, 254, 0.95), 0 0 30px rgba(0, 242, 254, 0.5) !important;
+    transform: scale(1.5) translateY(-5px) !important;
+    color: #ffffff !important;
 }
 
-.bottom-nav.is-touching .nav-item.is-hovered,
+.bottom-nav.is-nav-touching .nav-item.is-hovered,
 .nav-item.is-hovered {
     color: #ffffff !important;
 }
@@ -1155,7 +1237,7 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-:root[data-theme="light"] .bottom-nav.is-touching .nav-item.active i {
+:root[data-theme="light"] .bottom-nav.is-nav-touching .nav-item.active i {
     color: var(--text-muted) !important;
     text-shadow: none !important;
 }
@@ -1219,25 +1301,35 @@ body {
     backdrop-filter: blur(10px) url(#de-glass-distortion);
     -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .subject-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px var(--shadow-color);
-    border-color: var(--primary);
+    transform: translateY(-4px) scale(1.01);
+    background-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(16px) saturate(140%) url(#de-glass-distortion);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), inset 0 0 24px rgba(255, 255, 255, 0.06), 0 16px 36px rgba(0, 0, 0, 0.32);
 }
 
 .subject-icon {
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background-color: var(--primary-subtle);
-    color: var(--primary);
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1.6rem;
+}
+
+.subject-icon i {
+    color: #ffffff !important;
 }
 
 /* ==============================================================
@@ -1866,37 +1958,48 @@ body {
 }
 
 .toast-correct {
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-top: 1px solid rgba(16, 185, 129, 0.5);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-top: 1px solid rgba(16, 185, 129, 0.7);
+    background: rgba(15, 23, 42, 0.85);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(16, 185, 129, 0.15);
 }
 
 .toast-incorrect {
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-top: 1px solid rgba(239, 68, 68, 0.5);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-top: 1px solid rgba(239, 68, 68, 0.7);
+    background: rgba(15, 23, 42, 0.85);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(239, 68, 68, 0.15);
 }
 
 .toast-warning {
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-top: 1px solid rgba(245, 158, 11, 0.5);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-top: 1px solid rgba(245, 158, 11, 0.7);
+    background: rgba(15, 23, 42, 0.85);
 }
 
 .toast-icon {
     font-size: 1.2rem;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
 }
 
-.toast-correct .toast-icon {
-    color: var(--success);
+.toast-correct .toast-icon,
+.toast-correct .toast-icon i {
+    color: #10B981 !important;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
 }
 
-.toast-incorrect .toast-icon {
-    color: var(--danger);
+.toast-incorrect .toast-icon,
+.toast-incorrect .toast-icon i {
+    color: #EF4444 !important;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
 }
 
-.toast-warning .toast-icon {
-    color: var(--warning);
+.toast-warning .toast-icon,
+.toast-warning .toast-icon i {
+    color: #F59E0B !important;
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
 }
 
 @keyframes toast-slide-down {
@@ -2001,12 +2104,17 @@ body {
 }
 
 /* Action Icons */
-[data-theme="light"] .action-icon.bg-blue-subtle {
-    background: var(--primary-subtle);
+[data-theme="light"] .action-icon.bg-blue-subtle,
+[data-theme="light"] .action-icon {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
 }
 
-[data-theme="light"] .action-icon.text-blue {
-    color: var(--primary);
+[data-theme="light"] .action-icon.text-blue,
+[data-theme="light"] .action-icon i {
+    color: #ffffff !important;
 }
 
 /* Progress Text */
@@ -2092,34 +2200,84 @@ body {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
 }
 
-/* Practice Mode Explanation Box */
+/* Liquid Glass Explanation Container & Card */
+.explanation-container {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 90px;
+    display: block;
+    clear: both;
+}
+
+.explanation-card,
+.apple-explanation-card,
 .explanation-box {
-    margin-top: 16px;
-    padding: 16px;
-    background: rgba(100, 255, 218, 0.05);
-    border-left: 4px solid var(--cyan);
-    border-radius: var(--radius-sm);
-    animation: fadeIn 0.3s ease forwards;
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    background-color: rgba(72, 72, 72, 0);
+    backdrop-filter: blur(10px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(10px) url(#de-glass-distortion);
+    border: 1px solid rgba(100, 255, 218, 0.12);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 25px rgba(100, 255, 218, 0.06);
+    overflow: hidden;
+    box-sizing: border-box;
+    transform-origin: center top;
+    animation: appleExplanationSpring 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes appleExplanationSpring {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+
+    65% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .explanation-title {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
     color: var(--cyan);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
 }
 
 .explanation-text {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
+    line-height: 1.65;
     color: var(--text-main);
-    line-height: 1.5;
+    font-weight: 450;
+    letter-spacing: -0.01em;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
+/* Light theme overrides for Liquid Glass Explanation */
+[data-theme="light"] .explanation-card,
+[data-theme="light"] .apple-explanation-card,
 [data-theme="light"] .explanation-box {
-    background: rgba(6, 182, 212, 0.05);
+    background-color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+[data-theme="light"] .explanation-title {
+    color: var(--primary);
 }
 
 /* Flashcard Dedicated Option Styles */
@@ -2194,4 +2352,390 @@ body {
     background: #fff;
     border-color: var(--primary);
     box-shadow: 0 4px 12px var(--primary-subtle);
+}
+
+/* Apple Design Buttons for Flashcard and Practice (Liquid Glass 15px) */
+.apple-btn {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(72, 72, 72, 0);
+    backdrop-filter: blur(15px) url(#de-glass-distortion);
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.apple-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 16px rgba(0, 0, 0, 0.2);
+    color: #ffffff !important;
+}
+
+.apple-btn:active {
+    transform: scale(0.96) translateY(0);
+}
+
+.apple-btn i {
+    margin-right: 8px;
+    font-size: 1.1em;
+    color: #ffffff !important;
+}
+
+.apple-btn-practice {
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    border-top: 1px solid rgba(59, 130, 246, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 15px rgba(59, 130, 246, 0.08) !important;
+}
+
+.apple-btn-practice:hover {
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border-color: rgba(59, 130, 246, 0.65) !important;
+    border-top-color: rgba(59, 130, 246, 0.85) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 20px rgba(59, 130, 246, 0.25) !important;
+}
+
+.apple-btn-fc {
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    border-top: 1px solid rgba(16, 185, 129, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 15px rgba(16, 185, 129, 0.08) !important;
+}
+
+.apple-btn-fc:hover {
+    background-color: rgba(72, 72, 72, 0) !important;
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border-color: rgba(16, 185, 129, 0.65) !important;
+    border-top-color: rgba(16, 185, 129, 0.85) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 20px rgba(16, 185, 129, 0.25) !important;
+}
+
+.apple-btn-practice i,
+.apple-btn-fc i {
+    color: #ffffff !important;
+}
+
+.btn-restart {
+    backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    -webkit-backdrop-filter: blur(15px) url(#de-glass-distortion) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.btn-restart i {
+    color: #ffffff !important;
+}
+
+/* ==============================================================
+   UNIVERSAL ICON STYLING: Transparent background, no border, white icon
+   UNIVERSAL ICON STYLING & SEMANTIC TRUE/FALSE COLORS
+   ============================================================== */
+.action-icon,
+.stat-icon-circle,
+.subject-icon,
+.toast-icon,
+.icon-btn,
+.stat-icon {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+}
+
+.action-icon i,
+.stat-icon-circle i,
+.subject-icon i,
+.toast-icon i,
+.icon-btn i,
+.stat-icon i,
+#practice-quick-stats i,
+.grid-item-icon {
+    color: #ffffff !important;
+}
+
+    /* GIỮ LẠI MÀU CHO TRUE (XANH LÁ) VÀ FALSE (ĐỎ) KHI CHỌN ĐÁP ÁN */
+    /* 1. Nút đáp án khi chọn Đúng / Sai (Áp dụng cho cả Dark & Light Theme) */
+    .option-btn.correct,
+    [data-theme="light"] .option-btn.correct {
+        border-color: #10B981 !important;
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    .option-btn.correct .option-letter,
+    [data-theme="light"] .option-btn.correct .option-letter {
+        color: #10B981 !important;
+        border-color: #10B981 !important;
+        background: rgba(16, 185, 129, 0.2) !important;
+    }
+
+    .option-btn.wrong,
+    [data-theme="light"] .option-btn.wrong {
+        border-color: #EF4444 !important;
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3) !important;
+    }
+
+    .option-btn.wrong .option-letter,
+    [data-theme="light"] .option-btn.wrong .option-letter {
+        color: #EF4444 !important;
+        border-color: #EF4444 !important;
+        background: rgba(239, 68, 68, 0.2) !important;
+    }
+
+    /* 2. Header Practice (#practice-quick-stats) */
+    #practice-quick-stats .fa-check-circle {
+        color: #10B981 !important;
+    }
+
+    #practice-quick-stats .fa-times-circle {
+        color: #EF4444 !important;
+    }
+
+    /* 3. Toast thông báo */
+    .toast-correct .toast-icon i,
+    .toast-correct .toast-icon,
+    .toast.toast-correct i {
+        color: #10B981 !important;
+        filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+    }
+
+    .toast-incorrect .toast-icon i,
+    .toast-incorrect .toast-icon,
+    .toast.toast-incorrect i {
+        color: #EF4444 !important;
+        filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+    }
+
+    /* 4. Ô ngân hàng câu hỏi (Grid) */
+    .grid-item.correct .grid-item-icon {
+        color: #10B981 !important;
+    }
+
+    .grid-item.wrong .grid-item-icon {
+        color: #EF4444 !important;
+    }
+
+    /* 5. Thẻ thống kê chi tiết Correct / Incorrect trong Dashboard */
+    .stat-row-card .fa-check-circle {
+        color: #10B981 !important;
+    }
+
+    .stat-row-card .fa-times-circle {
+        color: #EF4444 !important;
+    }
+
+/* ==========================================================================
+   UNIVERSAL LIQUID GLASS TOUCH & BUBBLE RECOIL PHYSICS (INDEX.HTML)
+   - Tương tác chạm phát sáng tại vị trí chạm tay (Dynamic Radial Specular Glow)
+   - Hiệu ứng nẩy bong bóng nước co dãn đàn hồi (Jelly Bubble Recoil Animation)
+   ========================================================================== */
+
+/* 1. Thiết lập cơ bản cho tất cả feature/container tương tác */
+.card,
+.action-card,
+.stat-row-card,
+.subject-card,
+.option-btn,
+.question-card,
+.explanation-card,
+.apple-explanation-card,
+.explanation-box,
+.fc-container,
+.fc-face,
+.grid-item,
+.recent-item,
+.pill,
+.mode-btn,
+.apple-btn,
+.icon-btn,
+.category-card,
+.donut-chart,
+.mobile-search-box,
+.theme-switcher-vertical,
+.tag-pill,
+.btn,
+.btn-liquid-submit,
+[data-bubble-touch] {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transform-origin: center center;
+    will-change: transform, box-shadow;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* 2. Lớp phát sáng Specular Glow tại vị trí ngón tay chạm & vuốt (Soft White Liquid Glass) */
+.card::after,
+.action-card::after,
+.stat-row-card::after,
+.subject-card::after,
+.option-btn::after,
+.question-card::after,
+.explanation-card::after,
+.apple-explanation-card::after,
+.explanation-box::after,
+.fc-face::after,
+.grid-item::after,
+.recent-item::after,
+.pill::after,
+.mode-btn::after,
+.apple-btn::after,
+.category-card::after,
+.donut-chart::after,
+.mobile-search-box::after,
+.tag-pill::after,
+.btn::after,
+.btn-liquid-submit::after,
+[data-bubble-touch]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+        circle 160px at var(--touch-x, 50%) var(--touch-y, 50%),
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.10) 35%,
+        rgba(255, 255, 255, 0.03) 65%,
+        transparent 80%
+    );
+    mix-blend-mode: overlay;
+    transition: opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 6;
+}
+
+/* Khi đang chạm hoặc vuốt chạm: Ánh sáng trắng mềm mại bừng sáng và trượt theo ngón tay */
+.is-glass-touching::after {
+    opacity: 1 !important;
+    transition: opacity 0.1s ease-out !important;
+}
+
+/* Lớp phát sáng trong giao diện Light Theme (Trắng ngọc mềm) */
+[data-theme="light"] .card::after,
+[data-theme="light"] .action-card::after,
+[data-theme="light"] .stat-row-card::after,
+[data-theme="light"] .subject-card::after,
+[data-theme="light"] .option-btn::after,
+[data-theme="light"] .question-card::after,
+[data-theme="light"] .explanation-card::after,
+[data-theme="light"] .apple-explanation-card::after,
+[data-theme="light"] .explanation-box::after,
+[data-theme="light"] .fc-face::after,
+[data-theme="light"] .grid-item::after,
+[data-theme="light"] .recent-item::after,
+[data-theme="light"] .pill::after,
+[data-theme="light"] .mode-btn::after,
+[data-theme="light"] .apple-btn::after,
+[data-theme="light"] .category-card::after,
+[data-theme="light"] .donut-chart::after,
+[data-theme="light"] .mobile-search-box::after,
+[data-theme="light"] .tag-pill::after,
+[data-theme="light"] .btn::after,
+[data-theme="light"] .btn-liquid-submit::after,
+[data-theme="light"] [data-bubble-touch]::after {
+    background: radial-gradient(
+        circle 160px at var(--touch-x, 50%) var(--touch-y, 50%),
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.25) 35%,
+        rgba(255, 255, 255, 0.08) 65%,
+        transparent 80%
+    );
+    mix-blend-mode: normal;
+}
+
+/* 3. Hiệu ứng gợn sóng phát sáng nước màu trắng mềm (Liquid Water Ripple Wave) */
+.liquid-touch-ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0) 70%);
+    animation: liquidRippleSpread 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    z-index: 10;
+}
+
+[data-theme="light"] .liquid-touch-ripple {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 70%);
+}
+
+@keyframes liquidRippleSpread {
+    0% {
+        transform: scale(0.2);
+        opacity: 0.85;
+    }
+    100% {
+        transform: scale(15);
+        opacity: 0;
+    }
+}
+
+/* 4. Trạng thái .is-glass-touching: Co lún nhẹ nhàng với viền phản quang trắng dịu */
+.is-glass-touching {
+    transform: scale(0.97, 0.965) translateY(1.5px) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.25),
+        0 0 16px rgba(255, 255, 255, 0.08),
+        0 6px 20px rgba(0, 0, 0, 0.25) !important;
+    transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
+}
+
+[data-theme="light"] .is-glass-touching {
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.95),
+        0 0 16px rgba(255, 255, 255, 0.5),
+        0 6px 18px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 5. Trạng thái .is-bubble-bouncing: Nẩy nẩy bồng bềnh dập dềnh khi nhả tay */
+@keyframes bubbleJellyRecoil {
+    0% {
+        transform: scale(0.97, 0.965) translateY(1.5px);
+    }
+    30% {
+        transform: scale(1.035, 0.975) translateY(-3px);
+    }
+    55% {
+        transform: scale(0.988, 1.015) translateY(1px);
+    }
+    75% {
+        transform: scale(1.008, 0.996) translateY(-0.5px);
+    }
+    90% {
+        transform: scale(0.999, 1.001) translateY(0);
+    }
+    100% {
+        transform: scale(1, 1) translateY(0);
+    }
+}
+
+.is-bubble-bouncing {
+    animation: bubbleJellyRecoil 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
 }
