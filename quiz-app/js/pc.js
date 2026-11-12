@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (viewId === 'stats-view') updateDashboard();
         if (viewId === 'practice-view') {
-            focusedOptionIndex = 0; // reset focus
+            focusedOptionIndex = -1; // reset focus
             renderQuestion();
         }
         if (viewId === 'flashcard-view') {
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allSubjectsProgress = {};
     let currentQuestions = [];
     let currentQuestionIndex = 0;
-    let focusedOptionIndex = 0;
+    let focusedOptionIndex = -1;
     let currentSearchFilter = 'all';
     let currentSearchSubject = 'all';
     let currentSearchType = 'all';
@@ -901,10 +901,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (q.isNoted) {
                     noteContainer.style.display = 'block';
                     noteTextarea.value = q.noteText || '';
-                    noteTextarea.focus();
+                    setTimeout(() => noteTextarea.focus(), 60);
                 } else {
                     noteContainer.style.display = 'none';
                 }
+            }
+        });
+    }
+
+    const btnClearNote = document.getElementById('btn-clear-note');
+    if (btnClearNote) {
+        btnClearNote.addEventListener('click', () => {
+            if (currentQuestions.length === 0) return;
+            const q = currentQuestions[currentQuestionIndex];
+            const noteTextarea = document.getElementById('question-note-textarea');
+            if (noteTextarea) {
+                noteTextarea.value = '';
+                q.noteText = '';
+                saveProgress();
+                noteTextarea.focus();
             }
         });
     }
@@ -917,7 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarouselPrev.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
-                focusedOptionIndex = 0;
+                focusedOptionIndex = -1;
                 renderQuestion('left');
             } else {
                 switchView('home-view');
@@ -929,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarouselNext.addEventListener('click', () => {
             if (currentQuestionIndex < currentQuestions.length - 1) {
                 currentQuestionIndex++;
-                focusedOptionIndex = 0;
+                focusedOptionIndex = -1;
                 renderQuestion('right');
             } else {
                 showToast("You have reached the end of the module.", "info");
@@ -1002,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 item.addEventListener('click', () => {
                     currentQuestionIndex = result.idx;
-                    focusedOptionIndex = 0;
+                    focusedOptionIndex = -1;
                     renderQuestion();
                     quickSearchContainer.classList.remove('active');
                     dropdownQuickSearch.classList.remove('active');
@@ -1052,21 +1067,29 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowDown':
                 e.preventDefault();
                 if (!q.isSubmitted) {
-                    focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
+                    if (focusedOptionIndex === -1) {
+                        focusedOptionIndex = 0;
+                    } else {
+                        focusedOptionIndex = (focusedOptionIndex + 1) % q.options.length;
+                    }
                     renderQuestion();
                 }
                 break;
             case 'ArrowUp':
                 e.preventDefault();
                 if (!q.isSubmitted) {
-                    focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
+                    if (focusedOptionIndex === -1) {
+                        focusedOptionIndex = q.options.length - 1;
+                    } else {
+                        focusedOptionIndex = (focusedOptionIndex - 1 + q.options.length) % q.options.length;
+                    }
                     renderQuestion();
                 }
                 break;
 
             case 'Enter':
                 e.preventDefault();
-                if (!q.isSubmitted) {
+                if (!q.isSubmitted && focusedOptionIndex >= 0) {
                     toggleOption(focusedOptionIndex);
                 }
                 break;
@@ -1075,7 +1098,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (q.isSubmitted) {
                     if (currentQuestionIndex < currentQuestions.length - 1) {
                         currentQuestionIndex++;
-                        focusedOptionIndex = 0;
+                        focusedOptionIndex = -1;
+                        if (btnCarouselNext) {
+                            btnCarouselNext.classList.add('keyboard-active');
+                            setTimeout(() => btnCarouselNext.classList.remove('keyboard-active'), 250);
+                        }
                         renderQuestion('right');
                     } else {
                         showToast("You have reached the end of the module.", "info");
@@ -1098,8 +1125,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 if (currentQuestionIndex < currentQuestions.length - 1) {
                     currentQuestionIndex++;
-                    focusedOptionIndex = 0;
-                    renderQuestion();
+                    focusedOptionIndex = -1;
+                    if (btnCarouselNext) {
+                        btnCarouselNext.classList.add('keyboard-active');
+                        setTimeout(() => btnCarouselNext.classList.remove('keyboard-active'), 250);
+                    }
+                    renderQuestion('right');
                 } else if (q.isSubmitted) {
                     switchView('stats-view');
                 }
@@ -1108,8 +1139,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 if (currentQuestionIndex > 0) {
                     currentQuestionIndex--;
-                    focusedOptionIndex = 0;
-                    renderQuestion();
+                    focusedOptionIndex = -1;
+                    if (btnCarouselPrev) {
+                        btnCarouselPrev.classList.add('keyboard-active');
+                        setTimeout(() => btnCarouselPrev.classList.remove('keyboard-active'), 250);
+                    }
+                    renderQuestion('left');
                 }
                 break;
         }
